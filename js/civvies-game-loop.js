@@ -1,20 +1,30 @@
 (function (Civvies) {
-
     var _c = new Civvies('get_private_functions');
+
+    var game_loop_timer = null;
+    _c.start_game_loop = function (game, game_options) {
+        game_options = game_options || {};
+
+        //Run game tick every second
+        _c.stop_game_loop(game);
+        game.logMessage('Game Loop Starting');
+        game_loop_timer = setInterval(function () {
+            _c.tick_interval(game)
+        }, game_options.tick_time || 1000);
+    };
+    _c.stop_game_loop = function (game) {
+        if (game_loop_timer) {
+            clearInterval(game_loop_timer);
+            game.logMessage('Game Loop Stopped');
+        }
+    };
     _c.tick_interval = function (game) {
-//        //The whole game runs on a single setInterval clock. Basically this whole list is run every second
-//        //and should probably be minimised as much as possible.
+//        //The whole game runs on a single setInterval clock.
 //
         var start = new Date().getTime();
+        var options = game.game_options;
 //
-//        //Autosave
-//        if (autosave == "on") {
-//            autosaveCounter += 1;
-//            if (autosaveCounter >= 60) { //Currently autosave is every minute. Might change to 5 mins in future.
-//                save('auto');
-//                autosaveCounter = 1;
-//            }
-//        }
+        _c.autosave_if_time(game);
 //
 //        //Resource-related
 //
@@ -1397,13 +1407,12 @@
 //        updatePartyButtons();
 //        updateSpawnButtons();
 //        updateReset();
-//
-//        //Debugging - mark end of main loop and calculate delta in milliseconds
 
+        _c.updateResources(game);
+
+//        //Debugging - mark end of main loop and calculate delta in milliseconds
         var end = new Date().getTime();
         var time = end - start;
-        console.log('Main loop execution time: ' + time + 'ms');
-
 
     }
 

@@ -3,25 +3,26 @@
     var _game_options = {
         rand_seed: 0,
         tick_time: 1000,
-
+        autosave_every: 60,
+        autosave: true,
+        storage_initial: 100,
 
         resources: [
-            {name: 'food', grouping:1}, //TODO: Add images and descriptions?
-            {name: 'wood', grouping:1},
-            {name: 'stone', grouping:1},
+            {name: 'food', grouping:1, image:'../images/civclicker/food.png'},
+            {name: 'wood', grouping:1, image:'../images/civclicker/wood.png'},
+            {name: 'stone', grouping:1, image:'../images/civclicker/stone.png'},
 
-            {name: 'herbs', grouping:2},
-            {name: 'skins', grouping:2},
-            {name: 'ore', grouping:2},
+            {name: 'herbs', grouping:2, image:'../images/civclicker/herbs.png'},
+            {name: 'skins', grouping:2, image:'../images/civclicker/skins.png'},
+            {name: 'ore', grouping:2, image:'../images/civclicker/ore.png'},
 
-            {name: 'leather', grouping:3},
-            {name: 'metal', grouping:3},
+            {name: 'leather', grouping:2, image:'../images/civclicker/leather.png'},
+            {name: 'metal', grouping:2, image:'../images/civclicker/metal.png'},
+            {name: 'gold', grouping:2, image:'../images/civclicker/gold.png'},
 
-            {name: 'piety', grouping:4},
-            {name: 'corpses', grouping:4},
-            {name: 'gold', grouping:4},
-
-            {name: 'wonder', grouping:5}
+            {name: 'piety', grouping:3},
+            {name: 'corpses', grouping:3},
+            {name: 'wonder', grouping:3}
         ],
         buildings: [
             {name: 'tent', type:'home', materials:{skins: 2, wood: 2}, population_supports: 2},
@@ -30,13 +31,13 @@
             {name: 'house', type:'home', materials:{stone: 70, wood: 30}, population_supports: 10},
             {name: 'mansion', type:'home', materials:{stone: 200, wood: 200, leather:20}, population_supports: 20},
 
-            {name: 'barn', type:'storage', materials:{wood: 100}, storage:{food:100}},
-            {name: 'woodstock', type:'storage', materials:{wood: 100}, storage:{food:100}},
-            {name: 'stonestock', type:'storage', materials:{wood: 100}, storage:{food:100}},
+            {name: 'barn', type:'storage', materials:{wood: 100}, supports:{food:100}},
+            {name: 'woodstock', type:'storage', materials:{wood: 100}, supports:{food:100}},
+            {name: 'stonestock', type:'storage', materials:{wood: 100}, supports:{food:100}},
 
-            {name: 'farm', type:'business', materials:{}, supports:{farmers:10}},
-            {name: 'camp', type:'business', materials:{}, supports:{woodcutters:10}},
-            {name: 'mine', type:'business', materials:{}, supports:{miners:10}},
+            {name: 'farm', type:'business', supports:{farmers:10}},
+            {name: 'camp', type:'business', supports:{woodcutters:10}},
+            {name: 'mine', type:'business', supports:{miners:10}},
 
             {name: 'tannery', type:'business', materials:{wood: 30, stone:70, skins:2}, supports:{tanners:2}},
             {name: 'smithy', type:'business', materials:{wood: 30, stone:70, ore:2}, supports:{blacksmiths:2}},
@@ -71,7 +72,7 @@
             {name: 'cavalry', consumes:{food:1, herbs:1}, supports:{battle:2}},
             {name: 'siege', costs:{metal:10, wood:100}, supports:{battle:5}},
             {name: 'zombies', costs:{corpses:1}},
-            {name: 'cats'},  //TODO: What makes cats?
+            {name: 'cats'}  //TODO: What makes cats?
         ],
         variables: [
             {name: "happiness", value:1},

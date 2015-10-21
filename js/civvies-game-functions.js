@@ -1,24 +1,71 @@
 (function (Civvies) {
-
-    var game_loop_timer = null;
-
     var _c = new Civvies('get_private_functions');
-    _c.start_game_loop = function(game, game_options) {
-        //Run game tick every second
-        _c.stop_game_loop(game);
-        game.logMessage('Game Loop Starting');
-        game_loop_timer = setInterval(function(){_c.tick_interval(game)}, game_options.tick_time || 1000);
-    };
-    _c.stop_game_loop = function(game) {
-        if (game_loop_timer) {
-            clearInterval(game_loop_timer);
-            game.logMessage('Game Loop Stopped');
-        }
-    };
 
-    _c.increment = function () {
+    _c.increment_from_click = function(game,resource){
+        game.data.resources[resource.name]++;
+        _c.updateResources(game);
+        //TODO: Add in a delay, and a gui-countdown wipe in orange
 
     };
+    _c.buildInitialData = function(game){
+        game.data = game.data || {};
+
+        game.data.resources = game.data.resources || {};
+        _.each(game.game_options.resources, function(resource) {
+            game.data.resources[resource.name] = resource.initial || 0;
+        });
+
+        game.data.buildings = game.data.buildings || {};
+        _.each(game.game_options.buildings, function(building) {
+            game.data.buildings[building.name] = building.initial || 0;
+        });
+
+        game.data.populations = game.data.populations || {};
+        _.each(game.game_options.populations, function(population) {
+            game.data.populations[population.name] = population.initial || 0;
+        });
+
+        game.data.variables = game.data.variables || {};
+        _.each(game.game_options.variables, function(variable) {
+            game.data.variables[variable.name] = variable.value || 0;
+        });
+
+        game.data.upgrades = game.data.upgrades || {};
+        _.each(game.game_options.upgrades, function(upgrade) {
+            game.data.upgrades[upgrade.name] = upgrade.initial || false;
+        });
+
+        game.data.achievements = game.data.achievements || {};
+        _.each(game.game_options.achievements, function(achievement) {
+            game.data.achievements[achievement.name] = achievement.initial || false;
+        });
+    };
+    _c.info = function(game, kind, name) {
+        //Usage:  var info = _c.info(game, 'buildings', resource.name);
+        return _.find(game.game_options[kind], function(item){ return item.name == name});
+    };
+    _c.getResourceMax = function(game, resource) {
+        var storage = game.game_options.storage_initial;
+        _.each(game.game_options.buildings, function(building){
+            if (building.supports && building.supports[resource.name]) {
+                var num_buildings = game.data.buildings[building.name];
+                storage += (num_buildings * building.supports[resource.name]);
+            }
+        });
+        return storage;
+    };
+    _c.getResourceRate = function(game, resource) {
+
+    };
+    _c.cost_benefits_text = function(item) {
+
+    };
+    _c.create_building = function (game, building, amount) {
+
+    };
+
+
+    //-Not implemented yet------------------
     _c.createBuilding = function () {
 
     };

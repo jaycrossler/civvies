@@ -268,6 +268,23 @@ Helpers.knownFileExt = function (ext) {
 Helpers.thousandsFormatter = function (num) {
     return num > 999 ? (num / 1000).toFixed(1) + 'k' : num;
 };
+Helpers.abbreviateNumber = function(value) {
+    //From: http://stackoverflow.com/questions/10599933/convert-long-number-into-abbreviated-string-in-javascript-with-a-special-shortn
+    var newValue = value;
+    if (value >= 1000) {
+        var suffixes = ["", "k", "m", "b","t"];
+        var suffixNum = Math.floor( (""+value).length/3 );
+        var shortValue = '';
+        for (var precision = 2; precision >= 1; precision--) {
+            shortValue = parseFloat( (suffixNum != 0 ? (value / Math.pow(1000,suffixNum) ) : value).toPrecision(precision));
+            var dotLessShortValue = (shortValue + '').replace(/[^a-zA-Z 0-9]+/g,'');
+            if (dotLessShortValue.length <= 2) { break; }
+        }
+        if (shortValue % 1 != 0)  shortNum = shortValue.toFixed(1);
+        newValue = shortValue+suffixes[suffixNum];
+    }
+    return newValue;
+};
 Helpers.invertColor = function (hexTripletColor) {
     var color = hexTripletColor;
     color = color.substring(1);           // remove #
@@ -924,31 +941,37 @@ var Civvies = (function ($, _, Helpers, maths) {
     };
 
     CivviesClass.prototype.drawOrRedraw = function (game_options) {
+        //Begin timing loop
         var timing_start = window.performance.now();
+        var game = this;
 
-        if (this.game_options === null) {
-            this.initialization_seed = null;
+        //Set up initialization data if not previously set
+        if (game.game_options === null) {
+            game.initialization_seed = null;
         }
-
-        this.initialization_options = game_options || this.initialization_options || {};
-
-        this.game_options = $.extend({}, this.game_options || _game_options, game_options || {});
+        game.initialization_options = game_options || game.initialization_options || {};
+        game.game_options = $.extend({}, game.game_options || _game_options, game_options || {});
 
         //Determine the random seed to use.  Either use the one passed in, the existing one, or a random one.
         game_options = game_options || {};
-        var rand_seed = game_options.rand_seed || this.initialization_seed || Math.floor(Math.random() * 100000);
-        this.initialization_seed = rand_seed;
-        this.initialization_options.rand_seed = rand_seed;
+        var rand_seed = game_options.rand_seed || game.initialization_seed || Math.floor(Math.random() * 100000);
+        game.initialization_seed = rand_seed;
+        game.initialization_options.rand_seed = rand_seed;
+        game.randomSetSeed(rand_seed);
 
-
-        this.randomSetSeed(rand_seed);
+        if (!game.data.gui_drawn && game._private_functions.buildInitialDisplay) {
+            game.data.gui_drawn = true;
+            game._private_functions.buildInitialDisplay(game);
+            game._private_functions.buildInitialData(game);
+        }
 
         //Begin Game Simulation
-        this.start(game_options);
+        game.start(game_options);
 
+        //Log timing information
         var timing_end = window.performance.now();
         var time_elapsed = (timing_end - timing_start);
-        this.timing_log.push({name: "build-elapsed", elapsed: time_elapsed, times_redrawn: this.times_game_drawn});
+        game.timing_log.push({name: "build-elapsed", elapsed: time_elapsed, times_redrawn: game.times_game_drawn});
     };
 
     //-----------------------------
@@ -1053,7 +1076,365 @@ Civvies.initializeOptions = function (option_type, options) {
 };
 (function (Civvies) {
 
+    var $pointers = {};
+
+    function show_basic_resources (game){
+        $('<h3>')
+            .text('Resources')
+            .appendTo($pointers.basic_resources);
+        var $table = $('<table>')
+            .appendTo($pointers.basic_resources);
+
+        _.each(game.game_options.resources, function(resource){
+            if (resource.grouping == 1) {
+                var name = _.str.titleize(resource.name);
+                var $tr = $('<tr>')
+                    .appendTo($table);
+                var $td1 = $('<td>')
+                    .appendTo($tr);
+                $('<button>')
+                    .text('Gather ' + name)
+                    .on('click', function(){
+                        _c.increment_from_click(game,resource);
+                    })
+                    .appendTo($td1);
+                $('<td>')
+                    .text(name + ":")
+                    .appendTo($tr);
+                resource.$holder = $('<td>')
+                    .addClass('number')
+                    .attr('id', 'resource-'+resource.name)
+                    .text(0)
+                    .appendTo($tr);
+                var $td4 = $('<td>')
+                    .addClass('icon')
+                    .appendTo($tr);
+                $('<img>')
+                    .attr('src', resource.image)
+                    .addClass('icon icon-lg')
+                    .appendTo($td4);
+                resource.$max = $('<td>')
+                    .addClass('number')
+                    .attr('id', 'resource-max-'+resource.name)
+                    .text("(Max: "+game.game_options.storage_initial+")")
+                    .appendTo($tr);
+                resource.$rate = $('<td>')
+                    .addClass('number net')
+                    .attr('id', 'resource-rate-'+resource.name)
+                    .text("0/s")
+                    .appendTo($tr);
+            }
+        });
+    }
+    function show_secondary_resources (game){
+        $('<h3>')
+            .text('Special Resources')
+            .appendTo($pointers.secondary_resources);
+
+        _.each(game.game_options.resources, function(resource){
+            if (resource.grouping == 2) {
+                var name = _.str.titleize(resource.name);
+
+                var $div = $('<div>')
+                    .addClass('icon resource-holder')
+                    .appendTo($pointers.secondary_resources);
+                $('<span>')
+                    .text(name+":" )
+                    .appendTo($div);
+                resource.$holder = $('<span>')
+                    .attr('id', 'resource-'+resource.name)
+                    .text(0)
+                    .appendTo($div);
+                $('<img>')
+                    .attr('src', resource.image)
+                    .addClass('icon icon-lg')
+                    .appendTo($div);
+            }
+        });
+    }
+    function show_buildings (game) {
+        $('<h3>')
+            .text('Buildings')
+            .appendTo($pointers.building_list);
+        var $table = $('<table>')
+            .appendTo($pointers.building_list);
+
+        _.each(game.game_options.buildings, function(building){
+            var name = _.str.titleize(building.title || building.name);
+            var $tr = $('<tr>')
+                .appendTo($table);
+            var $td1 = $('<td>')
+                .appendTo($tr);
+            $('<button>')
+                .text('Build ' + name)
+                .on('click', function(){
+                    _c.create_building(game, building, 1);
+                })
+                .appendTo($td1);
+
+            $('<td>')
+                .addClass('buildingnames')
+                .text(Helpers.pluralize(name)+": ")
+                .appendTo($tr);
+            building.$holder = $('<td>')
+                .addClass('number')
+                .attr('id', 'building-'+building.name)
+                .text(0)
+                .appendTo($tr);
+            $('<td>')
+                .addClass('cost')
+                .text(_c.cost_benefits_text(building))
+                .appendTo($tr);
+
+
+        });
+
+    }
+//
+//        <p id="customBuildIncrement">
+//            Increment: <input id="buildCustom" type="number" min="1" step="1" value="1">
+//        </p>
+//        <table id="buildings">
+//            <tr id="tentRow">
+//                <td><button onmousedown="createBuilding(tent,1)">Build Tent</button></td>
+//                <td class="buildingten"><button class="x10" onmousedown="createBuilding(tent,10)">x10</button></td>
+//                <td class="buildinghundred"><button class="x100" onmousedown="createBuilding(tent,100)">x100</button></td>
+//                <td class="buildingthousand"><button class="x1000" onmousedown="createBuilding(tent,1000)">x1k</button></td>
+//                <td class="buildCustom"><button onmousedown="buildCustom(tent)">+Custom</button></td>
+//                <td class="buildingnames">Tents: </td>
+//                <td class="number"><span id="tents">0</span></td>
+//                <td><span class="cost">2 skins, 2 wood</span><span class="note">: +1 max pop.</span></td>
+//            </tr>
+//            <tr id="whutRow">
+//                <td><button onmousedown="createBuilding(whut,1)">Build Wooden Hut</button></td>
+//                <td class="buildingten"><button class="x10" onmousedown="createBuilding(whut,10)">x10</button></td>
+//                <td class="buildinghundred"><button class="x100" onmousedown="createBuilding(whut,100)">x100</button></td>
+//                <td class="buildingthousand"><button class="x1000" onmousedown="createBuilding(whut,1000)">x1k</button></td>
+//                <td class="buildCustom"><button onmousedown="buildCustom(whut)">+Custom</button></td>
+//                <td class="buildingnames">Huts: </td>
+//                <td class="number"><span id="whuts">0</span></td>
+//                <td><span class="cost">1 skin, 20 wood</span><span class="note">: +3 max pop.</span></td>
+//            </tr>
+//            <tr id="cottageRow">
+//                <td><button onmousedown="createBuilding(cottage,1)">Build Cottage</button></td>
+//                <td class="buildingten"><button class="x10" onmousedown="createBuilding(cottage,10)">x10</button></td>
+//                <td class="buildinghundred"><button class="x100" onmousedown="createBuilding(cottage,100)">x100</button></td>
+//                <td class="buildingthousand"><button class="x1000" onmousedown="createBuilding(cottage,1000)">x1k</button></td>
+//                <td class="buildCustom"><button onmousedown="buildCustom(cottage)">+Custom</button></td>
+//                <td class="buildingnames">Cottages: </td>
+//                <td class="number"><span id="cottages">0</span></td>
+//                <td><span class="cost">10 wood, 30 stone</span><span class="note">: +6 max pop.</span></td>
+//            </tr>
+//            <tr id="houseRow">
+//                <td><button onmousedown="createBuilding(house,1)">Build House</button></td>
+//                <td class="buildingten"><button class="x10" onmousedown="createBuilding(house,10)">x10</button></td>
+//                <td class="buildinghundred"><button class="x100" onmousedown="createBuilding(house,100)">x100</button></td>
+//                <td class="buildingthousand"><button class="x1000" onmousedown="createBuilding(house,1000)">x1k</button></td>
+//                <td class="buildCustom"><button onmousedown="buildCustom(house)">+Custom</button></td>
+//                <td class="buildingnames">Houses: </td>
+//                <td class="number"><span id="houses">0</span></td>
+//                <td><span class="cost">30 wood, 70 stone</span><span class="note">: +10 max pop.</span></td>
+//            </tr>
+//            <tr id="mansionRow">
+//                <td><button onmousedown="createBuilding(mansion,1)">Build Mansion</button></td>
+//                <td class="buildingten"><button class="x10" onmousedown="createBuilding(mansion,10)">x10</button></td>
+//                <td class="buildinghundred"><button class="x100" onmousedown="createBuilding(mansion,100)">x100</button></td>
+//                <td class="buildingthousand"><button class="x1000" onmousedown="createBuilding(mansion,1000)">x1k</button></td>
+//                <td class="buildCustom"><button onmousedown="buildCustom(mansion)">+Custom</button></td>
+//                <td class="buildingnames">Mansions: </td>
+//                <td class="number"><span id="mansions">0</span></td>
+//                <td><span class="cost">200 wood, 200 stone, 20 leather</span><span class="note">: +50 max pop.</span></td>
+//            </tr>
+//            <tr>
+//                <td>&nbsp;</td>
+//                <td>&nbsp;</td>
+//                <td>&nbsp;</td>
+//                <td>&nbsp;</td>
+//                <td>&nbsp;</td>
+//                <td>&nbsp;</td>
+//                <td>&nbsp;</td>
+//                <td>&nbsp;</td>
+//            </tr>
+//            <tr id="barnRow">
+//                <td><button onmousedown="createBuilding(barn,1)">Build Barn</button></td>
+//                <td class="buildingten"><button class="x10" onmousedown="createBuilding(barn,10)">x10</button></td>
+//                <td class="buildinghundred"><button class="x100" onmousedown="createBuilding(barn,100)">x100</button></td>
+//                <td class="buildingthousand"><button class="x1000" onmousedown="createBuilding(barn,1000)">x1k</button></td>
+//                <td class="buildCustom"><button onmousedown="buildCustom(barn)">+Custom</button></td>
+//                <td class="buildingnames">Barns: </td>
+//                <td class="number"><span id="barns">0</span></td>
+//                <td><span class="cost">100 wood</span><span class="note">: store +200 food</span></td>
+//            </tr>
+//            <tr id="woodstockRow">
+//                <td><button onmousedown="createBuilding(woodstock,1)">Build Wood Stockpile</button></td>
+//                <td class="buildingten"><button class="x10" onmousedown="createBuilding(woodstock,10)">x10</button></td>
+//                <td class="buildinghundred"><button class="x100" onmousedown="createBuilding(woodstock,100)">x100</button></td>
+//                <td class="buildingthousand"><button class="x1000" onmousedown="createBuilding(woodstock,1000)">x1k</button></td>
+//                <td class="buildCustom"><button onmousedown="buildCustom(woodstock)">+Custom</button></td>
+//                <td class="buildingnames">Wood Stockpiles: </td>
+//                <td class="number"><span id="woodstock">0</span></td>
+//                <td><span class="cost">100 wood</span><span class="note">: store +200 wood</span></td>
+//            </tr>
+//            <tr id="stonestockRow">
+//                <td><button onmousedown="createBuilding(stonestock,1)">Build Stone Stockpile</button></td>
+//                <td class="buildingten"><button class="x10" onmousedown="createBuilding(stonestock,10)">x10</button></td>
+//                <td class="buildinghundred"><button class="x100" onmousedown="createBuilding(stonestock,100)">x100</button></td>
+//                <td class="buildingthousand"><button class="x1000" onmousedown="createBuilding(stonestock,1000)">x1k</button></td>
+//                <td class="buildCustom"><button onmousedown="buildCustom(stonestock)">+Custom</button></td>
+//                <td class="buildingnames">Stone Stockpiles: </td>
+//                <td class="number"><span id="stonestock">0</span></td>
+//                <td><span class="cost">100 wood</span><span class="note">: store +200 stone</span></td>
+//            </tr>
+//            <tr>
+//                <td>&nbsp;</td>
+//                <td>&nbsp;</td>
+//                <td>&nbsp;</td>
+//                <td>&nbsp;</td>
+//                <td>&nbsp;</td>
+//                <td>&nbsp;</td>
+//                <td>&nbsp;</td>
+//                <td>&nbsp;</td>
+//            </tr>
+//            <tr id="tanneryRow">
+//                <td><button onmousedown="createBuilding(tannery,1)">Build Tannery</button></td>
+//                <td class="buildingten"><button class="x10" onmousedown="createBuilding(tannery,10)">x10</button></td>
+//                <td class="buildinghundred"><button class="x100" onmousedown="createBuilding(tannery,100)">x100</button></td>
+//                <td class="buildingthousand"><button class="x1000" onmousedown="createBuilding(tannery,1000)">x1k</button></td>
+//                <td class="buildCustom"><button onmousedown="buildCustom(tannery)">+Custom</button></td>
+//                <td class="buildingnames">Tanneries: </td>
+//                <td class="number"><span id="tanneries">0</span></td>
+//                <td><span class="cost">30 wood, 70 stone, 2 skins</span><span class="note">: allows 1 tanner</span></td>
+//            </tr>
+//            <tr id="smithyRow">
+//                <td><button onmousedown="createBuilding(smithy,1)">Build Smithy</button></td>
+//                <td class="buildingten"><button class="x10" onmousedown="createBuilding(smithy,10)">x10</button></td>
+//                <td class="buildinghundred"><button class="x100" onmousedown="createBuilding(smithy,100)">x100</button></td>
+//                <td class="buildingthousand"><button class="x1000" onmousedown="createBuilding(smithy,1000)">x1k</button></td>
+//                <td class="buildCustom"><button onmousedown="buildCustom(smithy)">+Custom</button></td>
+//                <td class="buildingnames">Smithies: </td>
+//                <td class="number"><span id="smithies">0</span></td>
+//                <td><span class="cost">30 wood, 70 stone, 2 ore</span><span class="note">: allows 1 blacksmith</span></td>
+//            </tr>
+//            <tr id="apothecaryRow">
+//                <td><button onmousedown="createBuilding(apothecary,1)">Build Apothecary</button></td>
+//                <td class="buildingten"><button class="x10" onmousedown="createBuilding(apothecary,10)">x10</button></td>
+//                <td class="buildinghundred"><button class="x100" onmousedown="createBuilding(apothecary,100)">x100</button></td>
+//                <td class="buildingthousand"><button class="x1000" onmousedown="createBuilding(apothecary,1000)">x1k</button></td>
+//                <td class="buildCustom"><button onmousedown="buildCustom(apothecary)">+Custom</button></td>
+//                <td class="buildingnames">Apothecaries: </td>
+//                <td class="number"><span id="apothecaria">0</span></td>
+//                <td><span class="cost">30 wood, 70 stone, 2 herbs</span><span class="note">: allows 1 apothecary</span></td>
+//            </tr>
+//            <tr id="templeRow">
+//                <td><button onmousedown="createBuilding(temple,1)">Build Temple</button></td>
+//                <td class="buildingten"><button class="x10" onmousedown="createBuilding(temple,10)">x10</button></td>
+//                <td class="buildinghundred"><button class="x100" onmousedown="createBuilding(temple,100)">x100</button></td>
+//                <td class="buildingthousand"><button class="x1000" onmousedown="createBuilding(temple,1000)">x1k</button></td>
+//                <td class="buildCustom"><button onmousedown="buildCustom(temple)">+Custom</button></td>
+//                <td class="buildingnames">Temples: </td>
+//                <td class="number"><span id="temples">0</span></td>
+//                <td><span class="cost">30 wood, 120 stone, 10 herbs</span><span class="note">: allows 1 cleric</span></td>
+//            </tr>
+//            <tr id="barracksRow">
+//                <td><button onmousedown="createBuilding(barracks,1)">Build Barracks</button></td>
+//                <td class="buildingten"><button class="x10" onmousedown="createBuilding(barracks,10)">x10</button></td>
+//                <td class="buildinghundred"><button class="x100" onmousedown="createBuilding(barracks,100)">x100</button></td>
+//                <td class="buildingthousand"><button class="x1000" onmousedown="createBuilding(barracks,1000)">x1k</button></td>
+//                <td class="buildCustom"><button onmousedown="buildCustom(barracks)">+Custom</button></td>
+//                <td class="buildingnames">Barracks: </td>
+//                <td class="number"><span id="barracks">0</span></td>
+//                <td><span class="cost">20 food, 60 wood, 120 stone, 10 metal</span><span class="note">: allows 10 soldiers</span></td>
+//            </tr>
+//            <tr id="stableRow">
+//                <td><button onmousedown="createBuilding(stable,1)">Build Stable</button></td>
+//                <td class="buildingten"><button class="x10" onmousedown="createBuilding(stable,10)">x10</button></td>
+//                <td class="buildinghundred"><button class="x100" onmousedown="createBuilding(stable,100)">x100</button></td>
+//                <td class="buildingthousand"><button class="x1000" onmousedown="createBuilding(stable,1000)">x1k</button></td>
+//                <td class="buildCustom"><button onmousedown="buildCustom(stable)">+Custom</button></td>
+//                <td class="buildingnames">Stable: </td>
+//                <td class="number"><span id="stables">0</span></td>
+//                <td><span class="cost">60 food, 60 wood, 120 stone, 10 leather</span><span class="note">: allows 10 cavalry</span></td>
+//            </tr>
+//            <tr>
+//                <td>&nbsp;</td>
+//                <td>&nbsp;</td>
+//                <td>&nbsp;</td>
+//                <td>&nbsp;</td>
+//                <td>&nbsp;</td>
+//                <td>&nbsp;</td>
+//                <td>&nbsp;</td>
+//                <td>&nbsp;</td>
+//            </tr>
+//            <tr id="graveyardRow">
+//                <td><button onmousedown="createBuilding(graveyard,1)">Build Graveyard</button></td>
+//                <td class="buildingten"><button class="x10" onmousedown="createBuilding(graveyard,10)">x10</button></td>
+//                <td class="buildinghundred"><button class="x100" onmousedown="createBuilding(graveyard,100)">x100</button></td>
+//                <td class="buildingthousand"><button class="x1000" onmousedown="createBuilding(graveyard,1000)">x1k</button></td>
+//                <td class="buildCustom"><button onmousedown="buildCustom(graveyard)">+Custom</button></td>
+//                <td class="buildingnames">Graveyards: </td>
+//                <td class="number"><span id="graveyards">0</span></td>
+//                <td><span class="cost">100 wood; 200 stone, 50 herbs</span><span class="note">: contains 100 graves</span></td>
+//            </tr>
+//            <tr id="millRow">
+//                <td><button onmousedown="createBuilding(mill,1)">Build Mill</button></td>
+//                <td class="buildingten"></td>
+//                <td class="buildinghundred"></td>
+//                <td class="buildingthousand"></td>
+//                <td class="buildCustom"></td>
+//                <td class="buildingnames">Mills: </td>
+//                <td class="number"><span id="mills">0</span></td>
+//                <td><span class="cost"><span id="millCostW">100</span> wood, <span id="millCostS">100</span> stone</span><span class="note">: improves farmers</span></td>
+//            </tr>
+//            <tr id="fortificationRow">
+//                <td><button onmousedown="createBuilding(fortification,1)">Build Fortification</button></td>
+//                <td class="buildingten"></td>
+//                <td class="buildinghundred"></td>
+//                <td class="buildingthousand"></td>
+//                <td class="buildCustom"></td>
+//                <td class="buildingnames">Fortifications: </td>
+//                <td class="number"><span id="fortifications">0</span></td>
+//                <td><span class="cost"><span id="fortCost">100</span> stone</span><span class="note">: helps protect against attack</span></td>
+//            </tr>
+//        </table>
+
+
+
     var _c = new Civvies('get_private_functions');
+    _c.buildInitialDisplay = function (game) {
+        $pointers.basic_resources = $('#basic_resources');
+        show_basic_resources(game);
+
+        $pointers.secondary_resources = $('#secondary_resources');
+        show_secondary_resources(game);
+
+        $pointers.building_list = $('#buildingsPane');
+        show_buildings(game);
+
+    };
+
+    _c.updateResources = function(game) {
+        _.each(game.game_options.resources, function(resource) {
+            if (resource.$holder) {
+                var res_data = game.data.resources[resource.name];
+                res_data = Helpers.abbreviateNumber(res_data);
+                resource.$holder.text(res_data)
+            }
+
+            if (resource.$max) {
+                var res_max = _c.getResourceMax(game, resource);
+                res_max = Helpers.abbreviateNumber(res_max);
+                resource.$max.text("(Max: "+res_max+")")
+            }
+
+            if (resource.$rate) {
+                var res_rate = _c.getResourceRate(game, resource);
+                resource.$rate.text(res_rate)
+            }
+
+
+        });
+    };
+
 
     _c.updateBuildingTotals = function () {
 
@@ -1158,26 +1539,73 @@ Civvies.initializeOptions = function (option_type, options) {
 
 })(Civvies);
 (function (Civvies) {
-
-    var game_loop_timer = null;
-
     var _c = new Civvies('get_private_functions');
-    _c.start_game_loop = function(game, game_options) {
-        //Run game tick every second
-        _c.stop_game_loop(game);
-        game.logMessage('Game Loop Starting');
-        game_loop_timer = setInterval(function(){_c.tick_interval(game)}, game_options.tick_time || 1000);
-    };
-    _c.stop_game_loop = function(game) {
-        if (game_loop_timer) {
-            clearInterval(game_loop_timer);
-            game.logMessage('Game Loop Stopped');
-        }
-    };
 
-    _c.increment = function () {
+    _c.increment_from_click = function(game,resource){
+        game.data.resources[resource.name]++;
+        _c.updateResources(game);
+        //TODO: Add in a delay, and a gui-countdown wipe in orange
 
     };
+    _c.buildInitialData = function(game){
+        game.data = game.data || {};
+
+        game.data.resources = game.data.resources || {};
+        _.each(game.game_options.resources, function(resource) {
+            game.data.resources[resource.name] = resource.initial || 0;
+        });
+
+        game.data.buildings = game.data.buildings || {};
+        _.each(game.game_options.buildings, function(building) {
+            game.data.buildings[building.name] = building.initial || 0;
+        });
+
+        game.data.populations = game.data.populations || {};
+        _.each(game.game_options.populations, function(population) {
+            game.data.populations[population.name] = population.initial || 0;
+        });
+
+        game.data.variables = game.data.variables || {};
+        _.each(game.game_options.variables, function(variable) {
+            game.data.variables[variable.name] = variable.value || 0;
+        });
+
+        game.data.upgrades = game.data.upgrades || {};
+        _.each(game.game_options.upgrades, function(upgrade) {
+            game.data.upgrades[upgrade.name] = upgrade.initial || false;
+        });
+
+        game.data.achievements = game.data.achievements || {};
+        _.each(game.game_options.achievements, function(achievement) {
+            game.data.achievements[achievement.name] = achievement.initial || false;
+        });
+    };
+    _c.info = function(game, kind, name) {
+        //Usage:  var info = _c.info(game, 'buildings', resource.name);
+        return _.find(game.game_options[kind], function(item){ return item.name == name});
+    };
+    _c.getResourceMax = function(game, resource) {
+        var storage = game.game_options.storage_initial;
+        _.each(game.game_options.buildings, function(building){
+            if (building.supports && building.supports[resource.name]) {
+                var num_buildings = game.data.buildings[building.name];
+                storage += (num_buildings * building.supports[resource.name]);
+            }
+        });
+        return storage;
+    };
+    _c.getResourceRate = function(game, resource) {
+
+    };
+    _c.cost_benefits_text = function(item) {
+
+    };
+    _c.create_building = function (game, building, amount) {
+
+    };
+
+
+    //-Not implemented yet------------------
     _c.createBuilding = function () {
 
     };
@@ -1301,22 +1729,32 @@ Civvies.initializeOptions = function (option_type, options) {
 
 })(Civvies);
 (function (Civvies) {
-
     var _c = new Civvies('get_private_functions');
+
+    var game_loop_timer = null;
+    _c.start_game_loop = function (game, game_options) {
+        game_options = game_options || {};
+
+        //Run game tick every second
+        _c.stop_game_loop(game);
+        game.logMessage('Game Loop Starting');
+        game_loop_timer = setInterval(function () {
+            _c.tick_interval(game)
+        }, game_options.tick_time || 1000);
+    };
+    _c.stop_game_loop = function (game) {
+        if (game_loop_timer) {
+            clearInterval(game_loop_timer);
+            game.logMessage('Game Loop Stopped');
+        }
+    };
     _c.tick_interval = function (game) {
-//        //The whole game runs on a single setInterval clock. Basically this whole list is run every second
-//        //and should probably be minimised as much as possible.
+//        //The whole game runs on a single setInterval clock.
 //
         var start = new Date().getTime();
+        var options = game.game_options;
 //
-//        //Autosave
-//        if (autosave == "on") {
-//            autosaveCounter += 1;
-//            if (autosaveCounter >= 60) { //Currently autosave is every minute. Might change to 5 mins in future.
-//                save('auto');
-//                autosaveCounter = 1;
-//            }
-//        }
+        _c.autosave_if_time(game);
 //
 //        //Resource-related
 //
@@ -2699,13 +3137,12 @@ Civvies.initializeOptions = function (option_type, options) {
 //        updatePartyButtons();
 //        updateSpawnButtons();
 //        updateReset();
-//
-//        //Debugging - mark end of main loop and calculate delta in milliseconds
 
+        _c.updateResources(game);
+
+//        //Debugging - mark end of main loop and calculate delta in milliseconds
         var end = new Date().getTime();
         var time = end - start;
-        console.log('Main loop execution time: ' + time + 'ms');
-
 
     }
 
@@ -2714,16 +3151,27 @@ Civvies.initializeOptions = function (option_type, options) {
 
     var _c = new Civvies('get_private_functions');
 
-    _c.load = function(loadType) {
+    _c.autosave_if_time = function(game) {
+        if (game.game_options.autosave) {
+            game.data.autosave_counter = game.data.autosave_counter || 0;
+            game.data.autosave_counter += 1;
+            if (game.data.autosave_counter >= game.game_options.autosave_every) {
+                _c.save(game, 'auto');
+                game.data.autosave_counter = 0;
+            }
+        }
+    };
+    _c.load = function(game, loadType) {
 
     };
-    _c.save = function(saveType) {
+    _c.save = function(game, saveType) {
+        console.log("Autosave");
 
     };
-    _c.toggleAutosave = function(saveType) {
+    _c.toggleAutosave = function(game, saveType) {
 
     };
-    _c.deleteSave = function(saveType) {
+    _c.deleteSave = function(game, saveType) {
 
     };
     _c.renameCiv = function(saveType) {
@@ -2746,25 +3194,26 @@ Civvies.initializeOptions = function (option_type, options) {
     var _game_options = {
         rand_seed: 0,
         tick_time: 1000,
-
+        autosave_every: 60,
+        autosave: true,
+        storage_initial: 100,
 
         resources: [
-            {name: 'food', grouping:1}, //TODO: Add images and descriptions?
-            {name: 'wood', grouping:1},
-            {name: 'stone', grouping:1},
+            {name: 'food', grouping:1, image:'../images/civclicker/food.png'},
+            {name: 'wood', grouping:1, image:'../images/civclicker/wood.png'},
+            {name: 'stone', grouping:1, image:'../images/civclicker/stone.png'},
 
-            {name: 'herbs', grouping:2},
-            {name: 'skins', grouping:2},
-            {name: 'ore', grouping:2},
+            {name: 'herbs', grouping:2, image:'../images/civclicker/herbs.png'},
+            {name: 'skins', grouping:2, image:'../images/civclicker/skins.png'},
+            {name: 'ore', grouping:2, image:'../images/civclicker/ore.png'},
 
-            {name: 'leather', grouping:3},
-            {name: 'metal', grouping:3},
+            {name: 'leather', grouping:2, image:'../images/civclicker/leather.png'},
+            {name: 'metal', grouping:2, image:'../images/civclicker/metal.png'},
+            {name: 'gold', grouping:2, image:'../images/civclicker/gold.png'},
 
-            {name: 'piety', grouping:4},
-            {name: 'corpses', grouping:4},
-            {name: 'gold', grouping:4},
-
-            {name: 'wonder', grouping:5}
+            {name: 'piety', grouping:3},
+            {name: 'corpses', grouping:3},
+            {name: 'wonder', grouping:3}
         ],
         buildings: [
             {name: 'tent', type:'home', materials:{skins: 2, wood: 2}, population_supports: 2},
@@ -2773,13 +3222,13 @@ Civvies.initializeOptions = function (option_type, options) {
             {name: 'house', type:'home', materials:{stone: 70, wood: 30}, population_supports: 10},
             {name: 'mansion', type:'home', materials:{stone: 200, wood: 200, leather:20}, population_supports: 20},
 
-            {name: 'barn', type:'storage', materials:{wood: 100}, storage:{food:100}},
-            {name: 'woodstock', type:'storage', materials:{wood: 100}, storage:{food:100}},
-            {name: 'stonestock', type:'storage', materials:{wood: 100}, storage:{food:100}},
+            {name: 'barn', type:'storage', materials:{wood: 100}, supports:{food:100}},
+            {name: 'woodstock', type:'storage', materials:{wood: 100}, supports:{food:100}},
+            {name: 'stonestock', type:'storage', materials:{wood: 100}, supports:{food:100}},
 
-            {name: 'farm', type:'business', materials:{}, supports:{farmers:10}},
-            {name: 'camp', type:'business', materials:{}, supports:{woodcutters:10}},
-            {name: 'mine', type:'business', materials:{}, supports:{miners:10}},
+            {name: 'farm', type:'business', supports:{farmers:10}},
+            {name: 'camp', type:'business', supports:{woodcutters:10}},
+            {name: 'mine', type:'business', supports:{miners:10}},
 
             {name: 'tannery', type:'business', materials:{wood: 30, stone:70, skins:2}, supports:{tanners:2}},
             {name: 'smithy', type:'business', materials:{wood: 30, stone:70, ore:2}, supports:{blacksmiths:2}},
@@ -2814,7 +3263,7 @@ Civvies.initializeOptions = function (option_type, options) {
             {name: 'cavalry', consumes:{food:1, herbs:1}, supports:{battle:2}},
             {name: 'siege', costs:{metal:10, wood:100}, supports:{battle:5}},
             {name: 'zombies', costs:{corpses:1}},
-            {name: 'cats'},  //TODO: What makes cats?
+            {name: 'cats'}  //TODO: What makes cats?
         ],
         variables: [
             {name: "happiness", value:1},
