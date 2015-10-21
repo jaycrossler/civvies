@@ -22,8 +22,15 @@ var Civvies = (function ($, _, Helpers, maths) {
 
         return this.initialize(option1, option2, option3);
     }
-    CivviesClass.prototype.initialize = function(option1, option2, option3) {
-        this.drawOrRedraw(option1, option2, option3);
+
+    CivviesClass.prototype.initialize = function (option1, option2, option3) {
+        if (option1 == 'get_private_functions') {
+            return this._private_functions;
+        } else if (option1 == '') {
+                //Class initialized
+        } else {
+            this.drawOrRedraw(option1, option2, option3);
+        }
     };
 
     CivviesClass.prototype.data = _data;
@@ -54,14 +61,15 @@ var Civvies = (function ($, _, Helpers, maths) {
 
         this.randomSetSeed(rand_seed);
 
-
+        //Begin Game Simulation
+        this.start(game_options);
 
         var timing_end = window.performance.now();
         var time_elapsed = (timing_end - timing_start);
         this.timing_log.push({name: "build-elapsed", elapsed: time_elapsed, times_redrawn: this.times_game_drawn});
     };
 
-        //-----------------------------
+    //-----------------------------
     //Supporting functions
     CivviesClass.prototype.log = function (showToConsole, showHTML) {
         var log = "Civvies: [seed:" + this.game_options.rand_seed + " #" + this.times_game_drawn + "]";
@@ -86,7 +94,7 @@ var Civvies = (function ($, _, Helpers, maths) {
         return log;
     };
     CivviesClass.prototype.logMessage = function (msg) {
-        if (_.isString(msg)) msg = {name:msg};
+        if (_.isString(msg)) msg = {name: msg};
 
         this.timing_log.push(msg);
     };
@@ -102,7 +110,21 @@ var Civvies = (function ($, _, Helpers, maths) {
         var result = this.initialization_options || {};
         return showAsString ? JSON.stringify(result) : result;
     };
-        //----------------------
+
+    CivviesClass.prototype.start = function (game_options) {
+        if (this._private_functions.start_game_loop) {
+            this._private_functions.start_game_loop(this, game_options);
+        } else {
+            throw "Game loop not found";
+        }
+    };
+    CivviesClass.prototype.stop = function () {
+        if (this._private_functions.stop_game_loop) {
+            this._private_functions.stop_game_loop(this);
+        }
+    };
+
+    //----------------------
     //Random numbers
     CivviesClass.prototype.randomSetSeed = function (seed) {
         this.game_options = this.game_options || {};
