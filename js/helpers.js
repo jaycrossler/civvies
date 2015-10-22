@@ -136,11 +136,27 @@ Helpers.knownFileExt = function (ext) {
 Helpers.thousandsFormatter = function (num) {
     return num > 999 ? (num / 1000).toFixed(1) + 'k' : num;
 };
-Helpers.abbreviateNumber = function(value) {
-    //From: http://stackoverflow.com/questions/10599933/convert-long-number-into-abbreviated-string-in-javascript-with-a-special-shortn
+Helpers.expandExponential = function(value){
+    //Modified from: http://stackoverflow.com/questions/16066793/javascript-display-really-big-numbers-rather-than-displaying-xen
+    if (value < 100000000000000000000) {
+        return value;
+    } else {
+        var value = value + "";
+        value = value.replace(/^([+-])?(\d+).?(\d*)[eE]([-+]?\d+)$/, function(x, s, n, f, c){
+            var l = +c < 0, i = n.length + +c, x = (l ? n : f).length,
+            c = ((c = Math.abs(c)) >= x ? c - x + l : 0),
+            z = (new Array(c + 1)).join("0"), r = n + f;
+            return (s || "") + (l ? r = z + r : r += z).substr(0, i += l ? z.length : 0) + (i < r.length ? "." + r.substr(i) : "");
+        });
+        return value;
+    }
+};
+Helpers.abbreviateNumber = function(value, useLongSuffixes) {
+    //Modified From: http://stackoverflow.com/questions/10599933/convert-long-number-into-abbreviated-string-in-javascript-with-a-special-shortn
     var newValue = value;
-    if (value >= 1000) {
-        var suffixes = ["", "k", "m", "b","t"];
+    if (value >= 10000) {
+        value = Helpers.expandExponential(value);
+        var suffixes = useLongSuffixes ? ["", " thousand", " million", " billion", " trillion", " quadrillion", " pentillion", " sextillion", " septillion"] : ["", "k", "m", "b", "t", "q", "p", "s", "ss"];
         var suffixNum = Math.floor( (""+value).length/3 );
         var shortValue = '';
         for (var precision = 2; precision >= 1; precision--) {
@@ -148,8 +164,9 @@ Helpers.abbreviateNumber = function(value) {
             var dotLessShortValue = (shortValue + '').replace(/[^a-zA-Z 0-9]+/g,'');
             if (dotLessShortValue.length <= 2) { break; }
         }
-        if (shortValue % 1 != 0)  shortNum = shortValue.toFixed(1);
         newValue = shortValue+suffixes[suffixNum];
+    } else {
+        newValue = newValue.toLocaleString();
     }
     return newValue;
 };
@@ -362,7 +379,7 @@ Helpers.randomLetters = function (n) {
 Helpers.pluralize = function (str) {
     var uncountable_words = [
         'equipment', 'information', 'rice', 'money', 'species', 'series',
-        'fish', 'sheep', 'moose', 'deer', 'news'
+        'fish', 'sheep', 'moose', 'deer', 'news', 'food', 'wood'
     ];
     var plural_rules = [
         [new RegExp('(m)an$', 'gi'), '$1en'],

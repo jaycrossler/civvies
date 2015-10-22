@@ -2,6 +2,8 @@
 
     var $pointers = {};
 
+    var purchase_multiples = [1,10,100,1000];
+
     function show_basic_resources (game){
         $('<h3>')
             .text('Resources')
@@ -16,8 +18,13 @@
                     .appendTo($table);
                 var $td1 = $('<td>')
                     .appendTo($tr);
+                var times = resource.amount_from_click || 1;
+                var title = (times == 1) ? name : times + " " + Helpers.pluralize(name);
+                var description = _c.cost_benefits_text(resource, true, times);
+
                 $('<button>')
                     .text('Gather ' + name)
+                    .popover({title:"Manually Gather "+ title, content:description, trigger:'hover', placement:'bottom', html:true})
                     .on('click', function(){
                         _c.increment_from_click(game,resource);
                     })
@@ -76,9 +83,10 @@
             }
         });
     }
-    function show_buildings (game) {
+    function show_building_buttons (game) {
         $('<h3>')
             .text('Buildings')
+            .hide()
             .appendTo($pointers.building_list);
         var $table = $('<table>')
             .appendTo($pointers.building_list);
@@ -86,6 +94,9 @@
         var lastStyle = game.game_options.buildings[0].type;
 
         _.each(game.game_options.buildings, function(building){
+            var name = _.str.titleize(building.title || building.name);
+            var amount = game.data.buildings[building.name];
+
             if (building.type != lastStyle) {
                 $('<tr>')
                     .css({height:'6px'})
@@ -93,48 +104,48 @@
             }
             lastStyle = building.type;
 
-            var name = _.str.titleize(building.title || building.name);
             var $tr = $('<tr>')
-                .hide()
                 .appendTo($table);
+            if (!amount) $tr.hide();
+
             var $td1 = $('<td>')
                 .appendTo($tr);
-            _.each([1,10,100,1000], function(times){
+            _.each(purchase_multiples, function(times){
                 var text = (times > 1) ? "x"+times : 'Build ' + name;
                 var btn_class = (times > 1) ? "x"+times : '';
 
-                //TODO: Show/Invalid buttons
-                $('<button>')
+                var title = (times == 1) ? name : times + " " + Helpers.pluralize(name);
+                var description = _c.cost_benefits_text(building, true, times);
+
+                building["$btn_x"+times] = $('<button>')
                     .text(text)
+                    .popover({title:"Build "+ title, content:description, trigger:'hover', placement:'bottom', html:true})
+                    .prop({disabled:true})
                     .addClass(btn_class)
                     .on('click', function(){
                         _c.create_building(game, building, times);
                     })
                     .appendTo($td1);
             });
-            $('<td>')
-                .addClass('buildingnames')
+            $('<td>')//TODO: These aren't aligning properly
                 .text(Helpers.pluralize(name)+": ")
                 .appendTo($tr);
             building.$holder = $('<td>')
                 .addClass('number')
                 .attr('id', 'building-'+building.name)
-                .text(0)
+                .text(amount)
                 .appendTo($tr);
-            $('<td>')
-                .addClass('cost')
-                .text(_c.cost_benefits_text(building))
-                .appendTo($tr);
+//            $('<td>')
+//                .addClass('cost')
+//                .text(_c.cost_benefits_text(building))
+//                .appendTo($tr);
 
             building.$display = $tr;
         });
 
     }
-//        <p id="customBuildIncrement">
-//            Increment: <input id="buildCustom" type="number" min="1" step="1" value="1">
-//        </p>
 
-
+    //-------------------------------------------------
     var _c = new Civvies('get_private_functions');
     _c.buildInitialDisplay = function (game) {
         $pointers.basic_resources = $('#basic_resources');
@@ -144,7 +155,7 @@
         show_secondary_resources(game);
 
         $pointers.building_list = $('#buildingsPane');
-        show_buildings(game);
+        show_building_buttons(game);
 
     };
 
@@ -183,10 +194,36 @@
     };
 
     _c.updateBuildingButtons = function (game) {
+        var buildings_shown = false;
         _.each(game.game_options.buildings, function(building) {
-            var display = _c.building_is_purchasable(game, building) ? "block" : "none";
-            building.$display.css({display:display});
+
+            var purchasable = _c.building_is_purchasable(game, building, 1);
+            var enabled;
+
+            if (!building.shown_before && purchasable) {
+                building.shown_before = true;
+                building.$display.css({display:"block"});
+            }
+            if (building.shown_before) {
+                buildings_shown = true;
+
+                enabled = purchasable;
+                _.each(purchase_multiples, function (times) {
+                    enabled = _c.building_is_purchasable(game, building, times);
+                    var $btn = building["$btn_x"+times];
+                    var currently_disabled = $btn.prop('disabled');
+                    if (!currently_disabled && !enabled) {
+                        //Changing to disabled, so turn off any popovers
+                        $btn.popover('hide');
+                    }
+                    $btn.prop({disabled: !enabled});
+
+                });
+            }
         });
+        if (buildings_shown) {
+            $pointers.building_list.find('h3').show();
+        }
     };
 
     _c.updateBuildingTotals = function () {

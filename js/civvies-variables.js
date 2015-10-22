@@ -8,9 +8,10 @@
         storage_initial: 100,
 
         resources: [
-            {name: 'food', grouping:1, image:'../images/civclicker/food.png'},
-            {name: 'wood', grouping:1, image:'../images/civclicker/wood.png'},
-            {name: 'stone', grouping:1, image:'../images/civclicker/stone.png'},
+            //Note: Grouping 1 is clickable by user to gather resources manually
+            {name: 'food', grouping:1, image:'../images/civclicker/food.png', chances:[{chance:"foodSpecialChance", resource:'herbs'}], amount_from_click:1},
+            {name: 'wood', grouping:1, image:'../images/civclicker/wood.png', chances:[{chance:"woodSpecialChance", resource:'skins'}], amount_from_click:1},
+            {name: 'stone', grouping:1, image:'../images/civclicker/stone.png', chances:[{chance:"stoneSpecialChance", resource:'ore'}], amount_from_click:1},
 
             {name: 'herbs', grouping:2, image:'../images/civclicker/herbs.png'},
             {name: 'skins', grouping:2, image:'../images/civclicker/skins.png'},
@@ -25,15 +26,15 @@
             {name: 'wonder', grouping:3}
         ],
         buildings: [ //TODO: Add upgrades required
-            {name: 'tent', type:'home', costs:{skins: 2, wood: 2}, population_supports: 2},
+            {name: 'tent', type:'home', costs:{skins: 2, wood: 2}, population_supports: 2, initial:1},
             {name: 'hut', type:'home', costs:{skins: 1, wood: 20}, population_supports: 4},
             {name: 'cottage', type:'home', costs:{stone: 30, wood: 10}, population_supports: 6},
             {name: 'house', type:'home', costs:{stone: 70, wood: 30}, population_supports: 10},
             {name: 'mansion', type:'home', costs:{stone: 200, wood: 200, leather:20}, population_supports: 20},
 
-            {name: 'barn', type:'storage', costs:{wood: 100}, supports:{food:100}},
-            {name: 'woodstock', type:'storage', costs:{wood: 100}, supports:{food:100}},
-            {name: 'stonestock', type:'storage', costs:{wood: 100}, supports:{food:100}},
+            {name: 'barn', type:'storage', costs:{wood: 100}, supports:{food:100}, notes:"Increase the food you can store"},
+            {name: 'woodstock', type:'storage', costs:{wood: 100}, supports:{wood:100}, notes:"Increase the wood you can store"},
+            {name: 'stonestock', type:'storage', costs:{wood: 100}, supports:{stone:100}, notes:"Increase the stone you can store"},
 
             {name: 'tannery', type:'business', costs:{wood: 30, stone:70, skins:2}, supports:{tanners:2}},
             {name: 'smithy', type:'business', costs:{wood: 30, stone:70, ore:2}, supports:{blacksmiths:2}},
@@ -42,21 +43,21 @@
             {name: 'barracks', type:'business', costs:{food: 20, wood: 60, stone:120}, supports:{soldiers:5}},
             {name: 'stable', type:'business', costs:{food: 60, wood: 60, stone:120, leather:10}, supports:{cavalry:5}},
 
-            {name: 'mill', type:'upgrade', costs:{wood: 100, stone: 100}, options:{food_efficiency:.1}},
-            {name: 'graveyard', type:'business', costs:{wood: 50, stone:200, herbs:50}, options:{grave_spot: 100}},
-            {name: 'fortification', type:'business', costs:{stone:100}, options:{defense_improvement:5}},
+            {name: 'mill', type:'upgrade', costs:{wood: 100, stone: 100}, options:{food_efficiency:.1}, notes:"Improves Farming Efficiency"},
+            {name: 'graveyard', type:'upgrade', costs:{wood: 50, stone:200, herbs:50}, options:{grave_spot: 100}, notes:"Increases Grave Plots"}, //TODO: Should graves be a resource?
+            {name: 'fortification', type:'upgrade', costs:{stone:100}, options:{defense_improvement:5}, notes:"Improves Defenses"},
 
 //TODO: How to handle altars?
             {name: 'battleAltar', title: "Battle Altar", type:'altar', costs:{devotion: 1, stone:200, metal:50, piety:200}},
             {name: 'fieldsAltar', title: "Fields Altar", type:'altar', costs:{devotion: 1, food: 500, wood: 500, stone:200, piety:200}},
             {name: 'underworldAltar', title: "Underworld Altar", type:'altar', costs:{devotion: 1, stone:200, piety:200, corpses:1}},
-            {name: 'catAltar', title: "Cat Altar", type:'altar', costs:{devotion: 1, herbs: 100, stone:200, piety:200}},
+            {name: 'catAltar', title: "Cat Altar", type:'altar', costs:{devotion: 1, herbs: 100, stone:200, piety:200}}
 //TODO: How to handle Wonder? Laborers currently produce it
         ],
         populations: [
-            {name: 'farmers', produces:{food:1}, chances:[{chance:"foodSpecialChance", resource:'herbs'}]},
-            {name: 'woodcutters', produces:{wood:1}, chances:[{chance:"woodSpecialChance", resource:'skins'}]},
-            {name: 'miners', produces:{stone:1}, chances:[{chance:"stoneSpecialChance", resource:'ore'}]},
+            {name: 'farmers', produces:{food:1}},
+            {name: 'woodcutters', produces:{wood:1}},
+            {name: 'miners', produces:{stone:1}},
 
             {name: 'tanners', consumes:{skins:1}, produces:{leather:1}},
             {name: 'blacksmiths', consumes:{ore:1}, produces:{metal:1}},
@@ -82,9 +83,9 @@
             {name: "clerics", value:0.05},
             {name: "soldiers", value:0.05},
             {name: "cavalry", value:0.08},
-            {name: "foodSpecialChance", value:0.001},
-            {name: "woodSpecialChance", value:0.001},
-            {name: "stoneSpecialChance", value:0.001}
+            {name: "foodSpecialChance", value:0.02},
+            {name: "woodSpecialChance", value:0.02},
+            {name: "stoneSpecialChance", value:0.01}
         ],
         upgrades: [
             {name:"domestication", costs:{leather:20}, variable_increase:{farmers:0.1}},

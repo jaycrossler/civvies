@@ -40,6 +40,25 @@ body{
     width: 70px;
     display: inline-block;
 }
+.benefit_population_text {
+    color: blue
+}
+.benefit_text {
+    color: green
+}
+.cost_text {
+    color: red
+}
+.notes_text {
+    color: orangered;
+}
+/*.btn.disabled {*/
+    /*pointer-events: auto;*/
+/*}*/
+/*.btn[disabled]{ pointer-events: auto; }*/
+/*.button[disabled]{ pointer-events: auto; }*/
+/*.button.disabled { pointer-events: auto; }*/
+
 .icon-lg{
 	height:42px;
 	width:42px;

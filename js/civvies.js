@@ -62,8 +62,8 @@ var Civvies = (function ($, _, Helpers, maths) {
 
         if (!game.data.gui_drawn && game._private_functions.buildInitialDisplay) {
             game.data.gui_drawn = true;
-            game._private_functions.buildInitialDisplay(game);
             game._private_functions.buildInitialData(game);
+            game._private_functions.buildInitialDisplay(game);
         }
 
         //Begin Game Simulation

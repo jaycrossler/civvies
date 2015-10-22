@@ -2,7 +2,7 @@
     var _c = new Civvies('get_private_functions');
 
     _c.increment_from_click = function (game, resource) {
-        game.data.resources[resource.name]++;
+        _c.increment_resource(game, resource, resource.amount_from_click || 1);
         _c.redraw_data(game);
         //TODO: Add in a delay, and a gui-countdown wipe in orange
 
@@ -59,8 +59,101 @@
     _c.getResourceRate = function (game, resource) {
 
     };
-    _c.cost_benefits_text = function (item) {
+    _c.cost_benefits_text = function (item, as_html, times) {
+        times = times || 1;
+        var costs = [];
+        var benefits = [];
+        var supports = [];
+        var key, amount, out;
 
+        for (key in item.costs || {}) {
+            amount = item.costs[key] * times;
+            out = Helpers.abbreviateNumber(amount) + " ";
+            if (amount == 1) {
+                out += key;
+            } else {
+                out += Helpers.pluralize(key);
+            }
+            if (as_html) {
+                out = "<span class='cost_text'>" + out + "</span>"
+            }
+            costs.push(out);
+        }
+
+        for (key in item.benefits || {}) {
+            amount = item.benefits[key] * times;
+            out = Helpers.abbreviateNumber(amount) + " ";
+            if (amount == 1) {
+                out += key;
+            } else {
+                out += Helpers.pluralize(key);
+            }
+            if (as_html) {
+                out = "<span class='benefit_text'>" + out + "</span>"
+            }
+            benefits.push(out);
+        }
+        for (key in item.supports || {}) {
+            amount = item.supports[key] * times;
+            out = Helpers.abbreviateNumber(amount) + " ";
+            if (amount == 1) {
+                out += key;
+            } else {
+                out += Helpers.pluralize(key);
+            }
+            if (as_html) {
+                out = "<span class='benefit_text'>" + out + "</span>"
+            }
+            supports.push(out);
+        }
+        if (item.population_supports) {
+            if (amount == 1) {
+                out = "houses 1 person";
+            } else {
+                out = "houses " + Helpers.abbreviateNumber(item.population_supports * times) + " people";
+            }
+            if (as_html) {
+                out = "<span class='benefit_population_text'>" + out + "</span>"
+            }
+            benefits.push(out);
+        }
+        var notes;
+        if (item.notes) {
+            notes = item.notes;
+            if (as_html) {
+                notes = "<span class='notes_text'>" + notes + "</span>";
+            }
+        }
+        var gather;
+        if (item.amount_from_click) {
+            gather = "Gather " + item.amount_from_click + ' ' + Helpers.pluralize(item.name);
+            if (as_html) {
+                gather = "<span class='benefit_text'>" + gather + "</span>";
+            }
+        }
+        var chances = [];
+        _.each(item.chances || [], function(chance){
+            out = "";
+            if (chance.resource) {
+                out = "Chance to find " + chance.resource;
+            }
+            if (as_html) {
+                out = "<span class='notes_text'>" + out + "</span>"
+            }
+            chances.push(out);
+        });
+
+        var text_pieces = [];
+        if (gather) text_pieces.push(gather);
+        if (costs.length) text_pieces.push("Costs: "+costs.join(", "));
+        if (benefits.length) text_pieces.push("Benefits: "+benefits.join(", "));
+        if (chances.length) text_pieces.push(chances.join(", "));
+        if (supports.length) text_pieces.push("Supports: "+supports.join(", "));
+        if (notes) text_pieces.push("Notes: "+notes);
+
+        var join_text = as_html ? ".</br>" : ".  ";
+
+        return text_pieces.join(join_text) || "";
     };
     _c.create_building = function (game, building, amount) {
         amount = amount || 1;
@@ -102,16 +195,35 @@
         return buildable;
     };
     _c.test = function (game) {
-        game.data.resources.stone += 1000;
-        game.data.resources.wood += 1000;
-        game.data.resources.food += 1000;
+        _c.increment_resource(game, _c.info(game, 'resources', 'food'), 1000);
+        _c.increment_resource(game, _c.info(game, 'resources', 'wood'), 1000);
+        _c.increment_resource(game, _c.info(game, 'resources', 'stone'), 1000);
         _c.redraw_data(game);
-    }
+    };
+    _c.increment_resource = function (game, resource, amount) {
+
+        //TODO: This now only does one roll, then gives resources if roll passes. Needs to simulate doing 'amount' roles
+        var max = _c.getResourceMax(game, resource);
+        game.data.resources[resource.name] = maths.clamp(game.data.resources[resource.name] + amount, 0, max);
+
+        if (resource.chances) {
+            _.each(resource.chances || [], function(chance){
+                var percent = chance.chance || 0.01;
+                if (_.isString(percent)) {
+                    percent = game.data.variables[percent];
+                }
+                if (_.isNumber(percent)){
+                    if (_c.random(game.game_options) < percent) {
+                        if (chance.resource) {
+                            game.data.resources[chance.resource] += amount;
+                        }
+                    }
+                }
+            });
+        }
+    };
 
     //-Not implemented yet------------------
-    _c.createBuilding = function () {
-
-    };
     _c.increment = function () {
 
     };
