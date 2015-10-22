@@ -99,10 +99,13 @@ var Civvies = (function ($, _, Helpers, maths) {
         if (showHTML) log = log.replace(/\n/g, '<br/>');
         return log;
     };
-    CivviesClass.prototype.logMessage = function (msg) {
+    CivviesClass.prototype.logMessage = function (msg, showToConsole) {
         if (_.isString(msg)) msg = {name: msg};
 
         this.timing_log.push(msg);
+        if (showToConsole) {
+            console.log(msg);
+        }
     };
     CivviesClass.prototype.lastTimeDrawn = function () {
         var time_drawn = 0;

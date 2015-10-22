@@ -20,12 +20,8 @@
     };
     _c.tick_interval = function (game) {
 //        //The whole game runs on a single setInterval clock.
-//
-        var start = new Date().getTime();
-        var options = game.game_options;
-//
         _c.autosave_if_time(game);
-//
+
 //        //Resource-related
 //
 //        var millMod = 1;
@@ -1408,11 +1404,7 @@
 //        updateSpawnButtons();
 //        updateReset();
 
-        _c.updateResources(game);
-
-//        //Debugging - mark end of main loop and calculate delta in milliseconds
-        var end = new Date().getTime();
-        var time = end - start;
+        _c.redraw_data(game);
 
     }
 
