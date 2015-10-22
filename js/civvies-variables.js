@@ -57,22 +57,24 @@
 //TODO: How to handle Wonder? Laborers currently produce it
         ],
         populations: [
-            {name: 'unemployed'},
-            {name: 'farmers', produces:{food:1}},
-            {name: 'woodcutters', produces:{wood:1}},
-            {name: 'miners', produces:{stone:1}},
+            {name: 'unemployed', title:'Unemployed Worker', type:'basic', notes:"Unassigned Workers that eat up food", unassignable:true},
+            {name: 'sick', type:'basic', notes:"Sick workers that need medical help", unassignable:true},
+            {name: 'farmers', type:'basic', produces:{food:1}, doesnt_require_office:true},
+            {name: 'woodcutters', type:'basic', produces:{wood:1}, doesnt_require_office:true},
+            {name: 'miners', type:'basic', produces:{stone:1}, doesnt_require_office:true},
 
-            {name: 'tanners', consumes:{skins:1}, produces:{leather:1}},
-            {name: 'blacksmiths', consumes:{ore:1}, produces:{metal:1}},
-            {name: 'apothecaries', consumes:{herbs:1}, supports:{healing:1}},
-            {name: 'clerics', consumes:{food:2, herbs:1}, supports:{healing:.1, burying: 5}, produces:{piety:1}},
-            {name: 'labourers', consumes:{herbs:10, leather:10, metal:10, piety:10}, produces:{wonder:1}},
+            {name: 'tanners', type:'medieval', consumes:{skins:1}, produces:{leather:1}},
+            {name: 'blacksmiths', type:'medieval', consumes:{ore:1}, produces:{metal:1}},
+            {name: 'apothecaries', type:'medieval', consumes:{herbs:1}, supports:{healing:1}},
+            {name: 'clerics', type:'medieval', consumes:{food:2, herbs:1}, supports:{healing:.1, burying: 5}, produces:{piety:1}},
+            {name: 'labourers', type:'medieval', consumes:{herbs:10, leather:10, metal:10, piety:10}, produces:{wonder:1}},
 
-            {name: 'soldiers', consumes:{food:2}, supports:{battle:1.5}},
-            {name: 'cavalry', consumes:{food:1, herbs:1}, supports:{battle:2}},
-            {name: 'siege', costs:{metal:10, wood:100}, supports:{battle:5}},
-            {name: 'zombies', costs:{corpses:1}},
-            {name: 'cats'}  //TODO: What makes cats?
+//            {name: 'cats', type:'mystical'},  //TODO: What makes cats?
+//            {name: 'zombies', type:'mystical', costs:{corpses:1}},
+
+            {name: 'soldiers', type:'warfare', consumes:{food:2}, supports:{battle:1.5}},
+            {name: 'cavalry', type:'warfare', consumes:{food:1, herbs:1}, supports:{battle:2}},
+            {name: 'siege', type:'warfare', costs:{metal:10, wood:100}, supports:{battle:5}}
         ],
         variables: [
             {name: "happiness", value:1},

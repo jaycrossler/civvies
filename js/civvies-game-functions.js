@@ -67,9 +67,13 @@
     };
     _c.cost_benefits_text = function (item, as_html, times) {
         times = times || 1;
+        if (!_.isNumber(times)) times = 1;
+
         var costs = [];
+        var consumes = [];
         var benefits = [];
         var supports = [];
+        var produces = [];
         var key, amount, out;
 
         for (key in item.costs || {}) {
@@ -85,7 +89,19 @@
             }
             costs.push(out);
         }
-
+        for (key in item.consumes || {}) {
+            amount = item.consumes[key] * times;
+            out = Helpers.abbreviateNumber(amount) + " ";
+            if (amount == 1) {
+                out += key;
+            } else {
+                out += Helpers.pluralize(key);
+            }
+            if (as_html) {
+                out = "<span class='cost_text'>" + out + "</span>"
+            }
+            consumes.push(out);
+        }
         for (key in item.benefits || {}) {
             amount = item.benefits[key] * times;
             out = Helpers.abbreviateNumber(amount) + " ";
@@ -98,6 +114,19 @@
                 out = "<span class='benefit_text'>" + out + "</span>"
             }
             benefits.push(out);
+        }
+        for (key in item.produces || {}) {
+            amount = item.produces[key] * times;
+            out = Helpers.abbreviateNumber(amount) + " ";
+            if (amount == 1) {
+                out += key;
+            } else {
+                out += Helpers.pluralize(key);
+            }
+            if (as_html) {
+                out = "<span class='benefit_text'>" + out + "</span>"
+            }
+            produces.push(out);
         }
         for (key in item.supports || {}) {
             amount = item.supports[key] * times;
@@ -152,7 +181,9 @@
         var text_pieces = [];
         if (gather) text_pieces.push(gather);
         if (costs.length) text_pieces.push("Costs: "+costs.join(", "));
+        if (consumes.length) text_pieces.push("Consumes: "+consumes.join(", "));
         if (benefits.length) text_pieces.push("Benefits: "+benefits.join(", "));
+        if (produces.length) text_pieces.push("Produces: "+produces.join(", "));
         if (chances.length) text_pieces.push(chances.join(", "));
         if (supports.length) text_pieces.push("Supports: "+supports.join(", "));
         if (notes) text_pieces.push("Notes: "+notes);
@@ -204,6 +235,12 @@
         _c.increment_resource(game, _c.info(game, 'resources', 'food'), 1000);
         _c.increment_resource(game, _c.info(game, 'resources', 'wood'), 1000);
         _c.increment_resource(game, _c.info(game, 'resources', 'stone'), 1000);
+        _c.increment_resource(game, _c.info(game, 'resources', 'herbs'), 10);
+        _c.increment_resource(game, _c.info(game, 'resources', 'skins'), 10);
+        _c.increment_resource(game, _c.info(game, 'resources', 'ore'), 10);
+        _c.increment_resource(game, _c.info(game, 'resources', 'leather'), 10);
+        _c.increment_resource(game, _c.info(game, 'resources', 'metal'), 10);
+
         _c.redraw_data(game);
     };
     _c.increment_resource = function (game, resource, amount) {
@@ -274,8 +311,46 @@
         }
         return enough_food && enough_space;
     };
+    _c.population_is_assignable = function(game, job, times) {
+        times = times || 1;
+        //TODO: Take into account all/max
 
-
+        var assignable = false;
+        if (!job.unassignable) {
+            var current = game.data.populations[job.name];
+            if (_.isNumber(times)) {
+                if (times > 0) {
+                    var unassigned_workers = game.data.populations.unemployed;
+                    if (times <= unassigned_workers) assignable = true;
+                } else {
+                    if ((current + times) >= 0) assignable = true;
+                }
+            }
+            if (assignable && !job.doesnt_require_office) {
+                //Check through buildings
+                var offices_total = 0;
+                _.each(game.game_options.buildings, function(building){
+                    if (building.supports) {
+                        var offices_per = building.supports[job.name];
+                        if (offices_per) {
+                            offices_total += (game.data.buildings[building.name] * offices_per);
+                        }
+                    }
+                });
+                assignable = ((current+times) <= offices_total);
+            }
+        }
+        return assignable;
+    };
+    _c.assign_workers = function(game, job, times){
+        //TODO: Take into account all/max
+        if (_c.population_is_assignable(game,job,times)) {
+            if (_.isNumber(times)) {
+                game.data.populations[job.name] += times;
+                game.data.populations.unemployed -= times;
+            }
+        }
+    };
 
     //-Not implemented yet------------------
     _c.increment = function () {

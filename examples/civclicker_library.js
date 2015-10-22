@@ -4,6 +4,12 @@ var options = {
 var game = new Civvies(options);
 game.log(true);
 
+//For testing
+$(function(){
+    $('h1').on('click',function(){
+        game._private_functions.test(game);
+    })
+});
 
 function paneSelect(name){
 	//Called when user switches between the various panes on the left hand side of the interface
