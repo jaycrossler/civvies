@@ -5,6 +5,8 @@
         tick_time: 1000,
         autosave_every: 60,
         autosave: true,
+
+        //TODO: These should move to variables
         storage_initial: 100,
 
         resources: [
@@ -86,7 +88,8 @@
             {name: "cavalry", value:0.08},
             {name: "foodSpecialChance", value:0.02},
             {name: "woodSpecialChance", value:0.02},
-            {name: "stoneSpecialChance", value:0.01}
+            {name: "stoneSpecialChance", value:0.01},
+            {name: "foodCostInitial", value:20}
         ],
         upgrades: [
             {name:"domestication", costs:{leather:20}, variable_increase:{farmers:0.1}},

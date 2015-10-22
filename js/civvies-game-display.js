@@ -136,10 +136,6 @@
                 .attr('id', 'building-'+building.name)
                 .text(amount)
                 .appendTo($tr);
-//            $('<td>')
-//                .addClass('cost')
-//                .text(_c.cost_benefits_text(building))
-//                .appendTo($tr);
 
             building.$display = $tr;
         });
@@ -196,8 +192,6 @@
                 .text(description)
                 .appendTo($inner);
         });
-
-
     }
 
     //-------------------------------------------------

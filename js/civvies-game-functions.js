@@ -40,11 +40,17 @@
             game.data.achievements[achievement.name] = achievement.initial || false;
         });
     };
-    _c.info = function (game, kind, name) {
+    _c.info = function (game, kind, name, sub_var, if_not_listed) {
         //Usage:  var info = _c.info(game, 'buildings', resource.name);
-        return _.find(game.game_options[kind], function (item) {
+        var val = _.find(game.game_options[kind], function (item) {
             return item.name == name
         });
+        if (val && sub_var && val[sub_var]) {
+            val = val[sub_var];
+        }
+        if (!val) val = if_not_listed;
+
+        return val;
     };
     _c.getResourceMax = function (game, resource) {
         var storage = game.game_options.storage_initial;
@@ -243,16 +249,20 @@
         return pop;
     };
     _c.worker_food_cost = function(game, times) {
-        //TODO: Expand this to include growing multiples for spawning
-        return times;
+        var initial_cost = _c.info(game,'variables','foodCostInitial', 'value', 20);
+        times = times || 1;
+
+        var pop = _c.population(game);
+        var food_cost = initial_cost + Math.floor((pop.current+times) / 100);
+
+        return food_cost*times;
     };
     _c.create_workers = function(game, times) {
         if (_c.workers_are_creatable(game, times)){
             game.data.resources.food -= _c.worker_food_cost(game, times);
             game.data.populations.unemployed += times;
 
-            game.logMessage("Purchased: " + times + "x unemployed people", true);
-
+            game.logMessage("Purchased: " + times + "x unemployed workers", true);
         }
     };
     _c.workers_are_creatable = function(game, times) {
