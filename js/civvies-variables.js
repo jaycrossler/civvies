@@ -55,6 +55,7 @@
 //TODO: How to handle Wonder? Laborers currently produce it
         ],
         populations: [
+            {name: 'unemployed'},
             {name: 'farmers', produces:{food:1}},
             {name: 'woodcutters', produces:{wood:1}},
             {name: 'miners', produces:{stone:1}},

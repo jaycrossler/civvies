@@ -1154,6 +1154,7 @@ Civvies.initializeOptions = function (option_type, options) {
         });
     }
     function show_secondary_resources (game){
+        //TODO: Add some info on popover
         $('<h3>')
             .text('Special Resources')
             .appendTo($pointers.secondary_resources);
@@ -1240,6 +1241,60 @@ Civvies.initializeOptions = function (option_type, options) {
         });
 
     }
+    function show_population_data (game) {
+        $('<h3>')
+            .text('Population')
+            .appendTo($pointers.population_info);
+
+        var population =_c.population(game);
+        var population_current = population.current;
+        var population_max = population.max;
+
+        var $d1 = $('<div>')
+            .appendTo($pointers.population_info);
+        $("<span>")
+            .text("Current Population: ")
+            .appendTo($d1);
+        $pointers.population_current = $("<span>")
+            .text(population_current)
+            .appendTo($d1);
+
+        var $d2 = $('<div>')
+            .appendTo($pointers.population_info);
+        $("<span>")
+            .text("Maximum Population: ")
+            .appendTo($d2);
+        $pointers.population_max = $("<span>")
+            .text(population_max)
+            .appendTo($d2);
+
+
+        var $d3 = $("<div>")
+            .appendTo($pointers.population_info);
+        _.each(purchase_multiples, function(times){
+            var $inner = $('<div>')
+                .appendTo($d3);
+
+            var text = (times > 1) ? "Create "+ times + " workers" : "Create worker";
+
+            var food_cost = _c.worker_food_cost(game, times);
+            var description = "Consume " + food_cost + " food";
+
+            $pointers["create_workers_x"+times] = $('<button>')
+                .text(text)
+                .prop({disabled:true})
+                .on('click', function(){
+                    _c.create_workers(game, times);
+                    _c.redraw_data(game);
+                })
+                .appendTo($inner);
+            $pointers["create_workers_x"+times+"_cost"] = $("<span>")
+                .text(description)
+                .appendTo($inner);
+        });
+
+
+    }
 
     //-------------------------------------------------
     var _c = new Civvies('get_private_functions');
@@ -1253,11 +1308,15 @@ Civvies.initializeOptions = function (option_type, options) {
         $pointers.building_list = $('#buildingsPane');
         show_building_buttons(game);
 
+        $pointers.population_info = $('#populationContainer');
+        show_population_data(game);
+
     };
 
     _c.redraw_data = function(game) {
         _c.updateResources(game);
         _c.updateBuildingButtons(game);
+        _c.updatePopulationData(game);
     };
 
     _c.updateResources = function(game) {
@@ -1321,11 +1380,31 @@ Civvies.initializeOptions = function (option_type, options) {
             $pointers.building_list.find('h3').show();
         }
     };
+    _c.updatePopulationData = function (game) {
+        var population =_c.population(game);
+        var population_current = population.current;
+        var population_max = population.max;
 
-    _c.updateBuildingTotals = function () {
+        $pointers.population_current.text(population_current);
+        $pointers.population_max.text(population_max);
+
+        _.each(purchase_multiples, function(times){
+
+            var food_cost = _c.worker_food_cost(game, times);
+            var description = "Consume " + food_cost + " food";
+
+            $pointers["create_workers_x"+times]
+                .prop({disabled:!_c.workers_are_creatable(game, times)});
+
+            $pointers["create_workers_x"+times+"_cost"]
+                .text(description);
+        });
 
     };
-    _c.updatePopulation = function () {
+
+
+
+    _c.updateBuildingTotals = function () {
 
     };
     _c.updateSpawnButtons = function () {
@@ -1645,6 +1724,50 @@ Civvies.initializeOptions = function (option_type, options) {
             });
         }
     };
+    _c.population = function(game) {
+        var pop = {current:0, max:0};
+
+        var people = 0;
+        for (var key in game.data.populations) {
+            people += game.data.populations[key];
+        }
+        pop.current = people;
+
+        var storage = 0;
+        _.each(game.game_options.buildings, function (building) {
+            if (building.population_supports) {
+                var num_buildings = game.data.buildings[building.name];
+                storage += (num_buildings * building.population_supports);
+            }
+        });
+        pop.max = storage;
+
+        return pop;
+    };
+    _c.worker_food_cost = function(game, times) {
+        //TODO: Expand this to include growing multiples for spawning
+        return times;
+    };
+    _c.create_workers = function(game, times) {
+        if (_c.workers_are_creatable(game, times)){
+            game.data.resources.food -= _c.worker_food_cost(game, times);
+            game.data.populations.unemployed += times;
+
+            game.logMessage("Purchased: " + times + "x unemployed people", true);
+
+        }
+    };
+    _c.workers_are_creatable = function(game, times) {
+        var enough_food = (_c.worker_food_cost(game, times) <= game.data.resources.food);
+        var enough_space = false;
+        if (enough_food) {
+            var pop = _c.population(game);
+            enough_space = (pop.current+times <= pop.max);
+        }
+        return enough_food && enough_space;
+    };
+
+
 
     //-Not implemented yet------------------
     _c.increment = function () {
@@ -3276,6 +3399,7 @@ Civvies.initializeOptions = function (option_type, options) {
 //TODO: How to handle Wonder? Laborers currently produce it
         ],
         populations: [
+            {name: 'unemployed'},
             {name: 'farmers', produces:{food:1}},
             {name: 'woodcutters', produces:{wood:1}},
             {name: 'miners', produces:{stone:1}},

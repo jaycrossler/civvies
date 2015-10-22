@@ -222,6 +222,50 @@
             });
         }
     };
+    _c.population = function(game) {
+        var pop = {current:0, max:0};
+
+        var people = 0;
+        for (var key in game.data.populations) {
+            people += game.data.populations[key];
+        }
+        pop.current = people;
+
+        var storage = 0;
+        _.each(game.game_options.buildings, function (building) {
+            if (building.population_supports) {
+                var num_buildings = game.data.buildings[building.name];
+                storage += (num_buildings * building.population_supports);
+            }
+        });
+        pop.max = storage;
+
+        return pop;
+    };
+    _c.worker_food_cost = function(game, times) {
+        //TODO: Expand this to include growing multiples for spawning
+        return times;
+    };
+    _c.create_workers = function(game, times) {
+        if (_c.workers_are_creatable(game, times)){
+            game.data.resources.food -= _c.worker_food_cost(game, times);
+            game.data.populations.unemployed += times;
+
+            game.logMessage("Purchased: " + times + "x unemployed people", true);
+
+        }
+    };
+    _c.workers_are_creatable = function(game, times) {
+        var enough_food = (_c.worker_food_cost(game, times) <= game.data.resources.food);
+        var enough_space = false;
+        if (enough_food) {
+            var pop = _c.population(game);
+            enough_space = (pop.current+times <= pop.max);
+        }
+        return enough_food && enough_space;
+    };
+
+
 
     //-Not implemented yet------------------
     _c.increment = function () {
