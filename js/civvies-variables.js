@@ -23,9 +23,9 @@
             {name: 'metal', grouping:2, image:'../images/civclicker/metal.png'},
             {name: 'gold', grouping:2, image:'../images/civclicker/gold.png'},
 
-            {name: 'piety', grouping:3},
-            {name: 'corpses', grouping:3},
-            {name: 'wonder', grouping:3}
+            {name: 'piety', grouping:2, image:'../images/civclicker/piety.png'},
+            {name: 'corpses', grouping:2, image:'../images/civclicker/piety.png'},
+            {name: 'wonder', grouping:3, image:'../images/civclicker/piety.png'},
         ],
         buildings: [ //TODO: Add upgrades required
             {name: 'tent', type:'home', costs:{skins: 2, wood: 2}, population_supports: 2, initial:1},
@@ -57,28 +57,28 @@
 //TODO: How to handle Wonder? Laborers currently produce it
         ],
         populations: [
-            {name: 'unemployed', title:'Unemployed Worker', type:'basic', notes:"Unassigned Workers that eat up food", unassignable:true},
-            {name: 'sick', type:'basic', notes:"Sick workers that need medical help", unassignable:true},
-            {name: 'farmers', type:'basic', produces:{food:1}, doesnt_require_office:true},
-            {name: 'woodcutters', type:'basic', produces:{wood:1}, doesnt_require_office:true},
+            {name: 'unemployed', title:'Unemployed Worker', type:'basic', notes:"Unassigned Workers that eat up food", unassignable:true, cull_order:2},
+            {name: 'sick', type:'basic', notes:"Sick workers that need medical help", unassignable:true, cull_order:1},
+            {name: 'farmers', type:'basic', produces:{food:"farmers"}, doesnt_require_office:true, cull_order:10},
+            {name: 'woodcutters', type:'basic', produces:{wood:1}, doesnt_require_office:true, cull_order:9},
             {name: 'miners', type:'basic', produces:{stone:1}, doesnt_require_office:true},
 
             {name: 'tanners', type:'medieval', consumes:{skins:1}, produces:{leather:1}},
             {name: 'blacksmiths', type:'medieval', consumes:{ore:1}, produces:{metal:1}},
             {name: 'apothecaries', type:'medieval', consumes:{herbs:1}, supports:{healing:1}},
-            {name: 'clerics', type:'medieval', consumes:{food:2, herbs:1}, supports:{healing:.1, burying: 5}, produces:{piety:1}},
-            {name: 'labourers', type:'medieval', consumes:{herbs:10, leather:10, metal:10, piety:10}, produces:{wonder:1}},
+            {name: 'clerics', type:'medieval', consumes:{food:2, herbs:1}, supports:{healing:.1, burying: 5}, produces:{piety:1}, cull_order:6},
+            {name: 'labourers', type:'medieval', consumes:{herbs:10, leather:10, metal:10, piety:10}, produces:{wonder:1}, cull_order:2},
 
-//            {name: 'cats', type:'mystical'},  //TODO: What makes cats?
-//            {name: 'zombies', type:'mystical', costs:{corpses:1}},
+            {name: 'cats', type:'mystical', cull_order:11},  //TODO: What makes cats?
+            {name: 'zombies', type:'mystical', costs:{corpses:1}, doesnt_consume_food:true},
 
-            {name: 'soldiers', type:'warfare', consumes:{food:2}, supports:{battle:1.5}},
-            {name: 'cavalry', type:'warfare', consumes:{food:1, herbs:1}, supports:{battle:2}},
-            {name: 'siege', type:'warfare', costs:{metal:10, wood:100}, supports:{battle:5}}
+            {name: 'soldiers', type:'warfare', consumes:{food:2}, supports:{battle:1.5}, cull_order:8},
+            {name: 'cavalry', type:'warfare', consumes:{food:1, herbs:1}, supports:{battle:2}, cull_order:7},
+            {name: 'siege', type:'warfare', costs:{metal:10, wood:100}, supports:{battle:5}, doesnt_require_office:true, doesnt_consume_food:true}
         ],
         variables: [
             {name: "happiness", value:1},
-            {name: "farmers", value:0.2},
+            {name: "farmers", value:1.2},
             {name: "pestBonus", value:0},
             {name: "woodcutters", value:0.5},
             {name: "miners", value:0.2},

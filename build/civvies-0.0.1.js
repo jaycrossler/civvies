@@ -1117,7 +1117,7 @@ Civvies.initializeOptions = function (option_type, options) {
                     .appendTo($tr);
                 var times = resource.amount_from_click || 1;
                 var title = (times == 1) ? name : times + " " + Helpers.pluralize(name);
-                var description = _c.cost_benefits_text(resource, true, times);
+                var description = _c.cost_benefits_text(game, resource, true, times);
 
                 $('<button>')
                     .text('Gather ' + name)
@@ -1244,7 +1244,7 @@ Civvies.initializeOptions = function (option_type, options) {
                 var btn_class = (times > 1) ? "x" + times : '';
 
                 var title = (times == 1) ? name : times + " " + Helpers.pluralize(name);
-                var description = _c.cost_benefits_text(building, true, times);
+                var description = _c.cost_benefits_text(game, building, true, times);
 
                 building["$btn_x" + times] = $('<button>')
                     .text(text)
@@ -1433,7 +1433,7 @@ Civvies.initializeOptions = function (option_type, options) {
                 }
 
                 var title = (_.isString(times)) ? name : times + " " + Helpers.pluralize(name);
-                var description = _c.cost_benefits_text(job, true, times);
+                var description = _c.cost_benefits_text(game, job, true, times);
 
                 if (show){
                     if (use_button) {
@@ -1955,7 +1955,7 @@ Civvies.initializeOptions = function (option_type, options) {
         var val = _.find(game.game_options[kind], function (item) {
             return item.name == name
         });
-        if (val && sub_var && val[sub_var]) {
+        if (val && sub_var) {
             val = val[sub_var];
         }
         if (!val) val = if_not_listed;
@@ -1975,7 +1975,7 @@ Civvies.initializeOptions = function (option_type, options) {
     _c.getResourceRate = function (game, resource) {
 
     };
-    _c.cost_benefits_text = function (item, as_html, times) {
+    _c.cost_benefits_text = function (game, item, as_html, times) {
         times = times || 1;
         if (!_.isNumber(times)) times = 1;
 
@@ -1987,7 +1987,10 @@ Civvies.initializeOptions = function (option_type, options) {
         var key, amount, out;
 
         for (key in item.costs || {}) {
-            amount = item.costs[key] * times;
+            amount = item.costs[key];
+            if (_.isString(amount)) amount = game.data.variables[amount];
+            amount *= times;
+
             out = Helpers.abbreviateNumber(amount) + " ";
             if (amount == 1) {
                 out += key;
@@ -2000,7 +2003,10 @@ Civvies.initializeOptions = function (option_type, options) {
             costs.push(out);
         }
         for (key in item.consumes || {}) {
-            amount = item.consumes[key] * times;
+            amount = item.consumes[key];
+            if (_.isString(amount)) amount = game.data.variables[amount];
+            amount *= times;
+
             out = Helpers.abbreviateNumber(amount) + " ";
             if (amount == 1) {
                 out += key;
@@ -2013,7 +2019,10 @@ Civvies.initializeOptions = function (option_type, options) {
             consumes.push(out);
         }
         for (key in item.benefits || {}) {
-            amount = item.benefits[key] * times;
+            amount = item.benefits[key];
+            if (_.isString(amount)) amount = game.data.variables[amount];
+            amount *= times;
+
             out = Helpers.abbreviateNumber(amount) + " ";
             if (amount == 1) {
                 out += key;
@@ -2026,7 +2035,10 @@ Civvies.initializeOptions = function (option_type, options) {
             benefits.push(out);
         }
         for (key in item.produces || {}) {
-            amount = item.produces[key] * times;
+            amount = item.produces[key];
+            if (_.isString(amount)) amount = game.data.variables[amount];
+            amount *= times;
+
             out = Helpers.abbreviateNumber(amount) + " ";
             if (amount == 1) {
                 out += key;
@@ -2039,7 +2051,10 @@ Civvies.initializeOptions = function (option_type, options) {
             produces.push(out);
         }
         for (key in item.supports || {}) {
-            amount = item.supports[key] * times;
+            amount = item.supports[key];
+            if (_.isString(amount)) amount = game.data.variables[amount];
+            amount *= times;
+
             out = Helpers.abbreviateNumber(amount) + " ";
             if (amount == 1) {
                 out += key;
@@ -2176,13 +2191,18 @@ Civvies.initializeOptions = function (option_type, options) {
         }
     };
     _c.population = function(game) {
-        var pop = {current:0, max:0};
+        var pop = {current:0, max:0, current_that_eats:0};
 
         var people = 0;
+        var eaters = 0;
         for (var key in game.data.populations) {
             people += game.data.populations[key];
+            if (!_c.info(game,'populations',key,'doesnt_consume_food', false)) {
+                eaters += game.data.populations[key];
+            }
         }
         pop.current = people;
+        pop.current_that_eats = eaters;
 
         var storage = 0;
         _.each(game.game_options.buildings, function (building) {
@@ -2385,6 +2405,84 @@ Civvies.initializeOptions = function (option_type, options) {
 (function (Civvies) {
     var _c = new Civvies('get_private_functions');
 
+    function populations_produce_products(game) {
+        for (var val in game.data.populations){
+            var number =  game.data.populations[val];
+            if (number) {
+                var job_details = _c.info(game,'populations',val);
+                var consumes = job_details.consumes;
+                var produces = job_details.produces;
+                var resource;
+
+                var can_produce = number;
+
+                if (consumes) {
+                    var can_consume = number; //TODO: find the amount that can be consumed if it's only partial
+                    for (resource in consumes) {
+                        var res_c = _c.info(game,'resources',resource);
+                        var amount_c = consumes[resource];
+                        if (_.isString(amount_c)) {
+                            amount_c = game.data.variables[amount_c];
+                        }
+                        _c.increment_resource(game, res_c, can_consume * -amount_c);
+                    }
+                    can_produce = can_consume;
+                }
+
+                if (produces && can_produce) {
+                    for (resource in produces) {
+                        var res_p = _c.info(game,'resources',resource);
+                        var amount_p = produces[resource];
+                        if (_.isString(amount_p)) {
+                            amount_p = game.data.variables[amount_p];
+                        }
+                        _c.increment_resource(game, res_p, can_produce * amount_p);
+                    }
+                }
+            }
+        }
+    }
+
+    function eat_food_or_die(game) {
+        var population = _c.population(game);
+
+        if (population.current <= game.data.resources.food) {
+            //Enough food, everyone is happy
+            game.data.resources.food -= population.current_that_eats;
+        } else {
+            //The culling
+            game.data.resources.food /= 2;
+
+            //TODO: Runs out of farmers a bit fast, might need to tweak it
+
+            var to_remove =  population.current_that_eats - game.data.resources.food - game.data.populations.farmers;
+            game.logMessage("Not enough food, need to cull the population: " + to_remove, true);
+
+            var culling_order = game.game_options.populations.sort(function(a,b){
+                var a_ord = a.cull_order || ((a.doesnt_consume_food)? 15 : 5);
+                var b_ord = b.cull_order || ((b.doesnt_consume_food)? 15 : 5);
+
+                return a_ord - b_ord;
+            });
+
+            for (var p=0; p<culling_order.length; p++) {
+                if (to_remove > 0 && !culling_order[p].doesnt_consume_food) {
+                    var name = culling_order[p].name;
+                    var num = game.data.populations[name];
+                    if (num >= to_remove) {
+                        game.data.populations[name] -= to_remove;
+                        to_remove = 0;  //Culling stops here
+                    } else {
+                        to_remove -= game.data.populations[name];
+                        game.data.populations[name] = 0;
+                    }
+                }
+            }
+
+        }
+    }
+
+
     var game_loop_timer = null;
     _c.start_game_loop = function (game, game_options) {
         game_options = game_options || {};
@@ -2407,6 +2505,9 @@ Civvies.initializeOptions = function (option_type, options) {
         _c.autosave_if_time(game);
 
 //        //Resource-related
+        populations_produce_products(game);
+        eat_food_or_die(game);
+
 //
 //        var millMod = 1;
 //        if (population.current > 0 || population.zombies > 0) millMod = population.current / (population.current + population.zombies);
@@ -3860,9 +3961,9 @@ Civvies.initializeOptions = function (option_type, options) {
             {name: 'metal', grouping:2, image:'../images/civclicker/metal.png'},
             {name: 'gold', grouping:2, image:'../images/civclicker/gold.png'},
 
-            {name: 'piety', grouping:3},
-            {name: 'corpses', grouping:3},
-            {name: 'wonder', grouping:3}
+            {name: 'piety', grouping:2, image:'../images/civclicker/piety.png'},
+            {name: 'corpses', grouping:2, image:'../images/civclicker/piety.png'},
+            {name: 'wonder', grouping:3, image:'../images/civclicker/piety.png'},
         ],
         buildings: [ //TODO: Add upgrades required
             {name: 'tent', type:'home', costs:{skins: 2, wood: 2}, population_supports: 2, initial:1},
@@ -3894,28 +3995,28 @@ Civvies.initializeOptions = function (option_type, options) {
 //TODO: How to handle Wonder? Laborers currently produce it
         ],
         populations: [
-            {name: 'unemployed', title:'Unemployed Worker', type:'basic', notes:"Unassigned Workers that eat up food", unassignable:true},
-            {name: 'sick', type:'basic', notes:"Sick workers that need medical help", unassignable:true},
-            {name: 'farmers', type:'basic', produces:{food:1}, doesnt_require_office:true},
-            {name: 'woodcutters', type:'basic', produces:{wood:1}, doesnt_require_office:true},
+            {name: 'unemployed', title:'Unemployed Worker', type:'basic', notes:"Unassigned Workers that eat up food", unassignable:true, cull_order:2},
+            {name: 'sick', type:'basic', notes:"Sick workers that need medical help", unassignable:true, cull_order:1},
+            {name: 'farmers', type:'basic', produces:{food:"farmers"}, doesnt_require_office:true, cull_order:10},
+            {name: 'woodcutters', type:'basic', produces:{wood:1}, doesnt_require_office:true, cull_order:9},
             {name: 'miners', type:'basic', produces:{stone:1}, doesnt_require_office:true},
 
             {name: 'tanners', type:'medieval', consumes:{skins:1}, produces:{leather:1}},
             {name: 'blacksmiths', type:'medieval', consumes:{ore:1}, produces:{metal:1}},
             {name: 'apothecaries', type:'medieval', consumes:{herbs:1}, supports:{healing:1}},
-            {name: 'clerics', type:'medieval', consumes:{food:2, herbs:1}, supports:{healing:.1, burying: 5}, produces:{piety:1}},
-            {name: 'labourers', type:'medieval', consumes:{herbs:10, leather:10, metal:10, piety:10}, produces:{wonder:1}},
+            {name: 'clerics', type:'medieval', consumes:{food:2, herbs:1}, supports:{healing:.1, burying: 5}, produces:{piety:1}, cull_order:6},
+            {name: 'labourers', type:'medieval', consumes:{herbs:10, leather:10, metal:10, piety:10}, produces:{wonder:1}, cull_order:2},
 
-//            {name: 'cats', type:'mystical'},  //TODO: What makes cats?
-//            {name: 'zombies', type:'mystical', costs:{corpses:1}},
+            {name: 'cats', type:'mystical', cull_order:11},  //TODO: What makes cats?
+            {name: 'zombies', type:'mystical', costs:{corpses:1}, doesnt_consume_food:true},
 
-            {name: 'soldiers', type:'warfare', consumes:{food:2}, supports:{battle:1.5}},
-            {name: 'cavalry', type:'warfare', consumes:{food:1, herbs:1}, supports:{battle:2}},
-            {name: 'siege', type:'warfare', costs:{metal:10, wood:100}, supports:{battle:5}}
+            {name: 'soldiers', type:'warfare', consumes:{food:2}, supports:{battle:1.5}, cull_order:8},
+            {name: 'cavalry', type:'warfare', consumes:{food:1, herbs:1}, supports:{battle:2}, cull_order:7},
+            {name: 'siege', type:'warfare', costs:{metal:10, wood:100}, supports:{battle:5}, doesnt_require_office:true, doesnt_consume_food:true}
         ],
         variables: [
             {name: "happiness", value:1},
-            {name: "farmers", value:0.2},
+            {name: "farmers", value:1.2},
             {name: "pestBonus", value:0},
             {name: "woodcutters", value:0.5},
             {name: "miners", value:0.2},

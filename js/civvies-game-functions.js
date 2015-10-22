@@ -45,7 +45,7 @@
         var val = _.find(game.game_options[kind], function (item) {
             return item.name == name
         });
-        if (val && sub_var && val[sub_var]) {
+        if (val && sub_var) {
             val = val[sub_var];
         }
         if (!val) val = if_not_listed;
@@ -65,7 +65,7 @@
     _c.getResourceRate = function (game, resource) {
 
     };
-    _c.cost_benefits_text = function (item, as_html, times) {
+    _c.cost_benefits_text = function (game, item, as_html, times) {
         times = times || 1;
         if (!_.isNumber(times)) times = 1;
 
@@ -77,7 +77,10 @@
         var key, amount, out;
 
         for (key in item.costs || {}) {
-            amount = item.costs[key] * times;
+            amount = item.costs[key];
+            if (_.isString(amount)) amount = game.data.variables[amount];
+            amount *= times;
+
             out = Helpers.abbreviateNumber(amount) + " ";
             if (amount == 1) {
                 out += key;
@@ -90,7 +93,10 @@
             costs.push(out);
         }
         for (key in item.consumes || {}) {
-            amount = item.consumes[key] * times;
+            amount = item.consumes[key];
+            if (_.isString(amount)) amount = game.data.variables[amount];
+            amount *= times;
+
             out = Helpers.abbreviateNumber(amount) + " ";
             if (amount == 1) {
                 out += key;
@@ -103,7 +109,10 @@
             consumes.push(out);
         }
         for (key in item.benefits || {}) {
-            amount = item.benefits[key] * times;
+            amount = item.benefits[key];
+            if (_.isString(amount)) amount = game.data.variables[amount];
+            amount *= times;
+
             out = Helpers.abbreviateNumber(amount) + " ";
             if (amount == 1) {
                 out += key;
@@ -116,7 +125,10 @@
             benefits.push(out);
         }
         for (key in item.produces || {}) {
-            amount = item.produces[key] * times;
+            amount = item.produces[key];
+            if (_.isString(amount)) amount = game.data.variables[amount];
+            amount *= times;
+
             out = Helpers.abbreviateNumber(amount) + " ";
             if (amount == 1) {
                 out += key;
@@ -129,7 +141,10 @@
             produces.push(out);
         }
         for (key in item.supports || {}) {
-            amount = item.supports[key] * times;
+            amount = item.supports[key];
+            if (_.isString(amount)) amount = game.data.variables[amount];
+            amount *= times;
+
             out = Helpers.abbreviateNumber(amount) + " ";
             if (amount == 1) {
                 out += key;
@@ -266,13 +281,18 @@
         }
     };
     _c.population = function(game) {
-        var pop = {current:0, max:0};
+        var pop = {current:0, max:0, current_that_eats:0};
 
         var people = 0;
+        var eaters = 0;
         for (var key in game.data.populations) {
             people += game.data.populations[key];
+            if (!_c.info(game,'populations',key,'doesnt_consume_food', false)) {
+                eaters += game.data.populations[key];
+            }
         }
         pop.current = people;
+        pop.current_that_eats = eaters;
 
         var storage = 0;
         _.each(game.game_options.buildings, function (building) {

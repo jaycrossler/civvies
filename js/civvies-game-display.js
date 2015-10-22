@@ -21,7 +21,7 @@
                     .appendTo($tr);
                 var times = resource.amount_from_click || 1;
                 var title = (times == 1) ? name : times + " " + Helpers.pluralize(name);
-                var description = _c.cost_benefits_text(resource, true, times);
+                var description = _c.cost_benefits_text(game, resource, true, times);
 
                 $('<button>')
                     .text('Gather ' + name)
@@ -148,7 +148,7 @@
                 var btn_class = (times > 1) ? "x" + times : '';
 
                 var title = (times == 1) ? name : times + " " + Helpers.pluralize(name);
-                var description = _c.cost_benefits_text(building, true, times);
+                var description = _c.cost_benefits_text(game, building, true, times);
 
                 building["$btn_x" + times] = $('<button>')
                     .text(text)
@@ -337,7 +337,7 @@
                 }
 
                 var title = (_.isString(times)) ? name : times + " " + Helpers.pluralize(name);
-                var description = _c.cost_benefits_text(job, true, times);
+                var description = _c.cost_benefits_text(game, job, true, times);
 
                 if (show){
                     if (use_button) {
