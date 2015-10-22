@@ -106,6 +106,9 @@ var Civvies = (function ($, _, Helpers, maths) {
         if (showToConsole) {
             console.log(msg);
         }
+        if (this._private_functions.log_display) {
+            this._private_functions.log_display(this, msg);
+        }
     };
     CivviesClass.prototype.lastTimeDrawn = function () {
         var time_drawn = 0;
