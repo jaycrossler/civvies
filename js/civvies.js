@@ -27,7 +27,7 @@ var Civvies = (function ($, _, Helpers, maths) {
         if (option1 == 'get_private_functions') {
             return this._private_functions;
         } else if (option1 == '') {
-                //Class initialized
+            //Class initialized
         } else {
             this.drawOrRedraw(option1, option2, option3);
         }

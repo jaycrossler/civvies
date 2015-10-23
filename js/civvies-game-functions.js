@@ -385,7 +385,7 @@
         return buildable;
     };
     _c.purchase_upgrade = function (game, upgrade) {
-        if (_c.can_purchase_upgrade(game, upgrade)){
+        if (_c.can_purchase_upgrade(game, upgrade)) {
 
             var resource_costs = upgrade.costs;
 

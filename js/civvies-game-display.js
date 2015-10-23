@@ -200,7 +200,6 @@
                         $btn.popover('hide');
                     }
                     $btn.prop({disabled: !enabled});
-
                 });
             }
         });
@@ -272,7 +271,6 @@
         $pointers.population_max.text(population_max);
 
         _.each(purchase_multiples, function (times) {
-
             var food_cost = _c.worker_food_cost(game, times);
             var description = "Consume " + food_cost + " food";
 
@@ -341,7 +339,7 @@
                 var title = (_.isString(times)) ? name : times + " " + Helpers.pluralize(name);
                 var description = _c.cost_benefits_text(game, job, true, times);
 
-                if (show){
+                if (show) {
                     if (use_button) {
                         job["$btn_x" + times] = $('<button>')
                             .text(times_text)
@@ -368,7 +366,6 @@
                             .appendTo($inner);
                     }
                 }
-
             });
 
             job.$display = $tr;
@@ -427,18 +424,21 @@
             .appendTo($researched);
 
         var lastStyle = '';
-        var upgrades_non_deity = _.filter(game.game_options.upgrades, function(up){return up.type != 'deity'});
+        //TODO: Show deity (and trade, conquest, trade) elsewhere
+        var upgrades_non_deity = _.filter(game.game_options.upgrades, function (up) {
+            return up.type != 'deity'
+        });
         _.each(upgrades_non_deity, function (upgrade) {
             var name = _.str.titleize(upgrade.title || upgrade.name);
             var has_upgrade = game.data.upgrades[upgrade.name];
             var can_purchase = _c.can_purchase_upgrade(game, upgrade);
 
-            var title = "Upgrade: "+name;
+            var title = "Upgrade: " + name;
             var description = _c.cost_benefits_text(game, upgrade, true);
 
             if (upgrade.type != lastStyle) {
                 $('<div>')
-                    .css({fontSize:'8px'})
+                    .css({fontSize: '8px'})
                     .text(_.str.titleize(upgrade.type) + ":")
                     .appendTo($available);
             }
@@ -447,9 +447,9 @@
             upgrade.$holder = $('<button>')
                 .text(name)
                 .css({display: has_upgrade ? 'none' : 'inline-block'})
-                .prop({disabled:!can_purchase})
+                .prop({disabled: !can_purchase})
                 .popover({title: title, content: description, trigger: 'hover', placement: 'top', html: true})
-                .on('click', function(){
+                .on('click', function () {
                     upgrade.$holder.popover('hide');
                     _c.purchase_upgrade(game, upgrade);
                     _c.redraw_data(game);
@@ -459,21 +459,24 @@
 
             upgrade.$holder_purchased = $('<div>')
                 .text(name)
-                .css({backgroundColor:'lightgreen', display: has_upgrade ? 'inline-block' : 'none'})
-                .popover({title: 'Purchased '+title, content: description, trigger: 'hover', placement: 'top', html: true})
+                .css({backgroundColor: 'lightgreen', display: has_upgrade ? 'inline-block' : 'none'})
+                .popover({title: 'Purchased ' + title, content: description, trigger: 'hover', placement: 'top', html: true})
                 .addClass('icon upgrade_holder')
                 .appendTo($researched);
         });
     }
+
     function update_upgrade_list(game) {
-        var upgrades_non_deity = _.filter(game.game_options.upgrades, function(up){return up.type != 'deity'});
+        var upgrades_non_deity = _.filter(game.game_options.upgrades, function (up) {
+            return up.type != 'deity'
+        });
         _.each(upgrades_non_deity, function (upgrade) {
             var has_upgrade = game.data.upgrades[upgrade.name];
             var can_purchase = _c.can_purchase_upgrade(game, upgrade);
 
             upgrade.$holder
                 .css({display: has_upgrade ? 'none' : 'inline-block'})
-                .prop({disabled:!can_purchase});
+                .prop({disabled: !can_purchase});
 
             upgrade.$holder_purchased
                 .css({display: has_upgrade ? 'inline-block' : 'none'})
@@ -514,12 +517,12 @@
         update_upgrade_list(game);
     };
 
-    _c.log_display = function(game) {
+    _c.log_display = function (game) {
         if ($pointers.logs) {
             var log = "<b>Civvies: [seed:" + game.game_options.rand_seed + "]</b>";
 
             var head_log = _.last(game.timing_log, 5);
-            _.each(head_log.reverse(), function (log_item){
+            _.each(head_log.reverse(), function (log_item) {
                 if (log_item.name == 'exception') {
                     if (log_item.ex && log_item.ex.name) {
                         log += "<br/> -- EXCEPTION: " + log_item.ex.name + ", " + log_item.ex.message;

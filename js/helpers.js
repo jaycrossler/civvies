@@ -26,14 +26,14 @@ Helpers.between = function (s, prefix, suffix, suffixAtEnd, prefixAtEnd) {
     return s;
 };
 Helpers.sortWithConditions = function (input, val_name) {
-	//Sorts in order, and if any item has a before/behind or after/above condition, reorders those
+    //Sorts in order, and if any item has a before/behind or after/above condition, reorders those
     val_name = val_name || "name";
 
-	var out = [];
+    var out = [];
     var remaining = [];
     var i, c, t, item, after, highest, condition, to;
 
-    for (i=0; i<input.length; i++) {
+    for (i = 0; i < input.length; i++) {
         item = input[i];
         if (item.after || item.above) { //TODO: Also implement item.before || item.behind
             remaining.push(item);
@@ -44,18 +44,18 @@ Helpers.sortWithConditions = function (input, val_name) {
 
     //Look through each item, order them by their conditions
     var unmatched = 0;
-    for (i=0; i<remaining.length; i++) {
+    for (i = 0; i < remaining.length; i++) {
         item = remaining[i];
         after = item.after || item.above;
         if (!_.isArray(after)) after = [after];
         highest = 0;
         var conditions_met = 0;
-        for (c=0; c<after.length; c++) {
+        for (c = 0; c < after.length; c++) {
             condition = after[c];
-            for (t=0; t<out.length; t++) {
+            for (t = 0; t < out.length; t++) {
                 to = out[t];
                 if (condition == to[val_name]) {
-                    if ((t+1) > highest) highest = t+1;
+                    if ((t + 1) > highest) highest = t + 1;
                     conditions_met++;
                     break;
                 }
@@ -69,17 +69,17 @@ Helpers.sortWithConditions = function (input, val_name) {
         }
     }
     //Re-sort the last few items
-    for (i=(out.length-unmatched); i<out.length; i++) {
+    for (i = (out.length - unmatched); i < out.length; i++) {
         item = out[i];
         after = item.after || item.above;
         if (!_.isArray(after)) after = [after];
         highest = 0;
-        for (c=0; c<after.length; c++) {
+        for (c = 0; c < after.length; c++) {
             condition = after[c];
-            for (t=0; t<out.length; t++) {
+            for (t = 0; t < out.length; t++) {
                 to = out[t];
                 if (condition == to[val_name]) {
-                    if (t > highest) highest = t+1;
+                    if (t > highest) highest = t + 1;
                     break;
                 }
             }
@@ -89,7 +89,7 @@ Helpers.sortWithConditions = function (input, val_name) {
     }
 
 
-	return out;
+    return out;
 };
 
 Helpers.randomSetSeed = function (seed) {
@@ -136,35 +136,37 @@ Helpers.knownFileExt = function (ext) {
 Helpers.thousandsFormatter = function (num) {
     return num > 999 ? (num / 1000).toFixed(1) + 'k' : num;
 };
-Helpers.expandExponential = function(value){
+Helpers.expandExponential = function (value) {
     //Modified from: http://stackoverflow.com/questions/16066793/javascript-display-really-big-numbers-rather-than-displaying-xen
     if (value < 100000000000000000000) {
         return value;
     } else {
         var value = value + "";
-        value = value.replace(/^([+-])?(\d+).?(\d*)[eE]([-+]?\d+)$/, function(x, s, n, f, c){
+        value = value.replace(/^([+-])?(\d+).?(\d*)[eE]([-+]?\d+)$/, function (x, s, n, f, c) {
             var l = +c < 0, i = n.length + +c, x = (l ? n : f).length,
-            c = ((c = Math.abs(c)) >= x ? c - x + l : 0),
-            z = (new Array(c + 1)).join("0"), r = n + f;
+                c = ((c = Math.abs(c)) >= x ? c - x + l : 0),
+                z = (new Array(c + 1)).join("0"), r = n + f;
             return (s || "") + (l ? r = z + r : r += z).substr(0, i += l ? z.length : 0) + (i < r.length ? "." + r.substr(i) : "");
         });
         return value;
     }
 };
-Helpers.abbreviateNumber = function(value, useLongSuffixes) {
+Helpers.abbreviateNumber = function (value, useLongSuffixes) {
     //Modified From: http://stackoverflow.com/questions/10599933/convert-long-number-into-abbreviated-string-in-javascript-with-a-special-shortn
     var newValue = value;
     if (value >= 10000) {
         value = Helpers.expandExponential(value);
         var suffixes = useLongSuffixes ? ["", " thousand", " million", " billion", " trillion", " quadrillion", " pentillion", " sextillion", " septillion"] : ["", "k", "m", "b", "t", "q", "p", "s", "ss"];
-        var suffixNum = Math.floor( (""+value).length/3 );
+        var suffixNum = Math.floor(("" + value).length / 3);
         var shortValue = '';
         for (var precision = 2; precision >= 1; precision--) {
-            shortValue = parseFloat( (suffixNum != 0 ? (value / Math.pow(1000,suffixNum) ) : value).toPrecision(precision));
-            var dotLessShortValue = (shortValue + '').replace(/[^a-zA-Z 0-9]+/g,'');
-            if (dotLessShortValue.length <= 2) { break; }
+            shortValue = parseFloat((suffixNum != 0 ? (value / Math.pow(1000, suffixNum) ) : value).toPrecision(precision));
+            var dotLessShortValue = (shortValue + '').replace(/[^a-zA-Z 0-9]+/g, '');
+            if (dotLessShortValue.length <= 2) {
+                break;
+            }
         }
-        newValue = shortValue+suffixes[suffixNum];
+        newValue = shortValue + suffixes[suffixNum];
     } else {
         newValue = newValue.toLocaleString();
     }
@@ -758,27 +760,27 @@ Helpers.isInArray = function (searchFor, searchIn, ignoreCase) {
 
 })(jQuery);
 
-(function(){
+(function () {
 
-  if ("performance" in window == false) {
-      window.performance = {};
-  }
-
-  Date.now = (Date.now || function () {  // thanks IE8
-	  return new Date().getTime();
-  });
-
-  if ("now" in window.performance == false){
-
-    var nowOffset = Date.now();
-
-    if (performance.timing && performance.timing.navigationStart){
-      nowOffset = performance.timing.navigationStart
+    if ("performance" in window == false) {
+        window.performance = {};
     }
 
-    window.performance.now = function now(){
-      return Date.now() - nowOffset;
+    Date.now = (Date.now || function () {  // thanks IE8
+        return new Date().getTime();
+    });
+
+    if ("now" in window.performance == false) {
+
+        var nowOffset = Date.now();
+
+        if (performance.timing && performance.timing.navigationStart) {
+            nowOffset = performance.timing.navigationStart
+        }
+
+        window.performance.now = function now() {
+            return Date.now() - nowOffset;
+        }
     }
-  }
 
 })();
