@@ -90,102 +90,104 @@
 
             <div id="buildingsPane"></div>
 
-            <div id="upgradesPane">
-            <h3>Upgrades</h3>
-                <span id="skinningLine"><button id="skinning" onmousedown="upgrade('skinning')">Skinning<br />(10 skins)</button><span class="note">Farmers can collect skins</span><br /></span>
-                <span id="harvestingLine"><button id="harvesting" onmousedown="upgrade('harvesting')">Harvesting<br />(10 herbs)</button><span class="note">Woodcutters can collect herbs</span><br /></span>
-                <span id="prospectingLine"><button id="prospecting" onmousedown="upgrade('prospecting')">Prospecting<br />(10 ore)</button><span class="note">Miners can collect ore</span><br /><br /></span>
-                <div id="basicFarming">
-                    <span id="domesticationLine"><button id="domestication" onmousedown="upgrade('domestication')">Domestication<br />(20 leather)</button><span class="note">Increase farmer food output</span><br /></span>
-                    <span id="ploughsharesLine"><button id="ploughshares" onmousedown="upgrade('ploughshares')">Ploughshares<br />(20 metal)</button><span class="note">Increase farmer food output</span><br /></span>
-                    <span id="irrigationLine"><button id="irrigation" onmousedown="upgrade('irrigation')">Irrigation<br />(500 wood, 200 stone)</button><span class="note">Increase farmer food output</span><br /><br /></span>
-                </div>
-                <div id="specialFarming">
-                    <span id="butcheringLine"><button id="butchering" onmousedown="upgrade('butchering')" disabled>Butchering<br />(Skinning, 40 leather)</button><span class="note">More farmers collect more skins</span><br /></span>
-                    <span id="gardeningLine"><button id="gardening" onmousedown="upgrade('gardening')" disabled>Gardening<br />(Harvesting, 40 herbs)</button><span class="note">More woodcutters collect more herbs</span><br /></span>
-                    <span id="extractionLine"><button id="extraction" onmousedown="upgrade('extraction')" disabled>Extraction<br />(Prospecting, 40 metal)</button><span class="note">More miners collect more ore</span><br /><br /></span>
-                </div>
-                <div id="specFreq">
-                    <span id="flensingLine"><button id="flensing" onmousedown="upgrade('flensing')">Flensing<br />(1000 metal)</button><span class="note">Collect skins more frequently</span><br /></span>
-                    <span id="maceratingLine"><button id="macerating" onmousedown="upgrade('macerating')">Macerating<br />(500 leather, 500 stone)</button><span class="note">Collect ore more frequently</span><br /><br /></span>
-                </div>
-                <div id="improvedFarming">
-                    <span id="cropRotationLine"><button id="croprotation" onmousedown="upgrade('croprotation')">Crop Rotation<br />(5000 herbs, 1000 piety)</button><span class="note">Increase farmer food output</span><br /></span>
-                    <span id="selectiveBreedingLine"><button id="selectivebreeding" onmousedown="upgrade('selectivebreeding')">Selective Breeding<br />(5000 skins, 1000 piety)</button><span class="note">Increase farmer food output</span><br /></span>
-                    <span id="fertilisersLine"><button id="fertilisers" onmousedown="upgrade('fertilisers')">Fertilisers<br />(5000 ore, 1000 piety)</button><span class="note">Increase farmer food output</span><br /><br /></span>
-                </div>
-                <span id="masonryLine"><button id="masonry" onmousedown="upgrade('masonry')">Masonry<br />(100 wood, 100 stone)</button><span class="note">Unlock more buildings and upgrades</span><br /></span>
-                <span id="constructionLine"><button id="construction" onmousedown="upgrade('construction')">Construction<br />(1000 wood, 1000 stone)</button><span class="note">Unlock more buildings and upgrades</span><br /></span>
-                <span id="architectureLine"><button id="architecture" onmousedown="upgrade('architecture')">Architecture<br />(10000 wood, 10000 stone)</button><span class="note">Unlock more buildings and upgrades</span><br /><br /></span>
-                <span id="tenementsLine"><button id="tenements" onmousedown="upgrade('tenements')">Tenements<br />(200 food, 500 wood, 500 stone)</button><span class="note">Houses support +2 workers</span><br /></span>
-                <span id="slumsLine"><button id="slums" onmousedown="upgrade('slums')">Slums<br />(500 food, 1000 wood, 1000 stone)</button><span class="note">Houses support +2 workers</span><br /></span>
-                <span id="granariesLine"><button id="granaries" onmousedown="upgrade('granaries')">Granaries<br />(1000 wood, 1000 stone)</button><span class="note">Barns store double the amount of food</span><br /></span>
-                <span id="palisadeLine"><button id="palisade" onmousedown="upgrade('palisade')">Palisade<br />(2000 wood, 1000 stone)</button><span class="note">Enemies do less damage</span><br /><br /></span>
-                <span id="masonryTech">
-                    <span id="weaponryLine"><button id="weaponry" onmousedown="upgrade('weaponry')">Basic Weaponry<br />(500 wood, 500 metal)</button><span class="note">Improve soldiers</span><br /></span>
-                    <span id="shieldsLine"><button id="shields" onmousedown="upgrade('shields')">Basic Shields<br />(500 wood, 500 leather)</button><span class="note">Improve soldiers</span><br /><br /></span>
-                    <span id="horsebackLine"><button id="horseback" onmousedown="upgrade('horseback')">Horseback Riding<br />(500 food, 500 wood)</button><span class="note">Build stables</span><br /></span>
-                    <span id="wheelLine"><button id="wheel" onmousedown="upgrade('wheel')">The Wheel<br />(500 wood, 500 stone)</button><span class="note">Build mills</span><br /><br /></span>
-                    <span id="writingLine"><button id="writing" onmousedown="upgrade('writing')">Writing<br />(500 skins)</button><span class="note">Increase cleric piety generation</span><br /></span>
-                    <div id="writingTech">
-                        <span id="administrationLine"><button id="administration" onmousedown="upgrade('administration')">Administration<br />(1000 stone, 1000 skins)</button><span class="note">Increase land gained from raiding</span><br /></span>
-                        <span id="codeoflawsLine"><button id="codeoflaws" onmousedown="upgrade('codeoflaws')">Code of Laws<br />(1000 stone, 1000 skins)</button><span class="note">Reduce unhappiness caused by overcrowding</span><br /></span>
-                        <span id="mathematicsLine"><button id="mathematics" onmousedown="upgrade('mathematics')">Mathematics<br />(1000 herbs, 1000 piety)</button><span class="note">Create siege engines</span><br /></span>
-                        <span id="aestheticsLine"><button id="aesthetics" onmousedown="upgrade('aesthetics')">Aesthetics<br />(5000 piety)</button><span class="note">Building temples increases happiness</span><br /><br /></span>
-                    </div>
-                    <span id="civilserviceLine"><button id="civilservice" onmousedown="upgrade('civilservice')">Civil Service<br />(5000 piety)</button><span class="note">Increase basic resources from clicking</span><br /></span>
-                    <div id="civilTech">
-                        <span id="feudalismLine"><button id="feudalism" onmousedown="upgrade('feudalism')">Feudalism<br />(10&#8239;000 piety)</button><span class="note">Further increase basic resources from clicking</span><br /></span>
-                        <span id="guildsLine"><button id="guilds" onmousedown="upgrade('guilds')">Guilds<br />(10&#8239;000 piety)</button><span class="note">Increase special resources from clicking</span><br /></span>
-                        <span id="serfsLine"><button id="serfs" onmousedown="upgrade('serfs')">Serfs<br />(20&#8239;000 piety)</button><span class="note">Unemployed workers increase resources from clicking</span><br /></span>
-                        <span id="nationalismLine"><button id="nationalism" onmousedown="upgrade('nationalism')">Nationalism<br />(50&#8239;000 piety)</button><span class="note">Soldiers increase basic resources from clicking</span><br /></span>
-                    </div>
-                    <span id="wonderLine"><br /><button id="startWonder" onmousedown="startWonder()">Start Building Wonder</button><br /></span>
-                </span>
-                <h3>Purchased Upgrades</h3>
-                <div id="purchased">
-                    <span id="Pskinning"><b>Skinning</b> - Farmers can collect skins</span>
-                    <span id="Pharvesting"><b>Harvesting</b> - Woodcutters can collect herbs</span>
-                    <span id="Pprospecting"><b>Prospecting</b> - Miners can collect ore</span>
-                    <span id="Pdomestication"><b>Domestication</b> - Increase farmer food output</span>
-                    <span id="Pploughshares"><b>Ploughshares</b> - Increase farmer food output</span>
-                    <span id="Pirrigation"><b>Irrigation</b> - Increase farmer food output</span>
-                    <span id="Pbutchering"><b>Butchering</b> - More farmers collect more skins</span>
-                    <span id="Pgardening"><b>Gardening</b> - More woodcutters collect more herbs</span>
-                    <span id="Pextraction"><b>Extraction</b> - More miners collect more ore</span>
-                    <span id="Pflensing"><b>Flensing</b> - Collect skins more frequently</span>
-                    <span id="Pmacerating"><b>Macerating</b> - Collect ore more frequently</span>
-                    <span id="Pcroprotation"><b>Crop Rotation</b> - Increase farmer food output</span>
-                    <span id="Pselectivebreeding"><b>Selective Breeding</b> - Increase farmer food output</span>
-                    <span id="Pfertilisers"><b>Fertilisers</b> - Increase farmer food output</span>
-                    <span id="Pmasonry"><b>Masonry</b> - Unlock more buildings and upgrades</span>
-                    <span id="Pconstruction"><b>Construction</b> - Unlock more buildings and upgrades</span>
-                    <span id="Parchitecture"><b>Architecture</b> - Unlock more buildings and upgrades</span>
-                    <span id="Ptenements"><b>Tenements</b> - Houses support +2 workers</span>
-                    <span id="Pslums"><b>Slums</b> - Houses support +2 workers</span>
-                    <span id="Pgranaries"><b>Granaries</b> - Barns store double the amount of food</span>
-                    <span id="Ppalisade"><b>Palisade</b> - Enemies do less damage</span>
-                    <span id="Pweaponry"><b>Basic Weaponry</b> - Improve soldiers</span>
-                    <span id="Pshields"><b>Basic Shields</b> - Improve soldiers</span>
-                    <span id="Phorseback"><b>Horseback Riding</b> - Build stables</span>
-                    <span id="Pwheel"><b>The Wheel</b> - Build mills</span>
-                    <span id="Pwriting"><b>Writing</b> - Increase cleric piety generation</span>
-                    <span id="Padministration"><b>Administration</b> - Increase land gained from raiding</span>
-                    <span id="Pcodeoflaws"><b>Code of Laws</b> - Reduce unhappiness caused by overcrowding</span>
-                    <span id="Pmathematics"><b>Mathematics</b> - Create siege engines</span>
-                    <span id="Paesthetics"><b>Aesthetics</b> - Building temples increases happiness</span>
-                    <span id="Pcivilservice"><b>Civil Service</b> - Increase basic resources from clicking</span>
-                    <span id="Pfeudalism"><b>Feudalism</b> - Further increase basic resources from clicking</span>
-                    <span id="Pguilds"><b>Guilds</b> - Increase special resources from clicking</span>
-                    <span id="Pserfs"><b>Serfs</b> - Unemployed workers increase resources from clicking</span>
-                    <span id="Pnationalism"><b>Nationalism</b> - Soldiers increase basic resources from clicking</span>
-                    <span id="Pworship"><b>Worship</b> - Allows you to worship a deity</span>
-                    <span id="Pstandard"><b>Battle Standard</b> - Allows you to assemble an army</span>
-                    <span id="Ptrade"><b>Trade</b> - Opens the trading post</span>
-                    <span id="Pcurrency"><b>Currency</b> - Traders arrive more frequently, stay longer</span>
-                    <span id="Pcommerce"><b>Commerce</b> - Traders arrive more frequently, stay longer</span>
-                </div>
-            </div>
+            <div id="upgradesPane"></div>
+            <!--<h3>Upgrades</h3>-->
+                <!--<span id="skinningLine"><button id="skinning" onmousedown="upgrade('skinning')">Skinning<br />(10 skins)</button><span class="note">Farmers can collect skins</span><br /></span>-->
+                <!--<span id="harvestingLine"><button id="harvesting" onmousedown="upgrade('harvesting')">Harvesting<br />(10 herbs)</button><span class="note">Woodcutters can collect herbs</span><br /></span>-->
+                <!--<span id="prospectingLine"><button id="prospecting" onmousedown="upgrade('prospecting')">Prospecting<br />(10 ore)</button><span class="note">Miners can collect ore</span><br /><br /></span>-->
+                <!--<div id="basicFarming">-->
+                    <!--<span id="domesticationLine"><button id="domestication" onmousedown="upgrade('domestication')">Domestication<br />(20 leather)</button><span class="note">Increase farmer food output</span><br /></span>-->
+                    <!--<span id="ploughsharesLine"><button id="ploughshares" onmousedown="upgrade('ploughshares')">Ploughshares<br />(20 metal)</button><span class="note">Increase farmer food output</span><br /></span>-->
+                    <!--<span id="irrigationLine"><button id="irrigation" onmousedown="upgrade('irrigation')">Irrigation<br />(500 wood, 200 stone)</button><span class="note">Increase farmer food output</span><br /><br /></span>-->
+                <!--</div>-->
+                <!--<div id="specialFarming">-->
+                    <!--<span id="butcheringLine"><button id="butchering" onmousedown="upgrade('butchering')" disabled>Butchering<br />(Skinning, 40 leather)</button><span class="note">More farmers collect more skins</span><br /></span>-->
+                    <!--<span id="gardeningLine"><button id="gardening" onmousedown="upgrade('gardening')" disabled>Gardening<br />(Harvesting, 40 herbs)</button><span class="note">More woodcutters collect more herbs</span><br /></span>-->
+                    <!--<span id="extractionLine"><button id="extraction" onmousedown="upgrade('extraction')" disabled>Extraction<br />(Prospecting, 40 metal)</button><span class="note">More miners collect more ore</span><br /><br /></span>-->
+                <!--</div>-->
+                <!--<div id="specFreq">-->
+                    <!--<span id="flensingLine"><button id="flensing" onmousedown="upgrade('flensing')">Flensing<br />(1000 metal)</button><span class="note">Collect skins more frequently</span><br /></span>-->
+                    <!--<span id="maceratingLine"><button id="macerating" onmousedown="upgrade('macerating')">Macerating<br />(500 leather, 500 stone)</button><span class="note">Collect ore more frequently</span><br /><br /></span>-->
+                <!--</div>-->
+                <!--<div id="improvedFarming">-->
+                    <!--<span id="cropRotationLine"><button id="croprotation" onmousedown="upgrade('croprotation')">Crop Rotation<br />(5000 herbs, 1000 piety)</button><span class="note">Increase farmer food output</span><br /></span>-->
+                    <!--<span id="selectiveBreedingLine"><button id="selectivebreeding" onmousedown="upgrade('selectivebreeding')">Selective Breeding<br />(5000 skins, 1000 piety)</button><span class="note">Increase farmer food output</span><br /></span>-->
+                    <!--<span id="fertilisersLine"><button id="fertilisers" onmousedown="upgrade('fertilisers')">Fertilisers<br />(5000 ore, 1000 piety)</button><span class="note">Increase farmer food output</span><br /><br /></span>-->
+                <!--</div>-->
+                <!--<span id="masonryLine"><button id="masonry" onmousedown="upgrade('masonry')">Masonry<br />(100 wood, 100 stone)</button><span class="note">Unlock more buildings and upgrades</span><br /></span>-->
+                <!--<span id="constructionLine"><button id="construction" onmousedown="upgrade('construction')">Construction<br />(1000 wood, 1000 stone)</button><span class="note">Unlock more buildings and upgrades</span><br /></span>-->
+                <!--<span id="architectureLine"><button id="architecture" onmousedown="upgrade('architecture')">Architecture<br />(10000 wood, 10000 stone)</button><span class="note">Unlock more buildings and upgrades</span><br /><br /></span>-->
+                <!--<span id="tenementsLine"><button id="tenements" onmousedown="upgrade('tenements')">Tenements<br />(200 food, 500 wood, 500 stone)</button><span class="note">Houses support +2 workers</span><br /></span>-->
+                <!--<span id="slumsLine"><button id="slums" onmousedown="upgrade('slums')">Slums<br />(500 food, 1000 wood, 1000 stone)</button><span class="note">Houses support +2 workers</span><br /></span>-->
+                <!--<span id="granariesLine"><button id="granaries" onmousedown="upgrade('granaries')">Granaries<br />(1000 wood, 1000 stone)</button><span class="note">Barns store double the amount of food</span><br /></span>-->
+                <!--<span id="palisadeLine"><button id="palisade" onmousedown="upgrade('palisade')">Palisade<br />(2000 wood, 1000 stone)</button><span class="note">Enemies do less damage</span><br /><br /></span>-->
+                <!--<span id="masonryTech">-->
+                    <!--<span id="weaponryLine"><button id="weaponry" onmousedown="upgrade('weaponry')">Basic Weaponry<br />(500 wood, 500 metal)</button><span class="note">Improve soldiers</span><br /></span>-->
+                    <!--<span id="shieldsLine"><button id="shields" onmousedown="upgrade('shields')">Basic Shields<br />(500 wood, 500 leather)</button><span class="note">Improve soldiers</span><br /><br /></span>-->
+                    <!--<span id="horsebackLine"><button id="horseback" onmousedown="upgrade('horseback')">Horseback Riding<br />(500 food, 500 wood)</button><span class="note">Build stables</span><br /></span>-->
+                    <!--<span id="wheelLine"><button id="wheel" onmousedown="upgrade('wheel')">The Wheel<br />(500 wood, 500 stone)</button><span class="note">Build mills</span><br /><br /></span>-->
+                    <!--<span id="writingLine"><button id="writing" onmousedown="upgrade('writing')">Writing<br />(500 skins)</button><span class="note">Increase cleric piety generation</span><br /></span>-->
+                    <!--<div id="writingTech">-->
+                        <!--<span id="administrationLine"><button id="administration" onmousedown="upgrade('administration')">Administration<br />(1000 stone, 1000 skins)</button><span class="note">Increase land gained from raiding</span><br /></span>-->
+                        <!--<span id="codeoflawsLine"><button id="codeoflaws" onmousedown="upgrade('codeoflaws')">Code of Laws<br />(1000 stone, 1000 skins)</button><span class="note">Reduce unhappiness caused by overcrowding</span><br /></span>-->
+                        <!--<span id="mathematicsLine"><button id="mathematics" onmousedown="upgrade('mathematics')">Mathematics<br />(1000 herbs, 1000 piety)</button><span class="note">Create siege engines</span><br /></span>-->
+                        <!--<span id="aestheticsLine"><button id="aesthetics" onmousedown="upgrade('aesthetics')">Aesthetics<br />(5000 piety)</button><span class="note">Building temples increases happiness</span><br /><br /></span>-->
+                    <!--</div>-->
+                    <!--<span id="civilserviceLine"><button id="civilservice" onmousedown="upgrade('civilservice')">Civil Service<br />(5000 piety)</button><span class="note">Increase basic resources from clicking</span><br /></span>-->
+                    <!--<div id="civilTech">-->
+                        <!--<span id="feudalismLine"><button id="feudalism" onmousedown="upgrade('feudalism')">Feudalism<br />(10&#8239;000 piety)</button><span class="note">Further increase basic resources from clicking</span><br /></span>-->
+                        <!--<span id="guildsLine"><button id="guilds" onmousedown="upgrade('guilds')">Guilds<br />(10&#8239;000 piety)</button><span class="note">Increase special resources from clicking</span><br /></span>-->
+                        <!--<span id="serfsLine"><button id="serfs" onmousedown="upgrade('serfs')">Serfs<br />(20&#8239;000 piety)</button><span class="note">Unemployed workers increase resources from clicking</span><br /></span>-->
+                        <!--<span id="nationalismLine"><button id="nationalism" onmousedown="upgrade('nationalism')">Nationalism<br />(50&#8239;000 piety)</button><span class="note">Soldiers increase basic resources from clicking</span><br /></span>-->
+                    <!--</div>-->
+                    <!--<span id="wonderLine"><br /><button id="startWonder" onmousedown="startWonder()">Start Building Wonder</button><br /></span>-->
+                <!--</span>-->
+                <!--<h3>Purchased Upgrades</h3>-->
+                <!--<div id="purchased">-->
+                    <!--<span id="Pskinning"><b>Skinning</b> - Farmers can collect skins</span>-->
+                    <!--<span id="Pharvesting"><b>Harvesting</b> - Woodcutters can collect herbs</span>-->
+                    <!--<span id="Pprospecting"><b>Prospecting</b> - Miners can collect ore</span>-->
+                    <!--<span id="Pdomestication"><b>Domestication</b> - Increase farmer food output</span>-->
+                    <!--<span id="Pploughshares"><b>Ploughshares</b> - Increase farmer food output</span>-->
+                    <!--<span id="Pirrigation"><b>Irrigation</b> - Increase farmer food output</span>-->
+                    <!--<span id="Pbutchering"><b>Butchering</b> - More farmers collect more skins</span>-->
+                    <!--<span id="Pgardening"><b>Gardening</b> - More woodcutters collect more herbs</span>-->
+                    <!--<span id="Pextraction"><b>Extraction</b> - More miners collect more ore</span>-->
+                    <!--<span id="Pflensing"><b>Flensing</b> - Collect skins more frequently</span>-->
+                    <!--<span id="Pmacerating"><b>Macerating</b> - Collect ore more frequently</span>-->
+                    <!--<span id="Pcroprotation"><b>Crop Rotation</b> - Increase farmer food output</span>-->
+                    <!--<span id="Pselectivebreeding"><b>Selective Breeding</b> - Increase farmer food output</span>-->
+                    <!--<span id="Pfertilisers"><b>Fertilisers</b> - Increase farmer food output</span>-->
+                    <!--<span id="Pmasonry"><b>Masonry</b> - Unlock more buildings and upgrades</span>-->
+                    <!--<span id="Pconstruction"><b>Construction</b> - Unlock more buildings and upgrades</span>-->
+                    <!--<span id="Parchitecture"><b>Architecture</b> - Unlock more buildings and upgrades</span>-->
+                    <!--<span id="Ptenements"><b>Tenements</b> - Houses support +2 workers</span>-->
+                    <!--<span id="Pslums"><b>Slums</b> - Houses support +2 workers</span>-->
+                    <!--<span id="Pgranaries"><b>Granaries</b> - Barns store double the amount of food</span>-->
+                    <!--<span id="Ppalisade"><b>Palisade</b> - Enemies do less damage</span>-->
+                    <!--<span id="Pweaponry"><b>Basic Weaponry</b> - Improve soldiers</span>-->
+                    <!--<span id="Pshields"><b>Basic Shields</b> - Improve soldiers</span>-->
+                    <!--<span id="Phorseback"><b>Horseback Riding</b> - Build stables</span>-->
+                    <!--<span id="Pwheel"><b>The Wheel</b> - Build mills</span>-->
+                    <!--<span id="Pwriting"><b>Writing</b> - Increase cleric piety generation</span>-->
+                    <!--<span id="Padministration"><b>Administration</b> - Increase land gained from raiding</span>-->
+                    <!--<span id="Pcodeoflaws"><b>Code of Laws</b> - Reduce unhappiness caused by overcrowding</span>-->
+                    <!--<span id="Pmathematics"><b>Mathematics</b> - Create siege engines</span>-->
+                    <!--<span id="Paesthetics"><b>Aesthetics</b> - Building temples increases happiness</span>-->
+                    <!--<span id="Pcivilservice"><b>Civil Service</b> - Increase basic resources from clicking</span>-->
+                    <!--<span id="Pfeudalism"><b>Feudalism</b> - Further increase basic resources from clicking</span>-->
+                    <!--<span id="Pguilds"><b>Guilds</b> - Increase special resources from clicking</span>-->
+                    <!--<span id="Pserfs"><b>Serfs</b> - Unemployed workers increase resources from clicking</span>-->
+                    <!--<span id="Pnationalism"><b>Nationalism</b> - Soldiers increase basic resources from clicking</span>-->
+                    <!--<span id="Pworship"><b>Worship</b> - Allows you to worship a deity</span>-->
+                    <!--<span id="Pstandard"><b>Battle Standard</b> - Allows you to assemble an army</span>-->
+                    <!--<span id="Ptrade"><b>Trade</b> - Opens the trading post</span>-->
+                    <!--<span id="Pcurrency"><b>Currency</b> - Traders arrive more frequently, stay longer</span>-->
+                    <!--<span id="Pcommerce"><b>Commerce</b> - Traders arrive more frequently, stay longer</span>-->
+                <!--</div>-->
+            <!--</div>-->
+
+
             <div id="deityPane">
             <h3>Deity</h3>
                 <span id="deityLine"><button id="deity" onmousedown="upgrade('deity')" disabled>Worship<br />(1000 piety)</button><span class="note">Begin worshipping a deity (requires temple)</span><br />

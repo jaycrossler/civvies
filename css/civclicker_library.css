@@ -83,6 +83,16 @@ button.multiplier {
     font-size: 0.9em;
     white-space: nowrap;
 }
+.upgrade_holder {
+    border:2px solid black;
+    background-color: white;
+    font-size: .7em;
+    width: 150px;
+    padding: 2px;
+    margin: 2px;
+    display: inline-block;
+
+}
 /*.btn.disabled {*/
     /*pointer-events: auto;*/
 /*}*/

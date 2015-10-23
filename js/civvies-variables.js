@@ -25,7 +25,7 @@
 
             {name: 'piety', grouping:2, image:'../images/civclicker/piety.png'},
             {name: 'corpses', grouping:2, image:'../images/civclicker/piety.png'},
-            {name: 'wonder', grouping:3, image:'../images/civclicker/piety.png'},
+            {name: 'wonder', grouping:3, image:'../images/civclicker/piety.png'}
         ],
         buildings: [ //TODO: Add upgrades required
             {name: 'tent', type:'home', costs:{skins: 2, wood: 2}, population_supports: 2, initial:1},
@@ -94,62 +94,74 @@
             {name: "foodCostInitial", value:20}
         ],
         upgrades: [
-            {name:"domestication", costs:{leather:20}, variable_increase:{farmers:0.1}},
-           	{name:"ploughshares", costs:{metal:20}, variable_increase:{farmers:0.1}},
-           	{name:"irrigation", costs:{wood:500, stone:200}, variable_increase:{farmers:0.1}},
-           	{name:"skinning", costs:{skins:10}, unlocks:["butchering"], unlocked: true},
-           	{name:"harvesting", costs:{herbs:10}, unlocks:["gardening"], unlocked: true},
-           	{name:"prospecting", costs:{ore:10}, unlocks:["extraction"], unlocked: true},
-           	{name:"butchering", costs:{leather:40}},
-           	{name:"gardening", costs:{herbs:40}},
-           	{name:"extraction", title: "Metal Extraction", costs:{metal:40}},
-           	{name:"croprotation", title: "Crop Rotation", costs:{herbs:5000, piety:1000}, variable_increase:{farmers:0.1}},
-           	{name:"selectivebreeding", title: "Selective Breeding", costs:{skins:5000, piety:1000}, variable_increase:{farmers:0.1}},
-           	{name:"fertilizers", costs:{ore:5000, piety:1000}, variable_increase:{farmers:0.1}},
-           	{name:"masonry", costs:{wood:100, stone:100}},
-           	{name:"construction", costs:{wood:1000, stone:1000}},
-           	{name:"architecture", costs:{wood:10000, stone:10000}},
-           	{name:"wheel", costs:{wood:500, stone:500}},
-           	{name:"horseback", costs:{wood:500, food:500}},
-           	{name:"tenements", costs:{food:200, wood:500, stone:500}},
-           	{name:"slums", costs:{food:500, wood:1000, stone:1000}},
-           	{name:"granaries", costs:{wood:1000, stone:1000}},
-           	{name:"palisade", costs:{wood:2000, stone:1000}},
-           	{name:"weaponry", costs:{wood:500, metal:500}, variable_increase:{soldier:0.01, cavalry:0.01}},
-           	{name:"shields", costs:{wood:500, leather:500}, variable_increase:{soldier:0.01, cavalry:0.01}},
-           	{name:"writing", costs:{skins:500}},
-           	{name:"administration", costs:{skins:1000, stone:1000}},
-           	{name:"codeoflaws", title: "Code of Laws", costs:{skins:1000, stone:1000}},
-           	{name:"mathematics", costs:{herbs:1000, piety:1000}},
-           	{name:"aesthetics", costs:{piety:5000}},
-           	{name:"civilservice", title: "Civil Service", costs:{piety:5000}},
-           	{name:"feudalism", costs:{piety:10000}},
-           	{name:"guilds", costs:{piety:10000}},
-           	{name:"serfs", costs:{piety:20000}},
-           	{name:"nationalism", costs:{piety:50000}},
-           	{name:"flensing", title: "Flaying", costs:{metal:1000}, variable_increase:{foodSpecialChance:0.001}},
-           	{name:"macerating", title: "Ore Refining", costs:{leather:500, stone:500}, variable_increase:{stoneSpecialChance:0.001}},
-            {name:"standard", title:"Battle Standard", costs:{leather:1000, metal:1000}},
+            //TODO: Have a grouping mechanism
+            {name:"skinning", type:'stone age', costs:{skins:10}, unlocks:["butchering"]},
+           	{name:"harvesting", type:'stone age', costs:{herbs:10}, unlocks:["gardening"]},
+           	{name:"prospecting", type:'stone age', costs:{ore:10}, unlocks:["extraction"]},
 
-           	{name:"deity", costs:{piety:1000}, special:"choose deity"},
-           	{name:"deityType"}, //TODO: How to handle 4 deities?
+            {name:"domestication", type:'basic farming', costs:{leather:20}, variable_increase:{farmers:0.1}},
+           	{name:"ploughshares", type:'basic farming', costs:{metal:20}, variable_increase:{farmers:0.1}},
+           	{name:"irrigation", type:'basic farming', costs:{wood:500, stone:200}, variable_increase:{farmers:0.1}},
 
-           	{name:"lure", costs:{piety:1000}},
-           	{name:"companion", costs:{piety:1000}},
-           	{name:"comfort", costs:{piety:5000}},
-           	{name:"blessing", costs:{piety:1000}},
-           	{name:"waste", costs:{piety:1000}},
-           	{name:"stay", costs:{piety:5000}},
-           	{name:"riddle", costs:{piety:1000}},
-           	{name:"throne", costs:{piety:1000}},
-           	{name:"lament", costs:{piety:5000}},
-           	{name:"book", costs:{piety:1000}},
-           	{name:"feast", costs:{piety:1000}},
-           	{name:"secrets", costs:{piety:5000}},
+           	{name:"butchering", type:'special farming', costs:{leather:40}},
+           	{name:"gardening", type:'special farming', costs:{herbs:40}},
+           	{name:"extraction", type:'special farming', title: "Metal Extraction", costs:{metal:40}},
 
-            {name:"trade", costs:{gold:1}},
-           	{name:"currency", costs:{gold:10, ore:1000}},
-           	{name:"commerce", costs:{gold:100, piety:10000}}
+            {name:"flensing", type:'efficiency farming', title: "Flaying", costs:{metal:1000}, variable_increase:{foodSpecialChance:0.001}},
+           	{name:"macerating", type:'efficiency farming', title: "Ore Refining", costs:{leather:500, stone:500}, variable_increase:{stoneSpecialChance:0.001}},
+
+           	{name:"croprotation", type:'improved farming', title: "Crop Rotation", costs:{herbs:5000, piety:1000}, variable_increase:{farmers:0.1}},
+           	{name:"selectivebreeding", type:'improved farming', title: "Breeding", costs:{skins:5000, piety:1000}, variable_increase:{farmers:0.1}},
+           	{name:"fertilizers", type:'improved farming', costs:{ore:5000, piety:1000}, variable_increase:{farmers:0.1}},
+
+           	{name:"masonry", type:'construction', costs:{wood:100, stone:100}},
+           	{name:"construction", type:'construction', costs:{wood:1000, stone:1000}},
+           	{name:"architecture", type:'construction', costs:{wood:10000, stone:10000}},
+
+            {name:"tenements", type:'housing', costs:{food:200, wood:500, stone:500}},
+            {name:"slums", type:'housing', costs:{food:500, wood:1000, stone:1000}},
+
+            {name:"granaries", type:'city efficiency', costs:{wood:1000, stone:1000}},
+           	{name:"palisade", type:'city efficiency', costs:{wood:2000, stone:1000}},
+
+            {name:"weaponry", type:'weaponry', costs:{wood:500, metal:500}, variable_increase:{soldier:0.01, cavalry:0.01}},
+           	{name:"shields", type:'weaponry', costs:{wood:500, leather:500}, variable_increase:{soldier:0.01, cavalry:0.01}},
+            {name:"horseback", type:'weaponry', costs:{wood:500, food:500}},
+           	{name:"wheel", type:'weaponry', costs:{wood:500, stone:500}},
+
+           	{name:"writing", type:'writing', costs:{skins:500}},
+           	{name:"administration", type:'writing', costs:{skins:1000, stone:1000}},
+           	{name:"codeoflaws", type:'writing', title: "Code of Laws", costs:{skins:1000, stone:1000}},
+           	{name:"mathematics", type:'writing', costs:{herbs:1000, piety:1000}},
+           	{name:"aesthetics", type:'writing', costs:{piety:5000}},
+            {name:"standard", type:'writing', title:"Battle Standard", costs:{leather:1000, metal:1000}},
+
+            {name:"civilservice", type:'civil', title: "Civil Service", costs:{piety:5000}},
+           	{name:"feudalism", type:'civil', costs:{piety:10000}},
+           	{name:"guilds", type:'civil', costs:{piety:10000}},
+           	{name:"serfs", type:'civil', costs:{piety:20000}},
+           	{name:"nationalism", type:'civil', costs:{piety:50000}},
+
+            {name:"trade", type:'commerce', costs:{gold:1}},
+           	{name:"currency", type:'commerce', costs:{gold:10, ore:1000}},
+           	{name:"commerce", type:'commerce', costs:{gold:100, piety:10000}},
+
+           	{name:"deity", type:'deity', costs:{piety:1000}, special:"choose deity"},
+//           	{name:"deityType"}, //TODO: How to handle 4 deities?
+
+           	{name:"lure", type:'deity', costs:{piety:1000}},
+           	{name:"companion", type:'deity', costs:{piety:1000}},
+           	{name:"comfort", type:'deity', costs:{piety:5000}},
+           	{name:"blessing", type:'deity', costs:{piety:1000}},
+           	{name:"waste", type:'deity', costs:{piety:1000}},
+           	{name:"stay", type:'deity', costs:{piety:5000}},
+           	{name:"riddle", type:'deity', costs:{piety:1000}},
+           	{name:"throne", type:'deity', costs:{piety:1000}},
+           	{name:"lament", type:'deity', costs:{piety:5000}},
+           	{name:"book", type:'deity', costs:{piety:1000}},
+           	{name:"feast", type:'deity', costs:{piety:1000}},
+           	{name:"secrets", type:'deity', costs:{piety:5000}}
+
         ],
         achievements: [
             {name: "hamlet"},

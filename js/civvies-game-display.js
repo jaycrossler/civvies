@@ -5,6 +5,7 @@
     var purchase_multiples = [1, 10, 100, 1000];
     var assign_multiples = ['-all', -100, -10, -1, 'info', 1, 10, 100, '+max'];
 
+    //------------------------------------------
     function show_basic_resources(game) {
         $('<h3>')
             .text('Resources')
@@ -14,7 +15,7 @@
 
         _.each(game.game_options.resources, function (resource) {
             if (resource.grouping == 1) {
-                var name = _.str.titleize(resource.name);
+                var name = _.str.titleize(resource.title || resource.name);
                 var $tr = $('<tr>')
                     .appendTo($table);
                 var $td1 = $('<td>')
@@ -67,7 +68,7 @@
 
         _.each(game.game_options.resources, function (resource) {
             if (resource.grouping == 2) {
-                var name = _.str.titleize(resource.name);
+                var name = _.str.titleize(resource.title || resource.name);
 
                 var $div = $('<div>')
                     .addClass('icon resource-holder')
@@ -116,6 +117,7 @@
         });
     }
 
+    //------------------------------------------
     function show_building_buttons(game) {
         $('<h3>')
             .text('Buildings')
@@ -207,6 +209,7 @@
         }
     }
 
+    //------------------------------------------
     function show_population_data(game) {
         $('<h3>')
             .text('Population')
@@ -281,7 +284,7 @@
         });
     }
 
-
+    //------------------------------------------
     function show_jobs_list(game) {
         $('<h3>')
             .text('Jobs')
@@ -292,7 +295,6 @@
             .appendTo($pointers.jobs_list);
 
         var lastStyle = game.game_options.populations[0].type;
-
         _.each(game.game_options.populations, function (job) {
             var name = _.str.titleize(job.title || job.name);
             var amount = game.data.populations[job.name];
@@ -410,6 +412,73 @@
         }
     }
 
+    //------------------------------------------
+    function show_upgrades_list(game) {
+        var $available = $('<h3>')
+            .text('Available Upgrades')
+            .appendTo($pointers.upgrade_list);
+        $("<div>")
+            .appendTo($available);
+
+        var $researched = $('<h3>')
+            .text('Researched Upgrades')
+            .appendTo($pointers.upgrade_list);
+        $("<div>")
+            .appendTo($researched);
+
+        var lastStyle = '';
+        var upgrades_non_deity = _.filter(game.game_options.upgrades, function(up){return up.type != 'deity'});
+        _.each(upgrades_non_deity, function (upgrade) {
+            var name = _.str.titleize(upgrade.title || upgrade.name);
+            var has_upgrade = game.data.upgrades[upgrade.name];
+            var can_purchase = _c.can_purchase_upgrade(game, upgrade);
+
+            var title = "Upgrade: "+name;
+            var description = _c.cost_benefits_text(game, upgrade, true);
+
+            if (upgrade.type != lastStyle) {
+                $('<div>')
+                    .css({fontSize:'8px'})
+                    .text(_.str.titleize(upgrade.type) + ":")
+                    .appendTo($available);
+            }
+            lastStyle = upgrade.type;
+
+            upgrade.$holder = $('<button>')
+                .text(name)
+                .css({display: has_upgrade ? 'none' : 'inline-block'})
+                .prop({disabled:!can_purchase})
+                .popover({title: title, content: description, trigger: 'hover', placement: 'top', html: true})
+                .on('click', function(){
+                    upgrade.$holder.popover('hide');
+                    _c.purchase_upgrade(game, upgrade);
+                    _c.redraw_data(game);
+                })
+                .addClass('icon upgrade_holder')
+                .appendTo($available);
+
+            upgrade.$holder_purchased = $('<div>')
+                .text(name)
+                .css({backgroundColor:'lightgreen', display: has_upgrade ? 'inline-block' : 'none'})
+                .popover({title: 'Purchased '+title, content: description, trigger: 'hover', placement: 'top', html: true})
+                .addClass('icon upgrade_holder')
+                .appendTo($researched);
+        });
+    }
+    function update_upgrade_list(game) {
+        var upgrades_non_deity = _.filter(game.game_options.upgrades, function(up){return up.type != 'deity'});
+        _.each(upgrades_non_deity, function (upgrade) {
+            var has_upgrade = game.data.upgrades[upgrade.name];
+            var can_purchase = _c.can_purchase_upgrade(game, upgrade);
+
+            upgrade.$holder
+                .css({display: has_upgrade ? 'none' : 'inline-block'})
+                .prop({disabled:!can_purchase});
+
+            upgrade.$holder_purchased
+                .css({display: has_upgrade ? 'inline-block' : 'none'})
+        });
+    }
 
     //-------------------------------------------------
     var _c = new Civvies('get_private_functions');
@@ -431,16 +500,21 @@
 
         $pointers.logs = $('#eventsContainer');
 
+        $pointers.upgrade_list = $('#upgradesPane');
+        show_upgrades_list(game);
+
     };
 
     _c.redraw_data = function (game) {
+        //TODO: Don't show these every time
         update_resources(game);
         update_building_buttons(game);
         update_population_data(game);
         update_jobs_list(game);
+        update_upgrade_list(game);
     };
 
-    _c.log_display = function(game, msg) {
+    _c.log_display = function(game) {
         if ($pointers.logs) {
             var log = "<b>Civvies: [seed:" + game.game_options.rand_seed + "]</b>";
 

@@ -182,7 +182,7 @@
             }
         }
         var chances = [];
-        _.each(item.chances || [], function(chance){
+        _.each(item.chances || [], function (chance) {
             out = "";
             if (chance.resource) {
                 out = "Chance to find " + chance.resource;
@@ -195,13 +195,13 @@
 
         var text_pieces = [];
         if (gather) text_pieces.push(gather);
-        if (costs.length) text_pieces.push("Costs: "+costs.join(", "));
-        if (consumes.length) text_pieces.push("Consumes: "+consumes.join(", "));
-        if (benefits.length) text_pieces.push("Benefits: "+benefits.join(", "));
-        if (produces.length) text_pieces.push("Produces: "+produces.join(", "));
+        if (costs.length) text_pieces.push("Costs: " + costs.join(", "));
+        if (consumes.length) text_pieces.push("Consumes: " + consumes.join(", "));
+        if (benefits.length) text_pieces.push("Benefits: " + benefits.join(", "));
+        if (produces.length) text_pieces.push("Produces: " + produces.join(", "));
         if (chances.length) text_pieces.push(chances.join(", "));
-        if (supports.length) text_pieces.push("Supports: "+supports.join(", "));
-        if (notes) text_pieces.push("Notes: "+notes);
+        if (supports.length) text_pieces.push("Supports: " + supports.join(", "));
+        if (notes) text_pieces.push("Notes: " + notes);
 
         var join_text = as_html ? ".</br>" : ".  ";
 
@@ -265,12 +265,12 @@
         game.data.resources[resource.name] = maths.clamp(game.data.resources[resource.name] + amount, 0, max);
 
         if (resource.chances) {
-            _.each(resource.chances || [], function(chance){
+            _.each(resource.chances || [], function (chance) {
                 var percent = chance.chance || 0.01;
                 if (_.isString(percent)) {
                     percent = game.data.variables[percent];
                 }
-                if (_.isNumber(percent)){
+                if (_.isNumber(percent)) {
                     if (_c.random(game.game_options) < percent) {
                         if (chance.resource) {
                             game.data.resources[chance.resource] += amount;
@@ -280,14 +280,14 @@
             });
         }
     };
-    _c.population = function(game) {
-        var pop = {current:0, max:0, current_that_eats:0};
+    _c.population = function (game) {
+        var pop = {current: 0, max: 0, current_that_eats: 0};
 
         var people = 0;
         var eaters = 0;
         for (var key in game.data.populations) {
             people += game.data.populations[key];
-            if (!_c.info(game,'populations',key,'doesnt_consume_food', false)) {
+            if (!_c.info(game, 'populations', key, 'doesnt_consume_food', false)) {
                 eaters += game.data.populations[key];
             }
         }
@@ -305,33 +305,33 @@
 
         return pop;
     };
-    _c.worker_food_cost = function(game, times) {
-        var initial_cost = _c.info(game,'variables','foodCostInitial', 'value', 20);
+    _c.worker_food_cost = function (game, times) {
+        var initial_cost = _c.info(game, 'variables', 'foodCostInitial', 'value', 20);
         times = times || 1;
 
         var pop = _c.population(game);
-        var food_cost = initial_cost + Math.floor((pop.current+times) / 100);
+        var food_cost = initial_cost + Math.floor((pop.current + times) / 100);
 
-        return food_cost*times;
+        return food_cost * times;
     };
-    _c.create_workers = function(game, times) {
-        if (_c.workers_are_creatable(game, times)){
+    _c.create_workers = function (game, times) {
+        if (_c.workers_are_creatable(game, times)) {
             game.data.resources.food -= _c.worker_food_cost(game, times);
             game.data.populations.unemployed += times;
 
             game.logMessage("Purchased: " + times + "x unemployed workers", true);
         }
     };
-    _c.workers_are_creatable = function(game, times) {
+    _c.workers_are_creatable = function (game, times) {
         var enough_food = (_c.worker_food_cost(game, times) <= game.data.resources.food);
         var enough_space = false;
         if (enough_food) {
             var pop = _c.population(game);
-            enough_space = (pop.current+times <= pop.max);
+            enough_space = (pop.current + times <= pop.max);
         }
         return enough_food && enough_space;
     };
-    _c.population_is_assignable = function(game, job, times) {
+    _c.population_is_assignable = function (game, job, times) {
         times = times || 1;
         //TODO: Take into account all/max
 
@@ -349,7 +349,7 @@
             if (assignable && !job.doesnt_require_office) {
                 //Check through buildings
                 var offices_total = 0;
-                _.each(game.game_options.buildings, function(building){
+                _.each(game.game_options.buildings, function (building) {
                     if (building.supports) {
                         var offices_per = building.supports[job.name];
                         if (offices_per) {
@@ -357,20 +357,46 @@
                         }
                     }
                 });
-                assignable = ((current+times) <= offices_total);
+                assignable = ((current + times) <= offices_total);
             }
         }
         return assignable;
     };
-    _c.assign_workers = function(game, job, times){
+    _c.assign_workers = function (game, job, times) {
         //TODO: Take into account all/max
-        if (_c.population_is_assignable(game,job,times)) {
+        if (_c.population_is_assignable(game, job, times)) {
             if (_.isNumber(times)) {
                 game.data.populations[job.name] += times;
                 game.data.populations.unemployed -= times;
             }
         }
     };
+    _c.can_purchase_upgrade = function (game, upgrade) {
+        var resource_costs = upgrade.costs;
+
+        var buildable = true;
+        for (var cost in resource_costs) {
+            var current = game.data.resources[cost];
+            if (current < (resource_costs[cost])) {
+                buildable = false;
+                break;
+            }
+        }
+        return buildable;
+    };
+    _c.purchase_upgrade = function (game, upgrade) {
+        if (_c.can_purchase_upgrade(game, upgrade)){
+
+            var resource_costs = upgrade.costs;
+
+            for (var cost in resource_costs) {
+                var amount = resource_costs[cost];
+                _c.increment_resource(game, _c.info(game, 'resources', cost), -amount);
+            }
+            game.data.upgrades[upgrade.name] = true;
+        }
+    };
+
 
     //-Not implemented yet------------------
     _c.increment = function () {

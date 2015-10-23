@@ -1022,6 +1022,9 @@ var Civvies = (function ($, _, Helpers, maths) {
         if (showToConsole) {
             console.log(msg);
         }
+        if (this._private_functions.log_display) {
+            this._private_functions.log_display(this);
+        }
     };
     CivviesClass.prototype.lastTimeDrawn = function () {
         var time_drawn = 0;
@@ -1101,6 +1104,7 @@ Civvies.initializeOptions = function (option_type, options) {
     var purchase_multiples = [1, 10, 100, 1000];
     var assign_multiples = ['-all', -100, -10, -1, 'info', 1, 10, 100, '+max'];
 
+    //------------------------------------------
     function show_basic_resources(game) {
         $('<h3>')
             .text('Resources')
@@ -1110,7 +1114,7 @@ Civvies.initializeOptions = function (option_type, options) {
 
         _.each(game.game_options.resources, function (resource) {
             if (resource.grouping == 1) {
-                var name = _.str.titleize(resource.name);
+                var name = _.str.titleize(resource.title || resource.name);
                 var $tr = $('<tr>')
                     .appendTo($table);
                 var $td1 = $('<td>')
@@ -1163,7 +1167,7 @@ Civvies.initializeOptions = function (option_type, options) {
 
         _.each(game.game_options.resources, function (resource) {
             if (resource.grouping == 2) {
-                var name = _.str.titleize(resource.name);
+                var name = _.str.titleize(resource.title || resource.name);
 
                 var $div = $('<div>')
                     .addClass('icon resource-holder')
@@ -1212,6 +1216,7 @@ Civvies.initializeOptions = function (option_type, options) {
         });
     }
 
+    //------------------------------------------
     function show_building_buttons(game) {
         $('<h3>')
             .text('Buildings')
@@ -1303,6 +1308,7 @@ Civvies.initializeOptions = function (option_type, options) {
         }
     }
 
+    //------------------------------------------
     function show_population_data(game) {
         $('<h3>')
             .text('Population')
@@ -1377,7 +1383,7 @@ Civvies.initializeOptions = function (option_type, options) {
         });
     }
 
-
+    //------------------------------------------
     function show_jobs_list(game) {
         $('<h3>')
             .text('Jobs')
@@ -1388,7 +1394,6 @@ Civvies.initializeOptions = function (option_type, options) {
             .appendTo($pointers.jobs_list);
 
         var lastStyle = game.game_options.populations[0].type;
-
         _.each(game.game_options.populations, function (job) {
             var name = _.str.titleize(job.title || job.name);
             var amount = game.data.populations[job.name];
@@ -1506,283 +1511,73 @@ Civvies.initializeOptions = function (option_type, options) {
         }
     }
 
-//
-//    <div id="jobsContainer">
-//        <h3>Jobs</h3>
-//        <table id="jobs">
-//            <tr id="customJobIncrement">
-//                <td class="jobNone"></td>
-//                <td class="jobCustom"></td>
-//                <td class="job100"></td>
-//                <td class="job10"></td>
-//                <td></td>
-//                <td>Increment:</td>
-//                <td><input id="jobCustom" type="number" min="1" step="1" value="1"></td>
-//                <td></td>
-//                <td class="job10"></td>
-//                <td class="job100"></td>
-//                <td class="jobCustom"></td>
-//                <td class="jobAll"></td>
-//                <td><span class="note"></span></td>
-//            </tr>
-//            <tr id="unempgroup">
-//                <td class="jobNone"></td>
-//                <td class="jobCustom"></td>
-//                <td class="job100"></td>
-//                <td class="job10"></td>
-//                <td></td>
-//                <td>Unemployed: </td>
-//                <td class="number"><span id="unemployed">0</span></td>
-//                <td></td>
-//                <td class="job10"></td>
-//                <td class="job100"></td>
-//                <td class="jobCustom"></td>
-//                <td class="jobAll"></td>
-//                <td><span class="note">Unassigned Workers</span></td>
-//            </tr>
-//            <tr id="sickGroup">
-//                <td class="jobNone"></td>
-//                <td class="jobCustom"></td>
-//                <td class="job100"></td>
-//                <td class="job10"></td>
-//                <td></td>
-//                <td>Sick: </td>
-//                <td class="number"><span id="sickTotal">0</span></td>
-//                <td></td>
-//                <td class="job10"></td>
-//                <td class="job100"></td>
-//                <td class="jobCustom"></td>
-//                <td class="jobAll"></td>
-//                <td><span class="note">Sick workers</span></td>
-//            </tr>
-//            <tr id="farmergroup">
-//                <td class="jobNone"><button onmousedown="fireAll('farmers');">-All</button></td>
-//                <td class="jobCustom"><button onmousedown="fireCustom('farmers');">-Custom</button></td>
-//                <td class="job100"><button onmousedown="fire('farmers',100);">-100</button></td>
-//                <td class="job10"><button onmousedown="fire('farmers',10);">-10</button></td>
-//                <td><button onmousedown="fire('farmers',1);">&lt;</button></td>
-//                <td class="job">Farmers: </td>
-//                <td class="number"><span id="farmers">0</span></td>
-//                <td><button onmousedown="hire('farmers',1);">&gt;</button></td>
-//                <td class="job10"><button onmousedown="hire('farmers',10);">+10</button></td>
-//                <td class="job100"><button onmousedown="hire('farmers',100);">+100</button></td>
-//                <td class="jobCustom"><button onmousedown="hireCustom('farmers');">+Custom</button></td>
-//                <td class="jobAll"><button onmousedown="hireAll('farmers');">Max</button></td>
-//                <td><span class="note">Automatically gather food</span></td>
-//            </tr>
-//            <tr id="woodcuttergroup">
-//                <td class="jobNone"><button onmousedown="fireAll('woodcutters');">-All</button></td>
-//                <td class="jobCustom"><button onmousedown="fireCustom('woodcutters');">-Custom</button></td>
-//                <td class="job100"><button onmousedown="fire('woodcutters',100);">-100</button></td>
-//                <td class="job10"><button onmousedown="fire('woodcutters',10);">-10</button></td>
-//                <td><button onmousedown="fire('woodcutters',1);">&lt;</button></td>
-//                <td class="job">Woodcutters: </td>
-//                <td class="number"><span id="woodcutters">0</span></td>
-//                <td><button onmousedown="hire('woodcutters',1);">&gt;</button></td>
-//                <td class="job10"><button onmousedown="hire('woodcutters',10);">+10</button></td>
-//                <td class="job100"><button onmousedown="hire('woodcutters',100);">+100</button></td>
-//                <td class="jobCustom"><button onmousedown="hireCustom('woodcutters');">+Custom</button></td>
-//                <td class="jobAll"><button onmousedown="hireAll('woodcutters');">Max</button></td>
-//                <td><span class="note">Automatically gather wood</span></td>
-//            </tr>
-//            <tr id="minergroup">
-//                <td class="jobNone"><button onmousedown="fireAll('miners');">-All</button></td>
-//                <td class="jobCustom"><button onmousedown="fireCustom('miners');">-Custom</button></td>
-//                <td class="job100"><button onmousedown="fire('miners',100);">-100</button></td>
-//                <td class="job10"><button onmousedown="fire('miners',10);">-10</button></td>
-//                <td><button onmousedown="fire('miners',1);">&lt;</button></td>
-//                <td class="job">Miners: </td>
-//                <td class="number"><span id="miners">0</span></td>
-//                <td><button onmousedown="hire('miners',1);">&gt;</button></td>
-//                <td class="job10"><button onmousedown="hire('miners',10);">+10</button></td>
-//                <td class="job100"><button onmousedown="hire('miners',100);">+100</button></td>
-//                <td class="jobCustom"><button onmousedown="hireCustom('miners');">+Custom</button></td>
-//                <td class="jobAll"><button onmousedown="hireAll('miners');">Max</button></td>
-//                <td><span class="note">Automatically gather stone</span></td>
-//            </tr>
-//            <tr id="tannergroup">
-//                <td class="jobNone"><button onmousedown="fireAll('tanners');">-All</button></td>
-//                <td class="jobCustom"><button onmousedown="fireCustom('tanners');">-Custom</button></td>
-//                <td class="job100"><button onmousedown="fire('tanners',100);">-100</button></td>
-//                <td class="job10"><button onmousedown="fire('tanners',10);">-10</button></td>
-//                <td><button onmousedown="fire('tanners',1);">&lt;</button></td>
-//                <td class="job">Tanners: </td>
-//                <td class="number"><span id="tanners">0</span></td>
-//                <td><button onmousedown="hire('tanners',1);">&gt;</button></td>
-//                <td class="job10"><button onmousedown="hire('tanners',10);">+10</button></td>
-//                <td class="job100"><button onmousedown="hire('tanners',100);">+100</button></td>
-//                <td class="jobCustom"><button onmousedown="hireCustom('tanners');">+Custom</button></td>
-//                <td class="jobAll"><button onmousedown="hireAll('tanners');">Max</button></td>
-//                <td><span class="note">Convert skins to leather</span></td>
-//            </tr>
-//            <tr id="blacksmithgroup">
-//                <td class="jobNone"><button onmousedown="fireAll('blacksmiths');">-All</button></td>
-//                <td class="jobCustom"><button onmousedown="fireCustom('blacksmiths');">-Custom</button></td>
-//                <td class="job100"><button onmousedown="fire('blacksmiths',100);">-100</button></td>
-//                <td class="job10"><button onmousedown="fire('blacksmiths',10);">-10</button></td>
-//                <td><button onmousedown="fire('blacksmiths',1);">&lt;</button></td>
-//                <td class="job">Blacksmiths: </td>
-//                <td class="number"><span id="blacksmiths">0</span></td>
-//                <td><button onmousedown="hire('blacksmiths',1);">&gt;</button></td>
-//                <td class="job10"><button onmousedown="hire('blacksmiths',10);">+10</button></td>
-//                <td class="job100"><button onmousedown="hire('blacksmiths',100);">+100</button></td>
-//                <td class="jobCustom"><button onmousedown="hireCustom('blacksmiths');">+Custom</button></td>
-//                <td class="jobAll"><button onmousedown="hireAll('blacksmiths');">Max</button></td>
-//                <td><span class="note">Convert ore to metal</span></td>
-//            </tr>
-//            <tr id="apothecarygroup">
-//                <td class="jobNone"><button onmousedown="fireAll('apothecaries');">-All</button></td>
-//                <td class="jobCustom"><button onmousedown="fireCustom('apothecaries');">-Custom</button></td>
-//                <td class="job100"><button onmousedown="fire('apothecaries',100);">-100</button></td>
-//                <td class="job10"><button onmousedown="fire('apothecaries',10);">-10</button></td>
-//                <td><button onmousedown="fire('apothecaries',1);">&lt;</button></td>
-//                <td class="job">Apothecaries: </td>
-//                <td class="number"><span id="apothecaries">0</span></td>
-//                <td><button onmousedown="hire('apothecaries',1);">&gt;</button></td>
-//                <td class="job10"><button onmousedown="hire('apothecaries',10);">+10</button></td>
-//                <td class="job100"><button onmousedown="hire('apothecaries',100);">+100</button></td>
-//                <td class="jobCustom"><button onmousedown="hireCustom('apothecaries');">+Custom</button></td>
-//                <td class="jobAll"><button onmousedown="hireAll('apothecaries');">Max</button></td>
-//                <td><span class="note">Cure sick workers</span></td>
-//            </tr>
-//            <tr id="clericgroup">
-//                <td class="jobNone"><button onmousedown="fireAll('clerics');">-All</button></td>
-//                <td class="jobCustom"><button onmousedown="fireCustom('clerics');">-Custom</button></td>
-//                <td class="job100"><button onmousedown="fire('clerics',100);">-100</button></td>
-//                <td class="job10"><button onmousedown="fire('clerics',10);">-10</button></td>
-//                <td><button onmousedown="fire('clerics',1);">&lt;</button></td>
-//                <td class="job">Clerics: </td>
-//                <td class="number"><span id="clerics">0</span></td>
-//                <td><button onmousedown="hire('clerics',1);">&gt;</button></td>
-//                <td class="job10"><button onmousedown="hire('clerics',10);">+10</button></td>
-//                <td class="job100"><button onmousedown="hire('clerics',100);">+100</button></td>
-//                <td class="jobCustom"><button onmousedown="hireCustom('clerics');">+Custom</button></td>
-//                <td class="jobAll"><button onmousedown="hireAll('clerics');">Max</button></td>
-//                <td><span class="note">Generate piety, bury corpses</span></td>
-//            </tr>
-//            <tr id="labourergroup">
-//                <td class="jobNone"><button onmousedown="fireAll('labourers');">-All</button></td>
-//                <td class="jobCustom"><button onmousedown="fireCustom('labourers');">-Custom</button></td>
-//                <td class="job100"><button onmousedown="fire('labourers',100);">-100</button></td>
-//                <td class="job10"><button onmousedown="fire('labourers',10);">-10</button></td>
-//                <td><button onmousedown="fire('labourers',1);">&lt;</button></td>
-//                <td class="job">Labourers: </td>
-//                <td class="number"><span id="labourers">0</span></td>
-//                <td><button onmousedown="hire('labourers',1);">&gt;</button></td>
-//                <td class="job10"><button onmousedown="hire('labourers',10);">+10</button></td>
-//                <td class="job100"><button onmousedown="hire('labourers',100);">+100</button></td>
-//                <td class="jobCustom"><button onmousedown="hireCustom('labourers');">+Custom</button></td>
-//                <td class="jobAll"><button onmousedown="hireAll('labourers');">Max</button></td>
-//                <td><span class="note">Use resources to build wonder</span></td>
-//            </tr>
-//            <tr id="soldiergroup">
-//                <td class="jobNone"><button onmousedown="fireAll('soldiers');">-All</button></td>
-//                <td class="jobCustom"><button onmousedown="fireCustom('soldiers');">-Custom</button></td>
-//                <td class="job100"><button onmousedown="fire('soldiers',100);">-100</button></td>
-//                <td class="job10"><button onmousedown="fire('soldiers',10);">-10</button></td>
-//                <td><button onmousedown="fire('soldiers',1);">&lt;</button></td>
-//                <td class="job">Soldiers: </td>
-//                <td class="number"><span id="soldiers">0</span></td>
-//                <td><button onmousedown="hire('soldiers',1);">&gt;</button></td>
-//                <td class="job10"><button onmousedown="hire('soldiers',10);">+10</button></td>
-//                <td class="job100"><button onmousedown="hire('soldiers',100);">+100</button></td>
-//                <td class="jobCustom"><button onmousedown="hireCustom('soldiers');">+Custom</button></td>
-//                <td class="jobAll"><button onmousedown="hireAll('soldiers');">Max</button></td>
-//                <td><span class="cost">10 metal, 10 leather</span><span class="note">: Protect from attack</span></td>
-//            </tr>
-//            <tr id="cavalrygroup">
-//                <td class="jobNone"><button onmousedown="fireAll('cavalry');">-All</button></td>
-//                <td class="jobCustom"><button onmousedown="fireCustom('cavalry');">-Custom</button></td>
-//                <td class="job100"><button onmousedown="fire('cavalry',100);">-100</button></td>
-//                <td class="job10"><button onmousedown="fire('cavalry',10);">-10</button></td>
-//                <td><button onmousedown="fire('cavalry',1);">&lt;</button></td>
-//                <td class="job"><span id="cavName">Cavalry</span>: </td>
-//                <td class="number"><span id="cavalry">0</span></td>
-//                <td><button onmousedown="hire('cavalry',1);">&gt;</button></td>
-//                <td class="job10"><button onmousedown="hire('cavalry',10);">+10</button></td>
-//                <td class="job100"><button onmousedown="hire('cavalry',100);">+100</button></td>
-//                <td class="jobCustom"><button onmousedown="hireCustom('cavalry');">+Custom</button></td>
-//                <td class="jobAll"><button onmousedown="hireAll('cavalry');">Max</button></td>
-//                <td><span class="cost">20 food, 20 leather</span><span class="note">: Protect from attack</span></td>
-//            </tr>
-//            <tr id="shadesgroup">
-//                <td class="jobNone"></td>
-//                <td class="jobCustom"></td>
-//                <td class="job100"></td>
-//                <td class="job10"></td>
-//                <td></td>
-//                <td>Shades: </td>
-//                <td class="number"><span id="shades">0</span></td>
-//                <td></td>
-//                <td class="job10"></td>
-//                <td class="job100"></td>
-//                <td class="jobCustom"></td>
-//                <td class="jobAll"></td>
-//                <td><span class="note">Insubstantial spirits</span></td>
-//            </tr>
-//            <tr id="wolfgroup">
-//                <td class="jobNone"></td>
-//                <td class="jobCustom"></td>
-//                <td class="job100"></td>
-//                <td class="job10"></td>
-//                <td></td>
-//                <td class="enemy">Wolves: </td>
-//                <td class="number"><span id="wolves">0</span></td>
-//                <td></td>
-//                <td class="job10"></td>
-//                <td class="job100"></td>
-//                <td class="jobCustom"></td>
-//                <td class="jobAll"></td>
-//                <td><span class="note"></span></td>
-//            </tr>
-//            <tr id="banditgroup">
-//                <td class="jobNone"></td>
-//                <td class="jobCustom"></td>
-//                <td class="job100"></td>
-//                <td class="job10"></td>
-//                <td></td>
-//                <td class="enemy">Bandits: </td>
-//                <td class="number"><span id="bandits">0</span></td>
-//                <td></td>
-//                <td class="job10"></td>
-//                <td class="job100"></td>
-//                <td class="jobCustom"></td>
-//                <td class="jobAll"></td>
-//                <td><span class="note"></span></td>
-//            </tr>
-//            <tr id="barbariangroup">
-//                <td class="jobNone"></td>
-//                <td class="jobCustom"></td>
-//                <td class="job100"></td>
-//                <td class="job10"></td>
-//                <td></td>
-//                <td class="enemy">Barbarians: </td>
-//                <td class="number"><span id="barbarians">0</span></td>
-//                <td></td>
-//                <td class="job10"></td>
-//                <td class="job100"></td>
-//                <td class="jobCustom"></td>
-//                <td class="jobAll"></td>
-//                <td><span class="note"></span></td>
-//            </tr>
-//            <tr id="esiegegroup">
-//                <td class="jobNone"></td>
-//                <td class="jobCustom"></td>
-//                <td class="job100"></td>
-//                <td class="job10"></td>
-//                <td></td>
-//                <td class="enemy">Siege Engines: </td>
-//                <td class="number"><span id="esiege">0</span></td>
-//                <td></td>
-//                <td class="job10"></td>
-//                <td class="job100"></td>
-//                <td class="jobCustom"></td>
-//                <td class="jobAll"></td>
-//                <td><span class="note"></span></td>
-//            </tr>
-//        </table>
-//    </div>
+    //------------------------------------------
+    function show_upgrades_list(game) {
+        var $available = $('<h3>')
+            .text('Available Upgrades')
+            .appendTo($pointers.upgrade_list);
+        $("<div>")
+            .appendTo($available);
 
+        var $researched = $('<h3>')
+            .text('Researched Upgrades')
+            .appendTo($pointers.upgrade_list);
+        $("<div>")
+            .appendTo($researched);
+
+        var lastStyle = '';
+        var upgrades_non_deity = _.filter(game.game_options.upgrades, function(up){return up.type != 'deity'});
+        _.each(upgrades_non_deity, function (upgrade) {
+            var name = _.str.titleize(upgrade.title || upgrade.name);
+            var has_upgrade = game.data.upgrades[upgrade.name];
+            var can_purchase = _c.can_purchase_upgrade(game, upgrade);
+
+            var title = "Upgrade: "+name;
+            var description = _c.cost_benefits_text(game, upgrade, true);
+
+            if (upgrade.type != lastStyle) {
+                $('<div>')
+                    .css({fontSize:'8px'})
+                    .text(_.str.titleize(upgrade.type) + ":")
+                    .appendTo($available);
+            }
+            lastStyle = upgrade.type;
+
+            upgrade.$holder = $('<button>')
+                .text(name)
+                .css({display: has_upgrade ? 'none' : 'inline-block'})
+                .prop({disabled:!can_purchase})
+                .popover({title: title, content: description, trigger: 'hover', placement: 'top', html: true})
+                .on('click', function(){
+                    upgrade.$holder.popover('hide');
+                    _c.purchase_upgrade(game, upgrade);
+                    _c.redraw_data(game);
+                })
+                .addClass('icon upgrade_holder')
+                .appendTo($available);
+
+            upgrade.$holder_purchased = $('<div>')
+                .text(name)
+                .css({backgroundColor:'lightgreen', display: has_upgrade ? 'inline-block' : 'none'})
+                .popover({title: 'Purchased '+title, content: description, trigger: 'hover', placement: 'top', html: true})
+                .addClass('icon upgrade_holder')
+                .appendTo($researched);
+        });
+    }
+    function update_upgrade_list(game) {
+        var upgrades_non_deity = _.filter(game.game_options.upgrades, function(up){return up.type != 'deity'});
+        _.each(upgrades_non_deity, function (upgrade) {
+            var has_upgrade = game.data.upgrades[upgrade.name];
+            var can_purchase = _c.can_purchase_upgrade(game, upgrade);
+
+            upgrade.$holder
+                .css({display: has_upgrade ? 'none' : 'inline-block'})
+                .prop({disabled:!can_purchase});
+
+            upgrade.$holder_purchased
+                .css({display: has_upgrade ? 'inline-block' : 'none'})
+        });
+    }
 
     //-------------------------------------------------
     var _c = new Civvies('get_private_functions');
@@ -1802,15 +1597,45 @@ Civvies.initializeOptions = function (option_type, options) {
         $pointers.jobs_list = $('#jobsContainer');
         show_jobs_list(game);
 
+        $pointers.logs = $('#eventsContainer');
+
+        $pointers.upgrade_list = $('#upgradesPane');
+        show_upgrades_list(game);
+
     };
 
     _c.redraw_data = function (game) {
+        //TODO: Don't show these every time
         update_resources(game);
         update_building_buttons(game);
         update_population_data(game);
         update_jobs_list(game);
+        update_upgrade_list(game);
     };
 
+    _c.log_display = function(game) {
+        if ($pointers.logs) {
+            var log = "<b>Civvies: [seed:" + game.game_options.rand_seed + "]</b>";
+
+            var head_log = _.last(game.timing_log, 5);
+            _.each(head_log.reverse(), function (log_item){
+                if (log_item.name == 'exception') {
+                    if (log_item.ex && log_item.ex.name) {
+                        log += "<br/> -- EXCEPTION: " + log_item.ex.name + ", " + log_item.ex.message;
+                    } else if (log_item.msg) {
+                        log += "<br/> -- EXCEPTION: " + log_item.msg;
+                    } else {
+                        log += "<br/> -- EXCEPTION";
+                    }
+                } else if (log_item.elapsed) {
+                    log += "<br/> - " + log_item.name + ": " + Helpers.round(log_item.elapsed, 4) + "ms";
+                } else {
+                    log += "<br/> - " + log_item.name;
+                }
+            });
+            $pointers.logs.html(log);
+        }
+    };
 
     _c.updateBuildingTotals = function () {
 
@@ -2092,7 +1917,7 @@ Civvies.initializeOptions = function (option_type, options) {
             }
         }
         var chances = [];
-        _.each(item.chances || [], function(chance){
+        _.each(item.chances || [], function (chance) {
             out = "";
             if (chance.resource) {
                 out = "Chance to find " + chance.resource;
@@ -2105,13 +1930,13 @@ Civvies.initializeOptions = function (option_type, options) {
 
         var text_pieces = [];
         if (gather) text_pieces.push(gather);
-        if (costs.length) text_pieces.push("Costs: "+costs.join(", "));
-        if (consumes.length) text_pieces.push("Consumes: "+consumes.join(", "));
-        if (benefits.length) text_pieces.push("Benefits: "+benefits.join(", "));
-        if (produces.length) text_pieces.push("Produces: "+produces.join(", "));
+        if (costs.length) text_pieces.push("Costs: " + costs.join(", "));
+        if (consumes.length) text_pieces.push("Consumes: " + consumes.join(", "));
+        if (benefits.length) text_pieces.push("Benefits: " + benefits.join(", "));
+        if (produces.length) text_pieces.push("Produces: " + produces.join(", "));
         if (chances.length) text_pieces.push(chances.join(", "));
-        if (supports.length) text_pieces.push("Supports: "+supports.join(", "));
-        if (notes) text_pieces.push("Notes: "+notes);
+        if (supports.length) text_pieces.push("Supports: " + supports.join(", "));
+        if (notes) text_pieces.push("Notes: " + notes);
 
         var join_text = as_html ? ".</br>" : ".  ";
 
@@ -2175,12 +2000,12 @@ Civvies.initializeOptions = function (option_type, options) {
         game.data.resources[resource.name] = maths.clamp(game.data.resources[resource.name] + amount, 0, max);
 
         if (resource.chances) {
-            _.each(resource.chances || [], function(chance){
+            _.each(resource.chances || [], function (chance) {
                 var percent = chance.chance || 0.01;
                 if (_.isString(percent)) {
                     percent = game.data.variables[percent];
                 }
-                if (_.isNumber(percent)){
+                if (_.isNumber(percent)) {
                     if (_c.random(game.game_options) < percent) {
                         if (chance.resource) {
                             game.data.resources[chance.resource] += amount;
@@ -2190,14 +2015,14 @@ Civvies.initializeOptions = function (option_type, options) {
             });
         }
     };
-    _c.population = function(game) {
-        var pop = {current:0, max:0, current_that_eats:0};
+    _c.population = function (game) {
+        var pop = {current: 0, max: 0, current_that_eats: 0};
 
         var people = 0;
         var eaters = 0;
         for (var key in game.data.populations) {
             people += game.data.populations[key];
-            if (!_c.info(game,'populations',key,'doesnt_consume_food', false)) {
+            if (!_c.info(game, 'populations', key, 'doesnt_consume_food', false)) {
                 eaters += game.data.populations[key];
             }
         }
@@ -2215,33 +2040,33 @@ Civvies.initializeOptions = function (option_type, options) {
 
         return pop;
     };
-    _c.worker_food_cost = function(game, times) {
-        var initial_cost = _c.info(game,'variables','foodCostInitial', 'value', 20);
+    _c.worker_food_cost = function (game, times) {
+        var initial_cost = _c.info(game, 'variables', 'foodCostInitial', 'value', 20);
         times = times || 1;
 
         var pop = _c.population(game);
-        var food_cost = initial_cost + Math.floor((pop.current+times) / 100);
+        var food_cost = initial_cost + Math.floor((pop.current + times) / 100);
 
-        return food_cost*times;
+        return food_cost * times;
     };
-    _c.create_workers = function(game, times) {
-        if (_c.workers_are_creatable(game, times)){
+    _c.create_workers = function (game, times) {
+        if (_c.workers_are_creatable(game, times)) {
             game.data.resources.food -= _c.worker_food_cost(game, times);
             game.data.populations.unemployed += times;
 
             game.logMessage("Purchased: " + times + "x unemployed workers", true);
         }
     };
-    _c.workers_are_creatable = function(game, times) {
+    _c.workers_are_creatable = function (game, times) {
         var enough_food = (_c.worker_food_cost(game, times) <= game.data.resources.food);
         var enough_space = false;
         if (enough_food) {
             var pop = _c.population(game);
-            enough_space = (pop.current+times <= pop.max);
+            enough_space = (pop.current + times <= pop.max);
         }
         return enough_food && enough_space;
     };
-    _c.population_is_assignable = function(game, job, times) {
+    _c.population_is_assignable = function (game, job, times) {
         times = times || 1;
         //TODO: Take into account all/max
 
@@ -2259,7 +2084,7 @@ Civvies.initializeOptions = function (option_type, options) {
             if (assignable && !job.doesnt_require_office) {
                 //Check through buildings
                 var offices_total = 0;
-                _.each(game.game_options.buildings, function(building){
+                _.each(game.game_options.buildings, function (building) {
                     if (building.supports) {
                         var offices_per = building.supports[job.name];
                         if (offices_per) {
@@ -2267,20 +2092,46 @@ Civvies.initializeOptions = function (option_type, options) {
                         }
                     }
                 });
-                assignable = ((current+times) <= offices_total);
+                assignable = ((current + times) <= offices_total);
             }
         }
         return assignable;
     };
-    _c.assign_workers = function(game, job, times){
+    _c.assign_workers = function (game, job, times) {
         //TODO: Take into account all/max
-        if (_c.population_is_assignable(game,job,times)) {
+        if (_c.population_is_assignable(game, job, times)) {
             if (_.isNumber(times)) {
                 game.data.populations[job.name] += times;
                 game.data.populations.unemployed -= times;
             }
         }
     };
+    _c.can_purchase_upgrade = function (game, upgrade) {
+        var resource_costs = upgrade.costs;
+
+        var buildable = true;
+        for (var cost in resource_costs) {
+            var current = game.data.resources[cost];
+            if (current < (resource_costs[cost])) {
+                buildable = false;
+                break;
+            }
+        }
+        return buildable;
+    };
+    _c.purchase_upgrade = function (game, upgrade) {
+        if (_c.can_purchase_upgrade(game, upgrade)){
+
+            var resource_costs = upgrade.costs;
+
+            for (var cost in resource_costs) {
+                var amount = resource_costs[cost];
+                _c.increment_resource(game, _c.info(game, 'resources', cost), -amount);
+            }
+            game.data.upgrades[upgrade.name] = true;
+        }
+    };
+
 
     //-Not implemented yet------------------
     _c.increment = function () {
@@ -3963,7 +3814,7 @@ Civvies.initializeOptions = function (option_type, options) {
 
             {name: 'piety', grouping:2, image:'../images/civclicker/piety.png'},
             {name: 'corpses', grouping:2, image:'../images/civclicker/piety.png'},
-            {name: 'wonder', grouping:3, image:'../images/civclicker/piety.png'},
+            {name: 'wonder', grouping:3, image:'../images/civclicker/piety.png'}
         ],
         buildings: [ //TODO: Add upgrades required
             {name: 'tent', type:'home', costs:{skins: 2, wood: 2}, population_supports: 2, initial:1},
@@ -4032,62 +3883,74 @@ Civvies.initializeOptions = function (option_type, options) {
             {name: "foodCostInitial", value:20}
         ],
         upgrades: [
-            {name:"domestication", costs:{leather:20}, variable_increase:{farmers:0.1}},
-           	{name:"ploughshares", costs:{metal:20}, variable_increase:{farmers:0.1}},
-           	{name:"irrigation", costs:{wood:500, stone:200}, variable_increase:{farmers:0.1}},
-           	{name:"skinning", costs:{skins:10}, unlocks:["butchering"], unlocked: true},
-           	{name:"harvesting", costs:{herbs:10}, unlocks:["gardening"], unlocked: true},
-           	{name:"prospecting", costs:{ore:10}, unlocks:["extraction"], unlocked: true},
-           	{name:"butchering", costs:{leather:40}},
-           	{name:"gardening", costs:{herbs:40}},
-           	{name:"extraction", title: "Metal Extraction", costs:{metal:40}},
-           	{name:"croprotation", title: "Crop Rotation", costs:{herbs:5000, piety:1000}, variable_increase:{farmers:0.1}},
-           	{name:"selectivebreeding", title: "Selective Breeding", costs:{skins:5000, piety:1000}, variable_increase:{farmers:0.1}},
-           	{name:"fertilizers", costs:{ore:5000, piety:1000}, variable_increase:{farmers:0.1}},
-           	{name:"masonry", costs:{wood:100, stone:100}},
-           	{name:"construction", costs:{wood:1000, stone:1000}},
-           	{name:"architecture", costs:{wood:10000, stone:10000}},
-           	{name:"wheel", costs:{wood:500, stone:500}},
-           	{name:"horseback", costs:{wood:500, food:500}},
-           	{name:"tenements", costs:{food:200, wood:500, stone:500}},
-           	{name:"slums", costs:{food:500, wood:1000, stone:1000}},
-           	{name:"granaries", costs:{wood:1000, stone:1000}},
-           	{name:"palisade", costs:{wood:2000, stone:1000}},
-           	{name:"weaponry", costs:{wood:500, metal:500}, variable_increase:{soldier:0.01, cavalry:0.01}},
-           	{name:"shields", costs:{wood:500, leather:500}, variable_increase:{soldier:0.01, cavalry:0.01}},
-           	{name:"writing", costs:{skins:500}},
-           	{name:"administration", costs:{skins:1000, stone:1000}},
-           	{name:"codeoflaws", title: "Code of Laws", costs:{skins:1000, stone:1000}},
-           	{name:"mathematics", costs:{herbs:1000, piety:1000}},
-           	{name:"aesthetics", costs:{piety:5000}},
-           	{name:"civilservice", title: "Civil Service", costs:{piety:5000}},
-           	{name:"feudalism", costs:{piety:10000}},
-           	{name:"guilds", costs:{piety:10000}},
-           	{name:"serfs", costs:{piety:20000}},
-           	{name:"nationalism", costs:{piety:50000}},
-           	{name:"flensing", title: "Flaying", costs:{metal:1000}, variable_increase:{foodSpecialChance:0.001}},
-           	{name:"macerating", title: "Ore Refining", costs:{leather:500, stone:500}, variable_increase:{stoneSpecialChance:0.001}},
-            {name:"standard", title:"Battle Standard", costs:{leather:1000, metal:1000}},
+            //TODO: Have a grouping mechanism
+            {name:"skinning", type:'stone age', costs:{skins:10}, unlocks:["butchering"]},
+           	{name:"harvesting", type:'stone age', costs:{herbs:10}, unlocks:["gardening"]},
+           	{name:"prospecting", type:'stone age', costs:{ore:10}, unlocks:["extraction"]},
 
-           	{name:"deity", costs:{piety:1000}, special:"choose deity"},
-           	{name:"deityType"}, //TODO: How to handle 4 deities?
+            {name:"domestication", type:'basic farming', costs:{leather:20}, variable_increase:{farmers:0.1}},
+           	{name:"ploughshares", type:'basic farming', costs:{metal:20}, variable_increase:{farmers:0.1}},
+           	{name:"irrigation", type:'basic farming', costs:{wood:500, stone:200}, variable_increase:{farmers:0.1}},
 
-           	{name:"lure", costs:{piety:1000}},
-           	{name:"companion", costs:{piety:1000}},
-           	{name:"comfort", costs:{piety:5000}},
-           	{name:"blessing", costs:{piety:1000}},
-           	{name:"waste", costs:{piety:1000}},
-           	{name:"stay", costs:{piety:5000}},
-           	{name:"riddle", costs:{piety:1000}},
-           	{name:"throne", costs:{piety:1000}},
-           	{name:"lament", costs:{piety:5000}},
-           	{name:"book", costs:{piety:1000}},
-           	{name:"feast", costs:{piety:1000}},
-           	{name:"secrets", costs:{piety:5000}},
+           	{name:"butchering", type:'special farming', costs:{leather:40}},
+           	{name:"gardening", type:'special farming', costs:{herbs:40}},
+           	{name:"extraction", type:'special farming', title: "Metal Extraction", costs:{metal:40}},
 
-            {name:"trade", costs:{gold:1}},
-           	{name:"currency", costs:{gold:10, ore:1000}},
-           	{name:"commerce", costs:{gold:100, piety:10000}}
+            {name:"flensing", type:'efficiency farming', title: "Flaying", costs:{metal:1000}, variable_increase:{foodSpecialChance:0.001}},
+           	{name:"macerating", type:'efficiency farming', title: "Ore Refining", costs:{leather:500, stone:500}, variable_increase:{stoneSpecialChance:0.001}},
+
+           	{name:"croprotation", type:'improved farming', title: "Crop Rotation", costs:{herbs:5000, piety:1000}, variable_increase:{farmers:0.1}},
+           	{name:"selectivebreeding", type:'improved farming', title: "Breeding", costs:{skins:5000, piety:1000}, variable_increase:{farmers:0.1}},
+           	{name:"fertilizers", type:'improved farming', costs:{ore:5000, piety:1000}, variable_increase:{farmers:0.1}},
+
+           	{name:"masonry", type:'construction', costs:{wood:100, stone:100}},
+           	{name:"construction", type:'construction', costs:{wood:1000, stone:1000}},
+           	{name:"architecture", type:'construction', costs:{wood:10000, stone:10000}},
+
+            {name:"tenements", type:'housing', costs:{food:200, wood:500, stone:500}},
+            {name:"slums", type:'housing', costs:{food:500, wood:1000, stone:1000}},
+
+            {name:"granaries", type:'city efficiency', costs:{wood:1000, stone:1000}},
+           	{name:"palisade", type:'city efficiency', costs:{wood:2000, stone:1000}},
+
+            {name:"weaponry", type:'weaponry', costs:{wood:500, metal:500}, variable_increase:{soldier:0.01, cavalry:0.01}},
+           	{name:"shields", type:'weaponry', costs:{wood:500, leather:500}, variable_increase:{soldier:0.01, cavalry:0.01}},
+            {name:"horseback", type:'weaponry', costs:{wood:500, food:500}},
+           	{name:"wheel", type:'weaponry', costs:{wood:500, stone:500}},
+
+           	{name:"writing", type:'writing', costs:{skins:500}},
+           	{name:"administration", type:'writing', costs:{skins:1000, stone:1000}},
+           	{name:"codeoflaws", type:'writing', title: "Code of Laws", costs:{skins:1000, stone:1000}},
+           	{name:"mathematics", type:'writing', costs:{herbs:1000, piety:1000}},
+           	{name:"aesthetics", type:'writing', costs:{piety:5000}},
+            {name:"standard", type:'writing', title:"Battle Standard", costs:{leather:1000, metal:1000}},
+
+            {name:"civilservice", type:'civil', title: "Civil Service", costs:{piety:5000}},
+           	{name:"feudalism", type:'civil', costs:{piety:10000}},
+           	{name:"guilds", type:'civil', costs:{piety:10000}},
+           	{name:"serfs", type:'civil', costs:{piety:20000}},
+           	{name:"nationalism", type:'civil', costs:{piety:50000}},
+
+            {name:"trade", type:'commerce', costs:{gold:1}},
+           	{name:"currency", type:'commerce', costs:{gold:10, ore:1000}},
+           	{name:"commerce", type:'commerce', costs:{gold:100, piety:10000}},
+
+           	{name:"deity", type:'deity', costs:{piety:1000}, special:"choose deity"},
+//           	{name:"deityType"}, //TODO: How to handle 4 deities?
+
+           	{name:"lure", type:'deity', costs:{piety:1000}},
+           	{name:"companion", type:'deity', costs:{piety:1000}},
+           	{name:"comfort", type:'deity', costs:{piety:5000}},
+           	{name:"blessing", type:'deity', costs:{piety:1000}},
+           	{name:"waste", type:'deity', costs:{piety:1000}},
+           	{name:"stay", type:'deity', costs:{piety:5000}},
+           	{name:"riddle", type:'deity', costs:{piety:1000}},
+           	{name:"throne", type:'deity', costs:{piety:1000}},
+           	{name:"lament", type:'deity', costs:{piety:5000}},
+           	{name:"book", type:'deity', costs:{piety:1000}},
+           	{name:"feast", type:'deity', costs:{piety:1000}},
+           	{name:"secrets", type:'deity', costs:{piety:5000}}
+
         ],
         achievements: [
             {name: "hamlet"},
