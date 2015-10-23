@@ -11,6 +11,45 @@ $(function () {
     })
 });
 
+var size = 1;
+var worksafe, usingWords, elems;
+var body = document.getElementsByTagName('body')[0];
+
+function text(scale){
+	if (scale > 0){
+		size += 0.1 * scale;
+		document.getElementById('smallerText').disabled = false;
+	} else {
+		if (size > 0.7){
+			size += 0.1 * scale;
+			if (size <= 0.7) document.getElementById('smallerText').disabled = true;
+		}
+	}
+	body.style.fontSize = size + "em";
+}
+
+function toggleWorksafe(){
+	if (body.style.backgroundImage == 'none'){
+		worksafe = false;
+		body.style.backgroundImage = 'url("../images/civclicker/constable.jpg")';
+		elems = document.getElementsByClassName('icon');
+		if (!usingWords){
+			for(var i = 0; i < elems.length; i++) {
+				elems[i].style.visibility = 'visible';
+			}
+		}
+	} else {
+		worksafe = true;
+		body.style.backgroundImage = 'none';
+		elems = document.getElementsByClassName('icon');
+		if (!usingWords){
+			for(var i = 0; i < elems.length; i++) {
+				elems[i].style.visibility = 'hidden';
+			}
+		}
+	}
+}
+
 function paneSelect(name) {
     //Called when user switches between the various panes on the left hand side of the interface
     if (name == 'buildings') {

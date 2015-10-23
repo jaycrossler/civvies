@@ -1,6 +1,8 @@
 (function (Civvies) {
     var _c = new Civvies('get_private_functions');
 
+    //TODO: Producing/consuming is a bit off with the higher levels
+
     _c.increment_from_click = function (game, resource) {
         _c.increment_resource(game, resource, resource.amount_from_click || 1);
         _c.redraw_data(game);
@@ -61,9 +63,6 @@
             }
         });
         return storage;
-    };
-    _c.getResourceRate = function (game, resource) {
-
     };
     _c.cost_benefits_text = function (game, item, as_html, times) {
         times = times || 1;
@@ -395,6 +394,35 @@
             }
             game.data.upgrades[upgrade.name] = true;
         }
+    };
+    _c.calculate_increment_costs = function(game) {
+        var increments = {};
+        _.each(game.game_options.resources, function(resource){
+            if (resource.grouping == 1) {
+                var rate = 0;
+                //How much is being produced and consumed
+                _.each(game.game_options.populations, function(job){
+                    var amount = game.data.populations[job.name];
+                    if (amount && job.produces && job.produces[resource.name]) {
+                        var rate_per = job.produces[resource.name];
+                        if (_.isString(rate_per)) rate_per = game.data.variables[rate_per];
+                        rate += (rate_per * amount);
+                    }
+
+                    if (amount && job.consumes && job.consumes[resource.name]) {
+                        var rate_less = job.consumes[resource.name];
+                        if (_.isString(rate_less)) rate_less = game.data.variables[rate_less];
+                        rate -= (rate_less * amount);
+                    }
+                });
+                if (resource.name == 'food') {
+                    var population = _c.population(game);
+                    rate -= population.current_that_eats;
+                }
+                increments[resource.name] = rate;
+            }
+        });
+        return increments;
     };
 
 

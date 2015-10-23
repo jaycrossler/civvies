@@ -89,6 +89,7 @@
     }
 
     function update_resources(game) {
+        var rates = _c.calculate_increment_costs(game);
         _.each(game.game_options.resources, function (resource) {
             if (resource.$holder) {
                 var res_data = game.data.resources[resource.name];
@@ -103,8 +104,8 @@
             }
 
             if (resource.$rate) {
-                var res_rate = _c.getResourceRate(game, resource);
-                resource.$rate.text(res_rate)
+                var res_rate = Helpers.abbreviateNumber(rates[resource.name]) || 0;
+                resource.$rate.text(res_rate + "/s"); //TODO: Calculate if tick frequence not 1s
             }
         });
 
@@ -483,6 +484,44 @@
         });
     }
 
+    //------------------------------------------
+    function show_achievements_list(game) {
+        $('<h3>')
+            .text('Achievements')
+            .appendTo($pointers.achievements_list);
+        $("<div>")
+            .appendTo($pointers.achievements_list);
+
+        _.each(game.game_options.achievements, function (achievement) {
+            var has_achievement = (game.data.achievements[achievement.name]);
+            var color = has_achievement ? "#aaf" : "#faa";
+            var name = _.str.titleize(achievement.title || achievement.name);
+            var description = name + "<br/>" + (achievement.notes || "");
+            description += has_achievement ? "<br/>You have this achievement" : "<br/>You have not achieved this yet";
+
+            achievement.$holder = $('<div>')
+                .text(name)
+                .css({backgroundColor: color, display: 'inline-block'})
+                .popover({title: 'Achievement', content: description, trigger: 'hover', placement: 'top', html: true})
+                .addClass('achievement_holder')
+                .appendTo($pointers.achievements_list);
+        });
+    }
+
+    function update_achievements_list(game) {
+        _.each(game.game_options.achievements, function (achievement) {
+            var has_achievement = (game.data.achievements[achievement.name]);
+            var color = has_achievement ? "#aaf" : "#faa";
+            var name = _.str.titleize(achievement.title || achievement.name);
+            var description = name + "<br/>" + (achievement.notes || "");
+            description += has_achievement ? "<br/>You have this achievement" : "<br/>You have not achieved this yet";
+
+            achievement.$holder
+                .popover({title: 'Achievement', content: description, trigger: 'hover', placement: 'top', html: true})
+                .css({backgroundColor: color, display: 'inline-block'})
+        });
+    }
+
     //-------------------------------------------------
     var _c = new Civvies('get_private_functions');
     _c.buildInitialDisplay = function (game) {
@@ -506,6 +545,8 @@
         $pointers.upgrade_list = $('#upgradesPane');
         show_upgrades_list(game);
 
+        $pointers.achievements_list = $('#achievementsList');
+        show_achievements_list(game);
     };
 
     _c.redraw_data = function (game) {
@@ -515,6 +556,7 @@
         update_population_data(game);
         update_jobs_list(game);
         update_upgrade_list(game);
+        update_achievements_list(game);
     };
 
     _c.log_display = function (game) {

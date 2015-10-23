@@ -91,7 +91,14 @@ button.multiplier {
     padding: 2px;
     margin: 2px;
     display: inline-block;
-
+}
+.achievement_holder {
+    border:2px solid black;
+    font-size: .8em;
+    width: 80px;
+    padding: 2px;
+    margin: 2px;
+    display: inline-block;
 }
 /*.btn.disabled {*/
     /*pointer-events: auto;*/

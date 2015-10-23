@@ -11,15 +11,9 @@
 
         resources: [
             //Note: Grouping 1 is clickable by user to gather resources manually
-            {name: 'food', grouping: 1, image: '../images/civclicker/food.png', chances: [
-                {chance: "foodSpecialChance", resource: 'herbs'}
-            ], amount_from_click: 1},
-            {name: 'wood', grouping: 1, image: '../images/civclicker/wood.png', chances: [
-                {chance: "woodSpecialChance", resource: 'skins'}
-            ], amount_from_click: 1},
-            {name: 'stone', grouping: 1, image: '../images/civclicker/stone.png', chances: [
-                {chance: "stoneSpecialChance", resource: 'ore'}
-            ], amount_from_click: 1},
+            {name: 'food', grouping: 1, image: '../images/civclicker/food.png', chances: [{chance: "foodSpecialChance", resource: 'herbs'}], amount_from_click: 1},
+            {name: 'wood', grouping: 1, image: '../images/civclicker/wood.png', chances: [{chance: "woodSpecialChance", resource: 'skins'}], amount_from_click: 1},
+            {name: 'stone', grouping: 1, image: '../images/civclicker/stone.png', chances: [{chance: "stoneSpecialChance", resource: 'ore'}], amount_from_click: 1},
 
             {name: 'herbs', grouping: 2, image: '../images/civclicker/herbs.png'},
             {name: 'skins', grouping: 2, image: '../images/civclicker/skins.png'},
@@ -33,7 +27,7 @@
             {name: 'corpses', grouping: 2, image: '../images/civclicker/piety.png'},
             {name: 'wonder', grouping: 3, image: '../images/civclicker/piety.png'}
         ],
-        buildings: [ //TODO: Add upgrades required
+        buildings: [
             {name: 'tent', type: 'home', costs: {skins: 2, wood: 2}, population_supports: 2, initial: 1},
             {name: 'hut', type: 'home', costs: {skins: 1, wood: 20}, population_supports: 4},
             {name: 'cottage', type: 'home', costs: {stone: 30, wood: 10}, population_supports: 6},
@@ -167,43 +161,41 @@
             {name: "book", type: 'deity', costs: {piety: 1000}},
             {name: "feast", type: 'deity', costs: {piety: 1000}},
             {name: "secrets", type: 'deity', costs: {piety: 5000}}
-
         ],
         achievements: [
             {name: "hamlet"},
             {name: "village"},
-            {name: "smallTown"},
-            {name: "largeTown"},
-            {name: "smallCity"},
-            {name: "largeCity"},
+            {name: "smallTown", title:"Small Town"},
+            {name: "largeTown", title:"Large Town"},
+            {name: "smallCity", title:"Small City"},
+            {name: "largeCity", title:"Large City"},
             {name: "metropolis"},
-            {name: "smallNation"},
+            {name: "smallNation", title:"Small Nation"},
             {name: "nation"},
-            {name: "largeNation"},
+            {name: "largeNation", title:"Large Nation"},
             {name: "empire"},
             {name: "raider"},
             {name: "engineer"},
             {name: "domination"},
             {name: "hated"},
             {name: "loved"},
-            {name: "cat"},
+            {name: "cat", title:"Cat!"},
             {name: "glaring"},
             {name: "clowder"},
             {name: "battle"},
             {name: "cats"},
             {name: "fields"},
             {name: "underworld"},
-            {name: "fullHouse"},
-            {name: "plague"},
-            {name: "ghostTown"},
+            {name: "fullHouse", title:"Full House"},
+            {name: "plague", title:"Plagued"},
+            {name: "ghostTown", title:"Ghost Town"},
             {name: "wonder"},
             {name: "seven"},
             {name: "merchant"},
             {name: "rushed"},
-            {name: "neverclick"}
+            {name: "neverclick", title:"Never Click"}
         ]
     };
-
 
     CivviesClass.initializeOptions('game_options', _game_options);
 
