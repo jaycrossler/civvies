@@ -1278,10 +1278,12 @@ Civvies.initializeOptions = function (option_type, options) {
 
                 var title = (times == 1) ? name : times + " " + Helpers.pluralize(name);
                 var description = _c.cost_benefits_text(game, building, true, times);
+                var tooltip_text = _c.cost_text(game, building, times);
 
                 building["$btn_x" + times] = $('<button>')
                     .text(text)
                     .popover({title: "Build " + title, content: description, trigger: 'hover', placement: 'top', html: true})
+                    .attr({title:tooltip_text})
                     .prop({disabled: true})
                     .addClass(btn_class)
                     .on('click', function () {
@@ -1971,6 +1973,26 @@ Civvies.initializeOptions = function (option_type, options) {
         });
         return storage;
     };
+    _c.cost_text = function (game, item, times) {
+        //Used to show on mouse hovers when popovers wot show
+        var costs = [];
+        for (key in item.costs || {}) {
+            var amount = item.costs[key];
+            if (_.isString(amount)) amount = game.data.variables[amount];
+            amount *= times;
+
+            var out = Helpers.abbreviateNumber(amount) + " ";
+            if (amount == 1) {
+                out += key;
+            } else {
+                out += Helpers.pluralize(key);
+            }
+            costs.push(out);
+        }
+
+        return costs.length ? "Costs: " + costs.join(", ") : "";
+    };
+
     _c.cost_benefits_text = function (game, item, as_html, times) {
         times = times || 1;
         if (!_.isNumber(times)) times = 1;

@@ -174,10 +174,12 @@
 
                 var title = (times == 1) ? name : times + " " + Helpers.pluralize(name);
                 var description = _c.cost_benefits_text(game, building, true, times);
+                var tooltip_text = _c.cost_text(game, building, times);
 
                 building["$btn_x" + times] = $('<button>')
                     .text(text)
                     .popover({title: "Build " + title, content: description, trigger: 'hover', placement: 'top', html: true})
+                    .attr({title:tooltip_text})
                     .prop({disabled: true})
                     .addClass(btn_class)
                     .on('click', function () {

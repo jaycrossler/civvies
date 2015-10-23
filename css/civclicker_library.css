@@ -19,6 +19,10 @@
  * <http://www.gnu.org/licenses/>.
  */
 
+.disabled {
+  pointer-events: all !important;
+}
+
 body{
 	font-family: sans-serif;
 	/*font-weight:600;*/
