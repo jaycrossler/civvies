@@ -1,7 +1,9 @@
 (function (Civvies) {
     var _c = new Civvies('get_private_functions');
 
-    //TODO: Producing/consuming is a bit off with the higher levels
+    //TODO: Producing/consuming is a bit off with the higher levels - all resources hitting max of 120
+    //TODO: Food running out slower, food maxes a little flexible
+    //TODO: Only show upgrade category titles if any are displayed
 
     _c.increment_from_click = function (game, resource) {
         _c.increment_resource(game, resource, resource.amount_from_click || 1);
@@ -191,8 +193,18 @@
             }
             chances.push(out);
         });
+        var style;
+        if (item.type) {
+            style = _.str.titleize(item.type);
+            if (as_html) {
+                style = "<b>Type: <span class='notes_text'>" + style + "</span></b>";
+            } else {
+                style = "Type: "+style;
+            }
+        }
 
         var text_pieces = [];
+        if (style) text_pieces.push(style);
         if (gather) text_pieces.push(gather);
         if (costs.length) text_pieces.push("Costs: " + costs.join(", "));
         if (consumes.length) text_pieces.push("Consumes: " + consumes.join(", "));
@@ -257,6 +269,28 @@
 
         _c.redraw_data(game);
     };
+    _c.test2 = function (game) {
+        _c.test(game);
+        _c.create_building(game, _c.info(game, 'buildings', 'woodstock'), 1);
+        _c.test(game);
+        _c.create_building(game, _c.info(game, 'buildings', 'woodstock'), 2);
+        _c.test(game);
+        _c.create_building(game, _c.info(game, 'buildings', 'woodstock'), 4);
+        _c.test(game);
+        _c.create_building(game, _c.info(game, 'buildings', 'woodstock'), 2);
+        _c.create_building(game, _c.info(game, 'buildings', 'stonestock'), 2);
+        _c.create_building(game, _c.info(game, 'buildings', 'barn'), 2);
+        _c.create_building(game, _c.info(game, 'buildings', 'hut'), 10);
+        _c.test(game);
+        _c.create_building(game, _c.info(game, 'buildings', 'woodstock'), 3);
+        _c.create_building(game, _c.info(game, 'buildings', 'stonestock'), 3);
+        _c.create_building(game, _c.info(game, 'buildings', 'barn'), 3);
+        _c.test(game);
+
+        _c.redraw_data(game);
+    };
+
+
     _c.increment_resource = function (game, resource, amount) {
 
         //TODO: This now only does one roll, then gives resources if roll passes. Needs to simulate doing 'amount' roles
@@ -358,6 +392,16 @@
                 });
                 assignable = ((current + times) <= offices_total);
             }
+            if (assignable && job.upgrades) {
+                for (var ucost in job.upgrades) {
+                    var has_upgrade = game.data.upgrades[ucost];
+                    if (!has_upgrade) {
+                        assignable = false;
+                        break;
+                    }
+                }
+            }
+
         }
         return assignable;
     };
@@ -381,6 +425,15 @@
                 break;
             }
         }
+        if (buildable) {
+            for (var val in upgrade.upgrades) {
+                if (!game.data.upgrades[val]) {
+                    buildable = false;
+                    break;
+                }
+            }
+        }
+
         return buildable;
     };
     _c.purchase_upgrade = function (game, upgrade) {

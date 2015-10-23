@@ -1,6 +1,6 @@
 /*
 -----------------------------------------------------------------------------------
--- civvies.js - v0.0.1 - Built on 2015-10-22 by Jay Crossler using Grunt.js
+-- civvies.js - v0.0.1 - Built on 2015-10-23 by Jay Crossler using Grunt.js
 -----------------------------------------------------------------------------------
 -- Inspired by civclicker.js - Copyright (C) 2014 David Stark 
 -----------------------------------------------------------------------------------
@@ -513,7 +513,7 @@ Helpers.randomLetters = function (n) {
 Helpers.pluralize = function (str) {
     var uncountable_words = [
         'equipment', 'information', 'rice', 'money', 'species', 'series',
-        'fish', 'sheep', 'moose', 'deer', 'news', 'food', 'wood'
+        'fish', 'sheep', 'moose', 'deer', 'news', 'food', 'wood', 'ore'
     ];
     var plural_rules = [
         [new RegExp('(m)an$', 'gi'), '$1en'],
@@ -1162,7 +1162,6 @@ Civvies.initializeOptions = function (option_type, options) {
     }
 
     function show_secondary_resources(game) {
-        //TODO: Add some info on popover
         $('<h3>')
             .text('Special Resources')
             .appendTo($pointers.secondary_resources);
@@ -1170,6 +1169,7 @@ Civvies.initializeOptions = function (option_type, options) {
         _.each(game.game_options.resources, function (resource) {
             if (resource.grouping == 2) {
                 var name = _.str.titleize(resource.title || resource.name);
+                var description = _c.cost_benefits_text(game, resource, false, 1);
 
                 var $div = $('<div>')
                     .addClass('icon resource-holder')
@@ -1183,6 +1183,7 @@ Civvies.initializeOptions = function (option_type, options) {
                     .appendTo($div);
                 $('<img>')
                     .attr('src', resource.image)
+                    .popover({title: name, content: description, trigger: 'hover', placement: 'right', html: false, container: $div})
                     .addClass('icon icon-lg')
                     .appendTo($div);
             }
@@ -1228,18 +1229,18 @@ Civvies.initializeOptions = function (option_type, options) {
         var $table = $('<table>')
             .appendTo($pointers.building_list);
 
-        var lastStyle = game.game_options.buildings[0].type;
+        var last_displayed_type = game.game_options.buildings[0].type;
 
         _.each(game.game_options.buildings, function (building) {
             var name = _.str.titleize(building.title || building.name);
             var amount = game.data.buildings[building.name];
 
-            if (building.type != lastStyle) {
+            if (building.type != last_displayed_type) {
                 $('<tr>')
                     .css({height: '6px'})
                     .appendTo($table);
             }
-            lastStyle = building.type;
+            last_displayed_type = building.type;
 
             var $tr = $('<tr>')
                 .appendTo($table);
@@ -1256,7 +1257,7 @@ Civvies.initializeOptions = function (option_type, options) {
 
                 building["$btn_x" + times] = $('<button>')
                     .text(text)
-                    .popover({title: "Build " + title, content: description, trigger: 'hover', placement: 'bottom', html: true})
+                    .popover({title: "Build " + title, content: description, trigger: 'hover', placement: 'top', html: true})
                     .prop({disabled: true})
                     .addClass(btn_class)
                     .on('click', function () {
@@ -1264,7 +1265,7 @@ Civvies.initializeOptions = function (option_type, options) {
                     })
                     .appendTo($td1);
             });
-            $('<td>')//TODO: These aren't aligning properly
+            $('<td>')//TODO: UI: These aren't aligning properly, replace with divs
                 .text(Helpers.pluralize(name) + ": ")
                 .appendTo($tr);
             building.$holder = $('<td>')
@@ -1394,17 +1395,17 @@ Civvies.initializeOptions = function (option_type, options) {
         var $table = $('<table>')
             .appendTo($pointers.jobs_list);
 
-        var lastStyle = game.game_options.populations[0].type;
+        var last_displayed_type = game.game_options.populations[0].type;
         _.each(game.game_options.populations, function (job) {
             var name = _.str.titleize(job.title || job.name);
             var amount = game.data.populations[job.name];
 
-            if (job.type != lastStyle) {
+            if (job.type != last_displayed_type) {
                 $('<tr>')
                     .css({height: '6px'})
                     .appendTo($table);
             }
-            lastStyle = job.type;
+            last_displayed_type = job.type;
 
             var $tr = $('<tr>')
                 .appendTo($table);
@@ -1513,19 +1514,33 @@ Civvies.initializeOptions = function (option_type, options) {
 
     //------------------------------------------
     function show_upgrades_list(game) {
-        var $available = $('<h3>')
+        $pointers.upgrade_available = $('<h3>')
             .text('Available Upgrades')
             .appendTo($pointers.upgrade_list);
         $("<div>")
-            .appendTo($available);
+            .appendTo($pointers.upgrade_available);
+        $pointers.upgrade_available_alt = $('<h3>')
+            .text('No upgrades currently purchasable')
+            .hide()
+            .appendTo($pointers.upgrade_list);
 
-        var $researched = $('<h3>')
+
+
+        $pointers.upgrades_researched = $('<h3>')
             .text('Researched Upgrades')
             .appendTo($pointers.upgrade_list);
         $("<div>")
-            .appendTo($researched);
+            .appendTo($pointers.upgrades_researched);
+        $pointers.upgrade_researched_alt = $('<h3>')
+            .text('No upgrades purchased')
+            .hide()
+            .appendTo($pointers.upgrade_list);
 
-        var lastStyle = '';
+        var last_displayed_type = '';
+        var $last_displayed_type_div;
+        var number_available = 0;
+        var number_purchased = 0;
+
         //TODO: Show deity (and trade, conquest, trade) elsewhere
         var upgrades_non_deity = _.filter(game.game_options.upgrades, function (up) {
             return up.type != 'deity'
@@ -1538,17 +1553,36 @@ Civvies.initializeOptions = function (option_type, options) {
             var title = "Upgrade: " + name;
             var description = _c.cost_benefits_text(game, upgrade, true);
 
-            if (upgrade.type != lastStyle) {
-                $('<div>')
-                    .css({fontSize: '8px'})
+            if (upgrade.type != last_displayed_type) {
+                $last_displayed_type_div = $('<div>')
+                    .css({fontSize: '9px'})
+                    .hide()
                     .text(_.str.titleize(upgrade.type) + ":")
-                    .appendTo($available);
+                    .appendTo($pointers.upgrade_available);
             }
-            lastStyle = upgrade.type;
+            last_displayed_type = upgrade.type;
 
+            var show_purchasable = false;
+            if (upgrade.shown_before) {
+                show_purchasable = !has_upgrade;
+            } else {
+                if (can_purchase) {
+                    show_purchasable = !has_upgrade;
+                    upgrade.shown_before = true;
+                }
+            }
+            if (show_purchasable) {
+                $last_displayed_type_div.show();
+                number_available++;
+            }
+            if (has_upgrade){
+                number_purchased++;
+            }
+
+            upgrade.$holder_category = $last_displayed_type_div;
             upgrade.$holder = $('<button>')
                 .text(name)
-                .css({display: has_upgrade ? 'none' : 'inline-block'})
+                .css({display: show_purchasable ? 'inline-block' : 'none'})
                 .prop({disabled: !can_purchase})
                 .popover({title: title, content: description, trigger: 'hover', placement: 'top', html: true})
                 .on('click', function () {
@@ -1557,32 +1591,97 @@ Civvies.initializeOptions = function (option_type, options) {
                     _c.redraw_data(game);
                 })
                 .addClass('icon upgrade_holder')
-                .appendTo($available);
+                .appendTo($pointers.upgrade_available);
 
             upgrade.$holder_purchased = $('<div>')
                 .text(name)
                 .css({backgroundColor: 'lightgreen', display: has_upgrade ? 'inline-block' : 'none'})
                 .popover({title: 'Purchased ' + title, content: description, trigger: 'hover', placement: 'top', html: true})
                 .addClass('icon upgrade_holder')
-                .appendTo($researched);
+                .appendTo($pointers.upgrades_researched);
         });
+        if (number_available > 0) {
+            $pointers.upgrade_available.show();
+            $pointers.upgrade_available_alt.hide();
+        } else {
+            $pointers.upgrade_available.hide();
+            $pointers.upgrade_available_alt.show();
+
+        }
+        if (number_purchased > 0) {
+            $pointers.upgrades_researched.show();
+            $pointers.upgrade_researched_alt.hide();
+        } else {
+            $pointers.upgrades_researched.hide();
+            $pointers.upgrade_researched_alt.show();
+        }
+
     }
 
     function update_upgrade_list(game) {
         var upgrades_non_deity = _.filter(game.game_options.upgrades, function (up) {
             return up.type != 'deity'
         });
+        var count_of_categories = 0;
+        var last_displayed_type = '';
+        var number_available = 0;
+        var number_purchased = 0;
+
         _.each(upgrades_non_deity, function (upgrade) {
             var has_upgrade = game.data.upgrades[upgrade.name];
             var can_purchase = _c.can_purchase_upgrade(game, upgrade);
 
+            var show_purchasable = false;
+            if (upgrade.shown_before) {
+                show_purchasable = !has_upgrade;
+            } else {
+                if (can_purchase) {
+                    show_purchasable = !has_upgrade;
+                    upgrade.shown_before = true;
+                }
+            }
+
+            if (show_purchasable) {
+                upgrade.$holder_category.show();
+                count_of_categories++;
+                number_available++;
+            }
+            if (has_upgrade){
+                number_purchased++;
+            }
             upgrade.$holder
-                .css({display: has_upgrade ? 'none' : 'inline-block'})
+                .css({display: show_purchasable ? 'inline-block' : 'none'})
                 .prop({disabled: !can_purchase});
 
             upgrade.$holder_purchased
-                .css({display: has_upgrade ? 'inline-block' : 'none'})
+                .css({display: has_upgrade ? 'inline-block' : 'none'});
+
+
+            if (upgrade.type != last_displayed_type) {
+                // New category
+                if (count_of_categories == 0) {
+                    upgrade.$holder_category.hide();
+                }
+                count_of_categories = 0;
+            }
+            last_displayed_type = upgrade.type;
+
         });
+        if (number_available > 0) {
+            $pointers.upgrade_available.show();
+            $pointers.upgrade_available_alt.hide();
+        } else {
+            $pointers.upgrade_available.hide();
+            $pointers.upgrade_available_alt.show();
+
+        }
+        if (number_purchased > 0) {
+            $pointers.upgrades_researched.show();
+            $pointers.upgrade_researched_alt.hide();
+        } else {
+            $pointers.upgrades_researched.hide();
+            $pointers.upgrade_researched_alt.show();
+        }
     }
 
     //------------------------------------------
@@ -1651,7 +1750,7 @@ Civvies.initializeOptions = function (option_type, options) {
     };
 
     _c.redraw_data = function (game) {
-        //TODO: Don't show these every time
+        //TODO: OPTIMIZATION: Don't show these every tick, only when content is modified
         update_resources(game);
         update_building_buttons(game);
         update_population_data(game);
@@ -1783,7 +1882,9 @@ Civvies.initializeOptions = function (option_type, options) {
 (function (Civvies) {
     var _c = new Civvies('get_private_functions');
 
-    //TODO: Producing/consuming is a bit off with the higher levels
+    //TODO: Producing/consuming is a bit off with the higher levels - all resources hitting max of 120
+    //TODO: Food running out slower, food maxes a little flexible
+    //TODO: Only show upgrade category titles if any are displayed
 
     _c.increment_from_click = function (game, resource) {
         _c.increment_resource(game, resource, resource.amount_from_click || 1);
@@ -1973,8 +2074,18 @@ Civvies.initializeOptions = function (option_type, options) {
             }
             chances.push(out);
         });
+        var style;
+        if (item.type) {
+            style = _.str.titleize(item.type);
+            if (as_html) {
+                style = "<b>Type: <span class='notes_text'>" + style + "</span></b>";
+            } else {
+                style = "Type: "+style;
+            }
+        }
 
         var text_pieces = [];
+        if (style) text_pieces.push(style);
         if (gather) text_pieces.push(gather);
         if (costs.length) text_pieces.push("Costs: " + costs.join(", "));
         if (consumes.length) text_pieces.push("Consumes: " + consumes.join(", "));
@@ -2039,6 +2150,28 @@ Civvies.initializeOptions = function (option_type, options) {
 
         _c.redraw_data(game);
     };
+    _c.test2 = function (game) {
+        _c.test(game);
+        _c.create_building(game, _c.info(game, 'buildings', 'woodstock'), 1);
+        _c.test(game);
+        _c.create_building(game, _c.info(game, 'buildings', 'woodstock'), 2);
+        _c.test(game);
+        _c.create_building(game, _c.info(game, 'buildings', 'woodstock'), 4);
+        _c.test(game);
+        _c.create_building(game, _c.info(game, 'buildings', 'woodstock'), 2);
+        _c.create_building(game, _c.info(game, 'buildings', 'stonestock'), 2);
+        _c.create_building(game, _c.info(game, 'buildings', 'barn'), 2);
+        _c.create_building(game, _c.info(game, 'buildings', 'hut'), 10);
+        _c.test(game);
+        _c.create_building(game, _c.info(game, 'buildings', 'woodstock'), 3);
+        _c.create_building(game, _c.info(game, 'buildings', 'stonestock'), 3);
+        _c.create_building(game, _c.info(game, 'buildings', 'barn'), 3);
+        _c.test(game);
+
+        _c.redraw_data(game);
+    };
+
+
     _c.increment_resource = function (game, resource, amount) {
 
         //TODO: This now only does one roll, then gives resources if roll passes. Needs to simulate doing 'amount' roles
@@ -2140,6 +2273,16 @@ Civvies.initializeOptions = function (option_type, options) {
                 });
                 assignable = ((current + times) <= offices_total);
             }
+            if (assignable && job.upgrades) {
+                for (var ucost in job.upgrades) {
+                    var has_upgrade = game.data.upgrades[ucost];
+                    if (!has_upgrade) {
+                        assignable = false;
+                        break;
+                    }
+                }
+            }
+
         }
         return assignable;
     };
@@ -2163,6 +2306,15 @@ Civvies.initializeOptions = function (option_type, options) {
                 break;
             }
         }
+        if (buildable) {
+            for (var val in upgrade.upgrades) {
+                if (!game.data.upgrades[val]) {
+                    buildable = false;
+                    break;
+                }
+            }
+        }
+
         return buildable;
     };
     _c.purchase_upgrade = function (game, upgrade) {
@@ -3871,7 +4023,7 @@ Civvies.initializeOptions = function (option_type, options) {
         autosave: true,
 
         //TODO: These should move to variables
-        storage_initial: 100,
+        storage_initial: 120,
 
         resources: [
             //Note: Grouping 1 is clickable by user to gather resources manually
@@ -3879,17 +4031,17 @@ Civvies.initializeOptions = function (option_type, options) {
             {name: 'wood', grouping: 1, image: '../images/civclicker/wood.png', chances: [{chance: "woodSpecialChance", resource: 'skins'}], amount_from_click: 1},
             {name: 'stone', grouping: 1, image: '../images/civclicker/stone.png', chances: [{chance: "stoneSpecialChance", resource: 'ore'}], amount_from_click: 1},
 
-            {name: 'herbs', grouping: 2, image: '../images/civclicker/herbs.png'},
-            {name: 'skins', grouping: 2, image: '../images/civclicker/skins.png'},
-            {name: 'ore', grouping: 2, image: '../images/civclicker/ore.png'},
+            {name: 'herbs', grouping: 2, image: '../images/civclicker/herbs.png', notes: "Found sometimes when gathering food or by farmers"},
+            {name: 'skins', grouping: 2, image: '../images/civclicker/skins.png', notes: "Found sometimes when collecting wood or by woodcutters"},
+            {name: 'ore', grouping: 2, image: '../images/civclicker/ore.png', notes: "Found sometimes when mining ore or by miners"},
 
-            {name: 'leather', grouping: 2, image: '../images/civclicker/leather.png'},
-            {name: 'metal', grouping: 2, image: '../images/civclicker/metal.png'},
-            {name: 'gold', grouping: 2, image: '../images/civclicker/gold.png'},
+            {name: 'leather', grouping: 2, image: '../images/civclicker/leather.png', notes: "Created by Tanners working in a Tannery"},
+            {name: 'metal', grouping: 2, image: '../images/civclicker/metal.png', notes: "Created by Blacksmiths working in a Smithy"},
+            {name: 'gold', grouping: 2, image: '../images/civclicker/gold.png', notes: "Created from trading goods with Traders"},
 
-            {name: 'piety', grouping: 2, image: '../images/civclicker/piety.png'},
-            {name: 'corpses', grouping: 2, image: '../images/civclicker/piety.png'},
-            {name: 'wonder', grouping: 3, image: '../images/civclicker/piety.png'}
+            {name: 'piety', grouping: 2, image: '../images/civclicker/piety.png', notes: "Created by Clerics working in a Temple"},
+            {name: 'corpses', grouping: 2, image: '../images/civclicker/piety.png', notes: "Created when towns people die from starvation or fighting"},
+            {name: 'wonder', grouping: 3, image: '../images/civclicker/piety.png', notes: "Created by Labourers working on a Wonder"}
         ],
         buildings: [
             {name: 'tent', type: 'home', costs: {skins: 2, wood: 2}, population_supports: 2, initial: 1},
@@ -3902,23 +4054,21 @@ Civvies.initializeOptions = function (option_type, options) {
             {name: 'woodstock', type: 'storage', costs: {wood: 100}, supports: {wood: 100}, notes: "Increase the wood you can store"},
             {name: 'stonestock', type: 'storage', costs: {wood: 100}, supports: {stone: 100}, notes: "Increase the stone you can store"},
 
-            {name: 'tannery', type: 'business', costs: {wood: 30, stone: 70, skins: 2}, supports: {tanners: 2}},
-            {name: 'smithy', type: 'business', costs: {wood: 30, stone: 70, ore: 2}, supports: {blacksmiths: 2}},
-            {name: 'apothecary', type: 'business', costs: {wood: 30, stone: 70, herbs: 2}, supports: {apothecaries: 2}},
-            {name: 'temple', type: 'business', costs: {wood: 30, stone: 120, herbs: 10}, supports: {clerics: 1}},
-            {name: 'barracks', type: 'business', costs: {food: 20, wood: 60, stone: 120}, supports: {soldiers: 5}},
-            {name: 'stable', type: 'business', costs: {food: 60, wood: 60, stone: 120, leather: 10}, supports: {cavalry: 5}},
+            {name: 'tannery', type: 'business', costs: {wood: 30, stone: 70, skins: 2}, supports: {tanners: 2}, upgrades: {skinning: true}},
+            {name: 'smithy', type: 'business', costs: {wood: 30, stone: 70, ore: 2}, supports: {blacksmiths: 2}, upgrades: {prospecting: true}},
+            {name: 'apothecary', type: 'business', costs: {wood: 30, stone: 70, herbs: 2}, supports: {apothecaries: 2}, upgrades: {harvesting: true}},
+            {name: 'temple', type: 'business', costs: {wood: 30, stone: 120, herbs: 10}, supports: {clerics: 1}, upgrades:{masonry:true}},
+            {name: 'barracks', type: 'business', costs: {food: 20, wood: 60, stone: 120}, supports: {soldiers: 5}, upgrades: {weaponry: true, masonry:true}},
+            {name: 'stable', type: 'business', costs: {food: 60, wood: 60, stone: 120, leather: 10}, supports: {cavalry: 5}, upgrades: {horseback: true}},
 
-            {name: 'mill', type: 'upgrade', costs: {wood: 100, stone: 100}, options: {food_efficiency: .1}, notes: "Improves Farming Efficiency"},
-            {name: 'graveyard', type: 'upgrade', costs: {wood: 50, stone: 200, herbs: 50}, options: {grave_spot: 100}, notes: "Increases Grave Plots"}, //TODO: Should graves be a resource?
-            {name: 'fortification', type: 'upgrade', costs: {stone: 100}, options: {defense_improvement: 5}, notes: "Improves Defenses"},
+            {name: 'mill', type: 'upgrade', costs: {wood: 100, stone: 100}, options: {food_efficiency: .1}, upgrades: {wheel: true}, notes: "Improves Farming Efficiency"},
+            {name: 'graveyard', type: 'upgrade', costs: {wood: 50, stone: 200, herbs: 50}, options: {grave_spot: 100}, notes: "Increases Grave Plots", upgrades:{writing:true}}, //TODO: Should graves be a resource?
+            {name: 'fortification', type: 'upgrade', costs: {stone: 100}, options: {defense_improvement: 5}, notes: "Improves Defenses", upgrades:{codeoflaws:true, palisade:true}},
 
-//TODO: How to handle altars?
-            {name: 'battleAltar', title: "Battle Altar", type: 'altar', costs: {devotion: 1, stone: 200, metal: 50, piety: 200}},
-            {name: 'fieldsAltar', title: "Fields Altar", type: 'altar', costs: {devotion: 1, food: 500, wood: 500, stone: 200, piety: 200}},
-            {name: 'underworldAltar', title: "Underworld Altar", type: 'altar', costs: {devotion: 1, stone: 200, piety: 200, corpses: 1}},
-            {name: 'catAltar', title: "Cat Altar", type: 'altar', costs: {devotion: 1, herbs: 100, stone: 200, piety: 200}}
-//TODO: How to handle Wonder? Laborers currently produce it
+            {name: 'battleAltar', title: "Battle Altar", type: 'altar', costs: {devotion: 1, stone: 200, metal: 50, piety: 200}, upgrades:{deity:true}},
+            {name: 'fieldsAltar', title: "Fields Altar", type: 'altar', costs: {devotion: 1, food: 500, wood: 500, stone: 200, piety: 200}, upgrades:{deity:true}},
+            {name: 'underworldAltar', title: "Underworld Altar", type: 'altar', costs: {devotion: 1, stone: 200, piety: 200, corpses: 1}, upgrades:{deity:true}},
+            {name: 'catAltar', title: "Cat Altar", type: 'altar', costs: {devotion: 1, herbs: 100, stone: 200, piety: 200}, upgrades:{deity:true}}
         ],
         populations: [
             {name: 'unemployed', title: 'Unemployed Worker', type: 'basic', notes: "Unassigned Workers that eat up food", unassignable: true, cull_order: 2},
@@ -3936,9 +4086,9 @@ Civvies.initializeOptions = function (option_type, options) {
             {name: 'cats', type: 'mystical', cull_order: 11},  //TODO: What makes cats?
             {name: 'zombies', type: 'mystical', costs: {corpses: 1}, doesnt_consume_food: true},
 
-            {name: 'soldiers', type: 'warfare', consumes: {food: 2}, supports: {battle: 1.5}, cull_order: 8},
-            {name: 'cavalry', type: 'warfare', consumes: {food: 1, herbs: 1}, supports: {battle: 2}, cull_order: 7},
-            {name: 'siege', type: 'warfare', costs: {metal: 10, wood: 100}, supports: {battle: 5}, doesnt_require_office: true, doesnt_consume_food: true}
+            {name: 'soldiers', type: 'warfare', consumes: {food: 2}, supports: {battle: 1.5}, upgrades: {weaponry: true}, cull_order: 8},
+            {name: 'cavalry', type: 'warfare', consumes: {food: 1, herbs: 1}, supports: {battle: 2}, upgrades: {horseback: true}, cull_order: 7},
+            {name: 'siege', type: 'warfare', costs: {metal: 10, wood: 100}, supports: {battle: 5}, upgrades: {construction: true, mathematics:true}, doesnt_require_office: true, doesnt_consume_food: true}
         ],
         variables: [
             {name: "happiness", value: 1},
@@ -3958,106 +4108,106 @@ Civvies.initializeOptions = function (option_type, options) {
             {name: "foodCostInitial", value: 20}
         ],
         upgrades: [
-            //TODO: Have a grouping mechanism
-            {name: "skinning", type: 'stone age', costs: {skins: 10}, unlocks: ["butchering"]},
-            {name: "harvesting", type: 'stone age', costs: {herbs: 10}, unlocks: ["gardening"]},
-            {name: "prospecting", type: 'stone age', costs: {ore: 10}, unlocks: ["extraction"]},
+            {name: "skinning", type: 'stone age', costs: {skins: 10}},
+            {name: "harvesting", type: 'stone age', costs: {herbs: 10}},
+            {name: "prospecting", type: 'stone age', costs: {ore: 10}},
 
-            {name: "domestication", type: 'basic farming', costs: {leather: 20}, variable_increase: {farmers: 0.1}},
-            {name: "ploughshares", type: 'basic farming', costs: {metal: 20}, variable_increase: {farmers: 0.1}},
-            {name: "irrigation", type: 'basic farming', costs: {wood: 500, stone: 200}, variable_increase: {farmers: 0.1}},
+            {name: "butchering", type: 'farming', costs: {leather: 40}, upgrades:{skinning:true}},
+            {name: "gardening", type: 'farming', costs: {herbs: 40}, upgrades:{harvesting:true}},
+            {name: "extraction", type: 'farming', title: "Metal Extraction", costs: {metal: 40}, upgrades:{prospecting:true}},
 
-            {name: "butchering", type: 'special farming', costs: {leather: 40}},
-            {name: "gardening", type: 'special farming', costs: {herbs: 40}},
-            {name: "extraction", type: 'special farming', title: "Metal Extraction", costs: {metal: 40}},
+            {name: "domestication", type: 'basic farming', costs: {leather: 20}, variable_increase: {farmers: 0.1}, upgrades:{butchering:true}},
+            {name: "ploughshares", type: 'basic farming', costs: {metal: 20}, variable_increase: {farmers: 0.1}, upgrades:{gardening:true}},
+            {name: "irrigation", type: 'basic farming', costs: {wood: 500, stone: 200}, variable_increase: {farmers: 0.1}, upgrades:{ploughshares:true}},
 
-            {name: "flensing", type: 'efficiency farming', title: "Flaying", costs: {metal: 1000}, variable_increase: {foodSpecialChance: 0.001}},
-            {name: "macerating", type: 'efficiency farming', title: "Ore Refining", costs: {leather: 500, stone: 500}, variable_increase: {stoneSpecialChance: 0.001}},
+            {name: "flensing", type: 'efficiency farming', title: "Flaying", costs: {metal: 1000}, variable_increase: {foodSpecialChance: 0.001}, upgrades:{domestication:true}},
+            {name: "macerating", type: 'efficiency farming', title: "Ore Refining", costs: {leather: 500, stone: 500}, variable_increase: {stoneSpecialChance: 0.001}, upgrades:{extraction:true}},
 
             {name: "croprotation", type: 'improved farming', title: "Crop Rotation", costs: {herbs: 5000, piety: 1000}, variable_increase: {farmers: 0.1}},
-            {name: "selectivebreeding", type: 'improved farming', title: "Breeding", costs: {skins: 5000, piety: 1000}, variable_increase: {farmers: 0.1}},
-            {name: "fertilizers", type: 'improved farming', costs: {ore: 5000, piety: 1000}, variable_increase: {farmers: 0.1}},
+            {name: "selectivebreeding", type: 'improved farming', title: "Breeding", costs: {skins: 7000, piety: 2000}, variable_increase: {farmers: 0.1}, upgrades:{croprotation:true}},
+            {name: "fertilizers", type: 'improved farming', costs: {ore: 9000, piety: 3000}, variable_increase: {farmers: 0.1}, upgrades:{selectivebreeding:true}},
 
-            {name: "masonry", type: 'construction', costs: {wood: 100, stone: 100}},
-            {name: "construction", type: 'construction', costs: {wood: 1000, stone: 1000}},
-            {name: "architecture", type: 'construction', costs: {wood: 10000, stone: 10000}},
+            {name: "masonry", type: 'construction', costs: {wood: 100, stone: 100}, upgrades:{prospecting:true}},
+            {name: "construction", type: 'construction', costs: {wood: 1000, stone: 1000}, notes: "Allows Siege Engines", upgrades:{masonry:true}},
+            {name: "architecture", type: 'construction', costs: {wood: 10000, stone: 10000}, upgrades:{construction:true}},
 
-            {name: "tenements", type: 'housing', costs: {food: 200, wood: 500, stone: 500}},
-            {name: "slums", type: 'housing', costs: {food: 500, wood: 1000, stone: 1000}},
+            {name: "tenements", type: 'housing', costs: {food: 200, wood: 500, stone: 500}, upgrades:{masonry:true}},
+            {name: "slums", type: 'housing', costs: {food: 500, wood: 1000, stone: 1000}, upgrades:{tenements:true}},
 
-            {name: "granaries", type: 'city efficiency', costs: {wood: 1000, stone: 1000}},
-            {name: "palisade", type: 'city efficiency', costs: {wood: 2000, stone: 1000}},
+            {name: "granaries", type: 'city efficiency', costs: {wood: 1000, stone: 1000}, upgrades:{construction:true}},
+            {name: "palisade", type: 'city efficiency', costs: {wood: 2000, stone: 1000}, upgrades:{architecture:true}},
 
             {name: "weaponry", type: 'weaponry', costs: {wood: 500, metal: 500}, variable_increase: {soldier: 0.01, cavalry: 0.01}},
             {name: "shields", type: 'weaponry', costs: {wood: 500, leather: 500}, variable_increase: {soldier: 0.01, cavalry: 0.01}},
             {name: "horseback", type: 'weaponry', costs: {wood: 500, food: 500}},
-            {name: "wheel", type: 'weaponry', costs: {wood: 500, stone: 500}},
+            {name: "wheel", type: 'weaponry', costs: {wood: 500, stone: 500}, upgrades:{masonry:true, domestication:true}},
+            {name: "standard", type: 'weaponry', title: "Battle Standard", costs: {leather: 1000, metal: 1000}, upgrades:{writing:true, weaponry:true, shields:true}},
 
             {name: "writing", type: 'writing', costs: {skins: 500}},
-            {name: "administration", type: 'writing', costs: {skins: 1000, stone: 1000}},
-            {name: "codeoflaws", type: 'writing', title: "Code of Laws", costs: {skins: 1000, stone: 1000}},
-            {name: "mathematics", type: 'writing', costs: {herbs: 1000, piety: 1000}},
-            {name: "aesthetics", type: 'writing', costs: {piety: 5000}},
-            {name: "standard", type: 'writing', title: "Battle Standard", costs: {leather: 1000, metal: 1000}},
+            {name: "administration", type: 'writing', costs: {skins: 1000, stone: 1000}, upgrades:{writing:true}},
+            {name: "codeoflaws", type: 'writing', title: "Code of Laws", costs: {skins: 1000, stone: 1000}, upgrades:{administration:true}},
+            {name: "mathematics", type: 'writing', costs: {herbs: 1000, piety: 1000}, upgrades:{codeoflaws:true}},
+            {name: "aesthetics", type: 'writing', costs: {piety: 5000}, upgrades:{codeoflaws:true, responsibility:true}},
 
-            {name: "civilservice", type: 'civil', title: "Civil Service", costs: {piety: 5000}},
-            {name: "feudalism", type: 'civil', costs: {piety: 10000}},
-            {name: "guilds", type: 'civil', costs: {piety: 10000}},
-            {name: "serfs", type: 'civil', costs: {piety: 20000}},
-            {name: "nationalism", type: 'civil', costs: {piety: 50000}},
+            {name: "responsibility", type: 'civil', costs: {skins: 30}},
+            {name: "civilservice", type: 'civil', title: "Civil Service", costs: {piety: 5000}, upgrades:{responsibility:true}},
+            {name: "feudalism", type: 'civil', costs: {piety: 10000}, upgrades:{civilservice:true}},
+            {name: "guilds", type: 'civil', costs: {piety: 10000}, upgrades:{feudalism:true}},
+            {name: "serfs", type: 'civil', costs: {piety: 20000}, upgrades:{guilds:true}},
+            {name: "nationalism", type: 'civil', costs: {piety: 50000}, upgrades:{serfs:true}},
 
-            {name: "trade", type: 'commerce', costs: {gold: 1}},
-            {name: "currency", type: 'commerce', costs: {gold: 10, ore: 1000}},
-            {name: "commerce", type: 'commerce', costs: {gold: 100, piety: 10000}},
+            {name: "trade", type: 'commerce', costs: {gold: 1}, upgrades:{writing:true}},
+            {name: "currency", type: 'commerce', costs: {gold: 10, ore: 1000}, upgrades:{writing:true, trade:true}},
+            {name: "commerce", type: 'commerce', costs: {gold: 100, piety: 10000}, upgrades:{currency:true, civilservice:true}},
 
-            {name: "deity", type: 'deity', costs: {piety: 1000}, special: "choose deity"},
+            {name: "deity", type: 'deity', costs: {piety: 1000}, special: "choose deity", upgrades:{responsibility:true, writing: true}},
 //           	{name:"deityType"}, //TODO: How to handle 4 deities?
 
-            {name: "lure", type: 'deity', costs: {piety: 1000}},
-            {name: "companion", type: 'deity', costs: {piety: 1000}},
-            {name: "comfort", type: 'deity', costs: {piety: 5000}},
-            {name: "blessing", type: 'deity', costs: {piety: 1000}},
-            {name: "waste", type: 'deity', costs: {piety: 1000}},
-            {name: "stay", type: 'deity', costs: {piety: 5000}},
-            {name: "riddle", type: 'deity', costs: {piety: 1000}},
-            {name: "throne", type: 'deity', costs: {piety: 1000}},
-            {name: "lament", type: 'deity', costs: {piety: 5000}},
-            {name: "book", type: 'deity', costs: {piety: 1000}},
-            {name: "feast", type: 'deity', costs: {piety: 1000}},
-            {name: "secrets", type: 'deity', costs: {piety: 5000}}
+            {name: "lure", type: 'deity', costs: {piety: 1000}, upgrades:{deity:true}},
+            {name: "companion", type: 'deity', costs: {piety: 1000}, upgrades:{deity:true}},
+            {name: "comfort", type: 'deity', costs: {piety: 5000}, upgrades:{deity:true}},
+            {name: "blessing", type: 'deity', costs: {piety: 1000}, upgrades:{deity:true}},
+            {name: "waste", type: 'deity', costs: {piety: 1000}, upgrades:{deity:true}},
+            {name: "stay", type: 'deity', costs: {piety: 5000}, upgrades:{deity:true}},
+            {name: "riddle", type: 'deity', costs: {piety: 1000}, upgrades:{deity:true}},
+            {name: "throne", type: 'deity', costs: {piety: 1000}, upgrades:{deity:true}},
+            {name: "lament", type: 'deity', costs: {piety: 5000}, upgrades:{deity:true}},
+            {name: "book", type: 'deity', costs: {piety: 1000}, upgrades:{deity:true}},
+            {name: "feast", type: 'deity', costs: {piety: 1000}, upgrades:{deity:true}},
+            {name: "secrets", type: 'deity', costs: {piety: 5000}, upgrades:{deity:true}}
         ],
         achievements: [
             {name: "hamlet"},
             {name: "village"},
-            {name: "smallTown", title:"Small Town"},
-            {name: "largeTown", title:"Large Town"},
-            {name: "smallCity", title:"Small City"},
-            {name: "largeCity", title:"Large City"},
+            {name: "smallTown", title: "Small Town"},
+            {name: "largeTown", title: "Large Town"},
+            {name: "smallCity", title: "Small City"},
+            {name: "largeCity", title: "Large City"},
             {name: "metropolis"},
-            {name: "smallNation", title:"Small Nation"},
+            {name: "smallNation", title: "Small Nation"},
             {name: "nation"},
-            {name: "largeNation", title:"Large Nation"},
+            {name: "largeNation", title: "Large Nation"},
             {name: "empire"},
             {name: "raider"},
             {name: "engineer"},
             {name: "domination"},
             {name: "hated"},
             {name: "loved"},
-            {name: "cat", title:"Cat!"},
+            {name: "cat", title: "Cat!"},
             {name: "glaring"},
             {name: "clowder"},
             {name: "battle"},
             {name: "cats"},
             {name: "fields"},
             {name: "underworld"},
-            {name: "fullHouse", title:"Full House"},
-            {name: "plague", title:"Plagued"},
-            {name: "ghostTown", title:"Ghost Town"},
+            {name: "fullHouse", title: "Full House"},
+            {name: "plague", title: "Plagued"},
+            {name: "ghostTown", title: "Ghost Town"},
             {name: "wonder"},
             {name: "seven"},
             {name: "merchant"},
             {name: "rushed"},
-            {name: "neverclick", title:"Never Click"}
+            {name: "neverclick", title: "Never Click"}
         ]
     };
 

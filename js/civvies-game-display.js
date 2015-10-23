@@ -61,7 +61,6 @@
     }
 
     function show_secondary_resources(game) {
-        //TODO: Add some info on popover
         $('<h3>')
             .text('Special Resources')
             .appendTo($pointers.secondary_resources);
@@ -69,6 +68,7 @@
         _.each(game.game_options.resources, function (resource) {
             if (resource.grouping == 2) {
                 var name = _.str.titleize(resource.title || resource.name);
+                var description = _c.cost_benefits_text(game, resource, false, 1);
 
                 var $div = $('<div>')
                     .addClass('icon resource-holder')
@@ -82,6 +82,7 @@
                     .appendTo($div);
                 $('<img>')
                     .attr('src', resource.image)
+                    .popover({title: name, content: description, trigger: 'hover', placement: 'right', html: false, container: $div})
                     .addClass('icon icon-lg')
                     .appendTo($div);
             }
@@ -127,18 +128,18 @@
         var $table = $('<table>')
             .appendTo($pointers.building_list);
 
-        var lastStyle = game.game_options.buildings[0].type;
+        var last_displayed_type = game.game_options.buildings[0].type;
 
         _.each(game.game_options.buildings, function (building) {
             var name = _.str.titleize(building.title || building.name);
             var amount = game.data.buildings[building.name];
 
-            if (building.type != lastStyle) {
+            if (building.type != last_displayed_type) {
                 $('<tr>')
                     .css({height: '6px'})
                     .appendTo($table);
             }
-            lastStyle = building.type;
+            last_displayed_type = building.type;
 
             var $tr = $('<tr>')
                 .appendTo($table);
@@ -155,7 +156,7 @@
 
                 building["$btn_x" + times] = $('<button>')
                     .text(text)
-                    .popover({title: "Build " + title, content: description, trigger: 'hover', placement: 'bottom', html: true})
+                    .popover({title: "Build " + title, content: description, trigger: 'hover', placement: 'top', html: true})
                     .prop({disabled: true})
                     .addClass(btn_class)
                     .on('click', function () {
@@ -163,7 +164,7 @@
                     })
                     .appendTo($td1);
             });
-            $('<td>')//TODO: These aren't aligning properly
+            $('<td>')//TODO: UI: These aren't aligning properly, replace with divs
                 .text(Helpers.pluralize(name) + ": ")
                 .appendTo($tr);
             building.$holder = $('<td>')
@@ -293,17 +294,17 @@
         var $table = $('<table>')
             .appendTo($pointers.jobs_list);
 
-        var lastStyle = game.game_options.populations[0].type;
+        var last_displayed_type = game.game_options.populations[0].type;
         _.each(game.game_options.populations, function (job) {
             var name = _.str.titleize(job.title || job.name);
             var amount = game.data.populations[job.name];
 
-            if (job.type != lastStyle) {
+            if (job.type != last_displayed_type) {
                 $('<tr>')
                     .css({height: '6px'})
                     .appendTo($table);
             }
-            lastStyle = job.type;
+            last_displayed_type = job.type;
 
             var $tr = $('<tr>')
                 .appendTo($table);
@@ -412,19 +413,33 @@
 
     //------------------------------------------
     function show_upgrades_list(game) {
-        var $available = $('<h3>')
+        $pointers.upgrade_available = $('<h3>')
             .text('Available Upgrades')
             .appendTo($pointers.upgrade_list);
         $("<div>")
-            .appendTo($available);
+            .appendTo($pointers.upgrade_available);
+        $pointers.upgrade_available_alt = $('<h3>')
+            .text('No upgrades currently purchasable')
+            .hide()
+            .appendTo($pointers.upgrade_list);
 
-        var $researched = $('<h3>')
+
+
+        $pointers.upgrades_researched = $('<h3>')
             .text('Researched Upgrades')
             .appendTo($pointers.upgrade_list);
         $("<div>")
-            .appendTo($researched);
+            .appendTo($pointers.upgrades_researched);
+        $pointers.upgrade_researched_alt = $('<h3>')
+            .text('No upgrades purchased')
+            .hide()
+            .appendTo($pointers.upgrade_list);
 
-        var lastStyle = '';
+        var last_displayed_type = '';
+        var $last_displayed_type_div;
+        var number_available = 0;
+        var number_purchased = 0;
+
         //TODO: Show deity (and trade, conquest, trade) elsewhere
         var upgrades_non_deity = _.filter(game.game_options.upgrades, function (up) {
             return up.type != 'deity'
@@ -437,17 +452,36 @@
             var title = "Upgrade: " + name;
             var description = _c.cost_benefits_text(game, upgrade, true);
 
-            if (upgrade.type != lastStyle) {
-                $('<div>')
-                    .css({fontSize: '8px'})
+            if (upgrade.type != last_displayed_type) {
+                $last_displayed_type_div = $('<div>')
+                    .css({fontSize: '9px'})
+                    .hide()
                     .text(_.str.titleize(upgrade.type) + ":")
-                    .appendTo($available);
+                    .appendTo($pointers.upgrade_available);
             }
-            lastStyle = upgrade.type;
+            last_displayed_type = upgrade.type;
 
+            var show_purchasable = false;
+            if (upgrade.shown_before) {
+                show_purchasable = !has_upgrade;
+            } else {
+                if (can_purchase) {
+                    show_purchasable = !has_upgrade;
+                    upgrade.shown_before = true;
+                }
+            }
+            if (show_purchasable) {
+                $last_displayed_type_div.show();
+                number_available++;
+            }
+            if (has_upgrade){
+                number_purchased++;
+            }
+
+            upgrade.$holder_category = $last_displayed_type_div;
             upgrade.$holder = $('<button>')
                 .text(name)
-                .css({display: has_upgrade ? 'none' : 'inline-block'})
+                .css({display: show_purchasable ? 'inline-block' : 'none'})
                 .prop({disabled: !can_purchase})
                 .popover({title: title, content: description, trigger: 'hover', placement: 'top', html: true})
                 .on('click', function () {
@@ -456,32 +490,97 @@
                     _c.redraw_data(game);
                 })
                 .addClass('icon upgrade_holder')
-                .appendTo($available);
+                .appendTo($pointers.upgrade_available);
 
             upgrade.$holder_purchased = $('<div>')
                 .text(name)
                 .css({backgroundColor: 'lightgreen', display: has_upgrade ? 'inline-block' : 'none'})
                 .popover({title: 'Purchased ' + title, content: description, trigger: 'hover', placement: 'top', html: true})
                 .addClass('icon upgrade_holder')
-                .appendTo($researched);
+                .appendTo($pointers.upgrades_researched);
         });
+        if (number_available > 0) {
+            $pointers.upgrade_available.show();
+            $pointers.upgrade_available_alt.hide();
+        } else {
+            $pointers.upgrade_available.hide();
+            $pointers.upgrade_available_alt.show();
+
+        }
+        if (number_purchased > 0) {
+            $pointers.upgrades_researched.show();
+            $pointers.upgrade_researched_alt.hide();
+        } else {
+            $pointers.upgrades_researched.hide();
+            $pointers.upgrade_researched_alt.show();
+        }
+
     }
 
     function update_upgrade_list(game) {
         var upgrades_non_deity = _.filter(game.game_options.upgrades, function (up) {
             return up.type != 'deity'
         });
+        var count_of_categories = 0;
+        var last_displayed_type = '';
+        var number_available = 0;
+        var number_purchased = 0;
+
         _.each(upgrades_non_deity, function (upgrade) {
             var has_upgrade = game.data.upgrades[upgrade.name];
             var can_purchase = _c.can_purchase_upgrade(game, upgrade);
 
+            var show_purchasable = false;
+            if (upgrade.shown_before) {
+                show_purchasable = !has_upgrade;
+            } else {
+                if (can_purchase) {
+                    show_purchasable = !has_upgrade;
+                    upgrade.shown_before = true;
+                }
+            }
+
+            if (show_purchasable) {
+                upgrade.$holder_category.show();
+                count_of_categories++;
+                number_available++;
+            }
+            if (has_upgrade){
+                number_purchased++;
+            }
             upgrade.$holder
-                .css({display: has_upgrade ? 'none' : 'inline-block'})
+                .css({display: show_purchasable ? 'inline-block' : 'none'})
                 .prop({disabled: !can_purchase});
 
             upgrade.$holder_purchased
-                .css({display: has_upgrade ? 'inline-block' : 'none'})
+                .css({display: has_upgrade ? 'inline-block' : 'none'});
+
+
+            if (upgrade.type != last_displayed_type) {
+                // New category
+                if (count_of_categories == 0) {
+                    upgrade.$holder_category.hide();
+                }
+                count_of_categories = 0;
+            }
+            last_displayed_type = upgrade.type;
+
         });
+        if (number_available > 0) {
+            $pointers.upgrade_available.show();
+            $pointers.upgrade_available_alt.hide();
+        } else {
+            $pointers.upgrade_available.hide();
+            $pointers.upgrade_available_alt.show();
+
+        }
+        if (number_purchased > 0) {
+            $pointers.upgrades_researched.show();
+            $pointers.upgrade_researched_alt.hide();
+        } else {
+            $pointers.upgrades_researched.hide();
+            $pointers.upgrade_researched_alt.show();
+        }
     }
 
     //------------------------------------------
@@ -550,7 +649,7 @@
     };
 
     _c.redraw_data = function (game) {
-        //TODO: Don't show these every time
+        //TODO: OPTIMIZATION: Don't show these every tick, only when content is modified
         update_resources(game);
         update_building_buttons(game);
         update_population_data(game);

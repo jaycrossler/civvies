@@ -8,46 +8,75 @@ game.log(true);
 $(function () {
     $('h1').on('click', function () {
         game._private_functions.test(game);
-    })
+    });
+    $('#appellation').on('click', function () {
+        game._private_functions.test2(game);
+    });
 });
 
 var size = 1;
 var worksafe, usingWords, elems;
 var body = document.getElementsByTagName('body')[0];
 
-function text(scale){
-	if (scale > 0){
-		size += 0.1 * scale;
-		document.getElementById('smallerText').disabled = false;
-	} else {
-		if (size > 0.7){
-			size += 0.1 * scale;
-			if (size <= 0.7) document.getElementById('smallerText').disabled = true;
-		}
-	}
-	body.style.fontSize = size + "em";
+
+function renameCiv() {
+    //Prompts player, uses result as new civName
+    var n = prompt('Please name your civilisation', game.data.civ_name);
+    if (n != null) {
+        game.data.civ_name = n;
+        document.getElementById('civName').innerHTML = game.data.civ_name;
+    }
+}
+function renameRuler() {
+    //Prompts player, uses result as rulerName
+    var n = prompt('What is your name?', game.data.ruler_name);
+    if (n != null) {
+        game.data.ruler_name = n;
+        document.getElementById('rulerName').innerHTML = game.data.ruler_name;
+    }
+}
+function renameDeity() {
+    //Prompts player, uses result as deity.name - called when first getting a deity
+    var n = prompt('Who do your people worship?', game.data.deity_name);
+    if (n != null) {
+        game.data.deity_name = n;
+        updateDeity();
+    }
 }
 
-function toggleWorksafe(){
-	if (body.style.backgroundImage == 'none'){
-		worksafe = false;
-		body.style.backgroundImage = 'url("../images/civclicker/constable.jpg")';
-		elems = document.getElementsByClassName('icon');
-		if (!usingWords){
-			for(var i = 0; i < elems.length; i++) {
-				elems[i].style.visibility = 'visible';
-			}
-		}
-	} else {
-		worksafe = true;
-		body.style.backgroundImage = 'none';
-		elems = document.getElementsByClassName('icon');
-		if (!usingWords){
-			for(var i = 0; i < elems.length; i++) {
-				elems[i].style.visibility = 'hidden';
-			}
-		}
-	}
+function text(scale) {
+    if (scale > 0) {
+        size += 0.1 * scale;
+        document.getElementById('smallerText').disabled = false;
+    } else {
+        if (size > 0.7) {
+            size += 0.1 * scale;
+            if (size <= 0.7) document.getElementById('smallerText').disabled = true;
+        }
+    }
+    body.style.fontSize = size + "em";
+}
+
+function toggleWorksafe() {
+    if (body.style.backgroundImage == 'none') {
+        worksafe = false;
+        body.style.backgroundImage = 'url("../images/civclicker/constable.jpg")';
+        elems = document.getElementsByClassName('icon');
+        if (!usingWords) {
+            for (var i = 0; i < elems.length; i++) {
+                elems[i].style.visibility = 'visible';
+            }
+        }
+    } else {
+        worksafe = true;
+        body.style.backgroundImage = 'none';
+        elems = document.getElementsByClassName('icon');
+        if (!usingWords) {
+            for (var i = 0; i < elems.length; i++) {
+                elems[i].style.visibility = 'hidden';
+            }
+        }
+    }
 }
 
 function paneSelect(name) {

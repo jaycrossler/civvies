@@ -381,7 +381,7 @@ Helpers.randomLetters = function (n) {
 Helpers.pluralize = function (str) {
     var uncountable_words = [
         'equipment', 'information', 'rice', 'money', 'species', 'series',
-        'fish', 'sheep', 'moose', 'deer', 'news', 'food', 'wood'
+        'fish', 'sheep', 'moose', 'deer', 'news', 'food', 'wood', 'ore'
     ];
     var plural_rules = [
         [new RegExp('(m)an$', 'gi'), '$1en'],
