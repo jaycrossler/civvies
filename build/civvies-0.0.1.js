@@ -283,8 +283,11 @@ Helpers.expandExponential = function (value) {
         return value;
     }
 };
-Helpers.abbreviateNumber = function (value, useLongSuffixes) {
+Helpers.abbreviateNumber = function (value, useLongSuffixes, hide_decimals) {
     //Modified From: http://stackoverflow.com/questions/10599933/convert-long-number-into-abbreviated-string-in-javascript-with-a-special-shortn
+    if (hide_decimals && value < 1000000) {
+        value = parseInt(value);
+    }
     var newValue = value;
     if (value >= 10000) {
         value = Helpers.expandExponential(value);
@@ -1124,6 +1127,7 @@ Civvies.initializeOptions = function (option_type, options) {
                 var times = resource.amount_from_click || 1;
                 var title = (times == 1) ? name : times + " " + Helpers.pluralize(name);
                 var description = _c.cost_benefits_text(game, resource, true, times);
+                var max = _c.getResourceMax(game, resource);
 
                 $('<button>')
                     .text('Gather ' + name)
@@ -1148,9 +1152,9 @@ Civvies.initializeOptions = function (option_type, options) {
                     .addClass('icon icon-lg')
                     .appendTo($td4);
                 resource.$max = $('<td>')
-                    .addClass('number')
+                    .addClass('number_small')
                     .attr('id', 'resource-max-' + resource.name)
-                    .text("(Max: " + game.game_options.storage_initial + ")")
+                    .text("(Max: " + max + ")")
                     .appendTo($tr);
                 resource.$rate = $('<td>')
                     .addClass('number net')
@@ -1170,22 +1174,35 @@ Civvies.initializeOptions = function (option_type, options) {
             if (resource.grouping == 2) {
                 var name = _.str.titleize(resource.title || resource.name);
                 var description = _c.cost_benefits_text(game, resource, false, 1);
+                var max = _c.getResourceMax(game, resource);
 
                 var $div = $('<div>')
                     .addClass('icon resource-holder')
                     .appendTo($pointers.secondary_resources);
                 $('<span>')
                     .text(name + ":")
+                    .css({verticalAlign:'top'})
+                    .appendTo($div);
+                var $holder = $('<span>')
+                    .css({display:'inline-block'})
                     .appendTo($div);
                 resource.$holder = $('<span>')
                     .attr('id', 'resource-' + resource.name)
+                    .addClass('number')
                     .text(0)
-                    .appendTo($div);
+                    .appendTo($holder);
+                resource.$max = $('<span>')
+                    .attr('id', 'resource-max-' + resource.name)
+                    .addClass('number_small')
+                    .text("(Max: " + max + ")")
+                    .appendTo($holder);
                 $('<img>')
                     .attr('src', resource.image)
+                    .css({verticalAlign:'top'})
                     .popover({title: name, content: description, trigger: 'hover', placement: 'right', html: false, container: $div})
                     .addClass('icon icon-lg')
                     .appendTo($div);
+
             }
         });
     }
@@ -1195,7 +1212,7 @@ Civvies.initializeOptions = function (option_type, options) {
         _.each(game.game_options.resources, function (resource) {
             if (resource.$holder) {
                 var res_data = game.data.resources[resource.name];
-                res_data = Helpers.abbreviateNumber(res_data);
+                res_data = Helpers.abbreviateNumber(res_data, false, true);
                 resource.$holder.text(res_data)
             }
 
@@ -1207,7 +1224,15 @@ Civvies.initializeOptions = function (option_type, options) {
 
             if (resource.$rate) {
                 var res_rate = Helpers.abbreviateNumber(rates[resource.name]) || 0;
-                resource.$rate.text(res_rate + "/s"); //TODO: Calculate if tick frequence not 1s
+                var rate_text;
+                if (res_rate < 0) {
+                    rate_text = '<span style="color:red">' + res_rate + '/s';
+                } else if (res_rate > 0) {
+                    rate_text = '<span style="color:green">+' + res_rate + '/s';
+                } else {
+                    rate_text = res_rate + '/s';
+                }
+                resource.$rate.html(rate_text); //TODO: Calculate if tick frequency not 1s
             }
         });
 
@@ -1224,7 +1249,6 @@ Civvies.initializeOptions = function (option_type, options) {
     function show_building_buttons(game) {
         $('<h3>')
             .text('Buildings')
-            .hide()
             .appendTo($pointers.building_list);
         var $table = $('<table>')
             .appendTo($pointers.building_list);
@@ -1306,9 +1330,9 @@ Civvies.initializeOptions = function (option_type, options) {
                 });
             }
         });
-        if (buildings_shown) {
-            $pointers.building_list.find('h3').show();
-        }
+//        if (buildings_shown) {
+//            $pointers.building_list.find('h3').show();
+//        }
     }
 
     //------------------------------------------
@@ -1882,11 +1906,8 @@ Civvies.initializeOptions = function (option_type, options) {
 (function (Civvies) {
     var _c = new Civvies('get_private_functions');
 
-    //TODO: Producing/consuming is a bit off with the higher levels - all resources hitting max of 120
-    //TODO: Food running out slower, food maxes a little flexible
-    //TODO: Only show upgrade category titles if any are displayed
-
     _c.increment_from_click = function (game, resource) {
+        //Increment basic resource when it's clicked on to manually gather
         _c.increment_resource(game, resource, resource.amount_from_click || 1);
         _c.redraw_data(game);
         //TODO: Add in a delay, and a gui-countdown wipe in orange
@@ -1937,8 +1958,11 @@ Civvies.initializeOptions = function (option_type, options) {
 
         return val;
     };
+    _c.variable = function(game, var_name) {
+        return game.data.variables[var_name];
+    };
     _c.getResourceMax = function (game, resource) {
-        var storage = game.game_options.storage_initial;
+        var storage = _c.variable(game, 'storageInitial');
         _.each(game.game_options.buildings, function (building) {
             if (building.supports && building.supports[resource.name]) {
                 var num_buildings = game.data.buildings[building.name];
@@ -2528,12 +2552,22 @@ Civvies.initializeOptions = function (option_type, options) {
             //Enough food, everyone is happy
             game.data.resources.food -= population.current_that_eats;
         } else {
-            //The culling
-            game.data.resources.food /= 2;
 
-            //TODO: Runs out of farmers a bit fast, might need to tweak it
+            //First, try assigning any unemployed workers to farms
 
-            var to_remove = population.current_that_eats - game.data.resources.food - game.data.populations.farmers;
+            if (game.data.populations.unemployed) {
+                game.logMessage("Not enough food, assigned " + game.data.populations.unemployed+ " vagrants to farms", true);
+                _c.assign_workers(game, _c.info(game,'populations','farmers'),game.data.populations.unemployed);
+                return;
+            }
+
+            //The culling, eat most of the food, then start removing non-essential people
+            game.data.resources.food *= .2;
+
+            var to_remove = population.current_that_eats - game.data.resources.food - game.data.populations.farmers + .5;
+            to_remove = Math.round(to_remove);
+            if (to_remove < 0) return;
+
             game.logMessage("Not enough food, need to cull the population: " + to_remove, true);
 
             var culling_order = game.game_options.populations.sort(function (a, b) {
@@ -2583,8 +2617,8 @@ Civvies.initializeOptions = function (option_type, options) {
         _c.autosave_if_time(game);
 
 //        //Resource-related
-        populations_produce_products(game);
         eat_food_or_die(game);
+        populations_produce_products(game);
 
 //
 //        var millMod = 1;
@@ -4022,9 +4056,6 @@ Civvies.initializeOptions = function (option_type, options) {
         autosave_every: 60,
         autosave: true,
 
-        //TODO: These should move to variables
-        storage_initial: 120,
-
         resources: [
             //Note: Grouping 1 is clickable by user to gather resources manually
             {name: 'food', grouping: 1, image: '../images/civclicker/food.png', chances: [{chance: "foodSpecialChance", resource: 'herbs'}], amount_from_click: 1},
@@ -4037,33 +4068,38 @@ Civvies.initializeOptions = function (option_type, options) {
 
             {name: 'leather', grouping: 2, image: '../images/civclicker/leather.png', notes: "Created by Tanners working in a Tannery"},
             {name: 'metal', grouping: 2, image: '../images/civclicker/metal.png', notes: "Created by Blacksmiths working in a Smithy"},
-            {name: 'gold', grouping: 2, image: '../images/civclicker/gold.png', notes: "Created from trading goods with Traders"},
 
+            {name: 'gold', grouping: 2, image: '../images/civclicker/gold.png', notes: "Created from trading goods with Traders"},
             {name: 'piety', grouping: 2, image: '../images/civclicker/piety.png', notes: "Created by Clerics working in a Temple"},
             {name: 'corpses', grouping: 2, image: '../images/civclicker/piety.png', notes: "Created when towns people die from starvation or fighting"},
+
+            //TODO: Haven't applied these yet
+            {name: 'healing', grouping: 3, image: '../images/civclicker/piety.png', notes: "Created by Clerics and Apothecaries"},
             {name: 'wonder', grouping: 3, image: '../images/civclicker/piety.png', notes: "Created by Labourers working on a Wonder"}
         ],
         buildings: [
-            {name: 'tent', type: 'home', costs: {skins: 2, wood: 2}, population_supports: 2, initial: 1},
+            {name: 'cave', type: 'home', costs: {wood: 2, food:1, stone:1}, population_supports: 1, initial: 1},
+            {name: 'tent', type: 'home', costs: {skins: 2, wood: 2}, population_supports: 2},
+            {name: 'hovel', type: 'home', costs: {food: 15, wood: 20, stone:5}, population_supports: 3},
             {name: 'hut', type: 'home', costs: {skins: 1, wood: 20}, population_supports: 4},
-            {name: 'cottage', type: 'home', costs: {stone: 30, wood: 10}, population_supports: 6},
-            {name: 'house', type: 'home', costs: {stone: 70, wood: 30}, population_supports: 10},
-            {name: 'mansion', type: 'home', costs: {stone: 200, wood: 200, leather: 20}, population_supports: 20},
+            {name: 'cottage', type: 'home', costs: {stone: 30, wood: 10}, population_supports: 6, upgrades: {harvesting: true}},
+            {name: 'house', type: 'home', costs: {stone: 70, wood: 30}, population_supports: 10, upgrades: {masonry: true}},
+            {name: 'mansion', type: 'home', costs: {stone: 200, wood: 200, leather: 20}, population_supports: 20, upgrades: {architecture: true}},
 
-            {name: 'barn', type: 'storage', costs: {wood: 100}, supports: {food: 100}, notes: "Increase the food you can store"},
-            {name: 'woodstock', type: 'storage', costs: {wood: 100}, supports: {wood: 100}, notes: "Increase the wood you can store"},
-            {name: 'stonestock', type: 'storage', costs: {wood: 100}, supports: {stone: 100}, notes: "Increase the stone you can store"},
+            {name: 'barn', type: 'storage', costs: {wood: 100}, supports: {food: 100, herbs: 1000}, upgrades: {harvesting: true}, notes: "Increase the food you can store"},
+            {name: 'woodstock', type: 'storage', costs: {wood: 100}, supports: {wood: 100, skins: 1000, leather:100}, notes: "Increase the wood you can store"},
+            {name: 'stonestock', type: 'storage', costs: {wood: 100}, supports: {stone: 100, ore: 1000, metal:100}, upgrades: {prospecting: true}, notes: "Increase the stone you can store"},
 
             {name: 'tannery', type: 'business', costs: {wood: 30, stone: 70, skins: 2}, supports: {tanners: 2}, upgrades: {skinning: true}},
             {name: 'smithy', type: 'business', costs: {wood: 30, stone: 70, ore: 2}, supports: {blacksmiths: 2}, upgrades: {prospecting: true}},
             {name: 'apothecary', type: 'business', costs: {wood: 30, stone: 70, herbs: 2}, supports: {apothecaries: 2}, upgrades: {harvesting: true}},
-            {name: 'temple', type: 'business', costs: {wood: 30, stone: 120, herbs: 10}, supports: {clerics: 1}, upgrades:{masonry:true}},
-            {name: 'barracks', type: 'business', costs: {food: 20, wood: 60, stone: 120}, supports: {soldiers: 5}, upgrades: {weaponry: true, masonry:true}},
+            {name: 'temple', type: 'business', costs: {wood: 30, stone: 120, herbs: 10}, supports: {clerics: 1, piety:2000, gold:5}, upgrades:{masonry:true}},
+            {name: 'barracks', type: 'business', costs: {food: 20, wood: 60, stone: 120}, supports: {soldiers: 5, gold:2}, upgrades: {weaponry: true, masonry:true}},
             {name: 'stable', type: 'business', costs: {food: 60, wood: 60, stone: 120, leather: 10}, supports: {cavalry: 5}, upgrades: {horseback: true}},
 
             {name: 'mill', type: 'upgrade', costs: {wood: 100, stone: 100}, options: {food_efficiency: .1}, upgrades: {wheel: true}, notes: "Improves Farming Efficiency"},
             {name: 'graveyard', type: 'upgrade', costs: {wood: 50, stone: 200, herbs: 50}, options: {grave_spot: 100}, notes: "Increases Grave Plots", upgrades:{writing:true}}, //TODO: Should graves be a resource?
-            {name: 'fortification', type: 'upgrade', costs: {stone: 100}, options: {defense_improvement: 5}, notes: "Improves Defenses", upgrades:{codeoflaws:true, palisade:true}},
+            {name: 'fortification', type: 'upgrade', costs: {stone: 100}, options: {defense_improvement: 5}, supports: {gold:10}, notes: "Improves Defenses", upgrades:{codeoflaws:true, palisade:true}},
 
             {name: 'battleAltar', title: "Battle Altar", type: 'altar', costs: {devotion: 1, stone: 200, metal: 50, piety: 200}, upgrades:{deity:true}},
             {name: 'fieldsAltar', title: "Fields Altar", type: 'altar', costs: {devotion: 1, food: 500, wood: 500, stone: 200, piety: 200}, upgrades:{deity:true}},
@@ -4073,24 +4109,26 @@ Civvies.initializeOptions = function (option_type, options) {
         populations: [
             {name: 'unemployed', title: 'Unemployed Worker', type: 'basic', notes: "Unassigned Workers that eat up food", unassignable: true, cull_order: 2},
             {name: 'sick', type: 'basic', notes: "Sick workers that need medical help", unassignable: true, cull_order: 1},
-            {name: 'farmers', type: 'basic', produces: {food: "farmers"}, doesnt_require_office: true, cull_order: 10},
-            {name: 'woodcutters', type: 'basic', produces: {wood: 1}, doesnt_require_office: true, cull_order: 9},
-            {name: 'miners', type: 'basic', produces: {stone: 1}, doesnt_require_office: true},
 
-            {name: 'tanners', type: 'medieval', consumes: {skins: 1}, produces: {leather: 1}},
-            {name: 'blacksmiths', type: 'medieval', consumes: {ore: 1}, produces: {metal: 1}},
-            {name: 'apothecaries', type: 'medieval', consumes: {herbs: 1}, supports: {healing: 1}},
-            {name: 'clerics', type: 'medieval', consumes: {food: 2, herbs: 1}, supports: {healing: .1, burying: 5}, produces: {piety: 1}, cull_order: 6},
+            {name: 'farmers', type: 'basic', produces: {food: "farmers"}, doesnt_require_office: true, cull_order: 10},
+            {name: 'woodcutters', type: 'basic', produces: {wood: "woodcutters"}, doesnt_require_office: true, cull_order: 9},
+            {name: 'miners', type: 'basic', produces: {stone: "miners"}, doesnt_require_office: true},
+
+            {name: 'tanners', type: 'medieval', consumes: {skins: 1}, produces: {leather: "tanners"}},
+            {name: 'blacksmiths', type: 'medieval', consumes: {ore: 1}, produces: {metal: "blacksmiths"}},
+            {name: 'apothecaries', type: 'medieval', consumes: {herbs: 1}, supports: {healing: "apothecaries"}},
+            {name: 'clerics', type: 'medieval', consumes: {food: 2, herbs: 1}, supports: {healing: .1, burying: 5}, produces: {piety: "clerics"}, cull_order: 6},
             {name: 'labourers', type: 'medieval', consumes: {herbs: 10, leather: 10, metal: 10, piety: 10}, produces: {wonder: 1}, cull_order: 2},
 
             {name: 'cats', type: 'mystical', cull_order: 11},  //TODO: What makes cats?
             {name: 'zombies', type: 'mystical', costs: {corpses: 1}, doesnt_consume_food: true},
 
-            {name: 'soldiers', type: 'warfare', consumes: {food: 2}, supports: {battle: 1.5}, upgrades: {weaponry: true}, cull_order: 8},
-            {name: 'cavalry', type: 'warfare', consumes: {food: 1, herbs: 1}, supports: {battle: 2}, upgrades: {horseback: true}, cull_order: 7},
-            {name: 'siege', type: 'warfare', costs: {metal: 10, wood: 100}, supports: {battle: 5}, upgrades: {construction: true, mathematics:true}, doesnt_require_office: true, doesnt_consume_food: true}
+            {name: 'soldiers', type: 'warfare', consumes: {food: 2}, supports: {battle: "soldiers"}, upgrades: {weaponry: true}, cull_order: 8},
+            {name: 'cavalry', type: 'warfare', consumes: {food: 1, herbs: 1}, supports: {battle: "cavalry"}, upgrades: {horseback: true}, cull_order: 7},
+            {name: 'siege', type: 'warfare', costs: {metal: 10, wood: 100}, supports: {battle: .1}, upgrades: {construction: true, mathematics:true}, doesnt_require_office: true, doesnt_consume_food: true}
         ],
         variables: [
+            {name: "storageInitial", value: 120},
             {name: "happiness", value: 1},
             {name: "farmers", value: 1.2},
             {name: "pestBonus", value: 0},

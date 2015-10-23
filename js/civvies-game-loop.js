@@ -46,12 +46,22 @@
             //Enough food, everyone is happy
             game.data.resources.food -= population.current_that_eats;
         } else {
-            //The culling
-            game.data.resources.food /= 2;
 
-            //TODO: Runs out of farmers a bit fast, might need to tweak it
+            //First, try assigning any unemployed workers to farms
 
-            var to_remove = population.current_that_eats - game.data.resources.food - game.data.populations.farmers;
+            if (game.data.populations.unemployed) {
+                game.logMessage("Not enough food, assigned " + game.data.populations.unemployed+ " vagrants to farms", true);
+                _c.assign_workers(game, _c.info(game,'populations','farmers'),game.data.populations.unemployed);
+                return;
+            }
+
+            //The culling, eat most of the food, then start removing non-essential people
+            game.data.resources.food *= .2;
+
+            var to_remove = population.current_that_eats - game.data.resources.food - game.data.populations.farmers + .5;
+            to_remove = Math.round(to_remove);
+            if (to_remove < 0) return;
+
             game.logMessage("Not enough food, need to cull the population: " + to_remove, true);
 
             var culling_order = game.game_options.populations.sort(function (a, b) {
@@ -101,8 +111,8 @@
         _c.autosave_if_time(game);
 
 //        //Resource-related
-        populations_produce_products(game);
         eat_food_or_die(game);
+        populations_produce_products(game);
 
 //
 //        var millMod = 1;

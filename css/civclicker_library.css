@@ -292,8 +292,14 @@ h3{
 	width:300px;
 }
 .number{
+    font-weight: bold;
 	text-align:right;
 	padding-right:5px;
+}
+.number_small {
+    text-align:right;
+   	padding-right:5px;
+    font-size: .8em;
 }
 .icon{
 	padding-right:10px;

@@ -23,6 +23,7 @@
                 var times = resource.amount_from_click || 1;
                 var title = (times == 1) ? name : times + " " + Helpers.pluralize(name);
                 var description = _c.cost_benefits_text(game, resource, true, times);
+                var max = _c.getResourceMax(game, resource);
 
                 $('<button>')
                     .text('Gather ' + name)
@@ -47,9 +48,9 @@
                     .addClass('icon icon-lg')
                     .appendTo($td4);
                 resource.$max = $('<td>')
-                    .addClass('number')
+                    .addClass('number_small')
                     .attr('id', 'resource-max-' + resource.name)
-                    .text("(Max: " + game.game_options.storage_initial + ")")
+                    .text("(Max: " + max + ")")
                     .appendTo($tr);
                 resource.$rate = $('<td>')
                     .addClass('number net')
@@ -69,22 +70,35 @@
             if (resource.grouping == 2) {
                 var name = _.str.titleize(resource.title || resource.name);
                 var description = _c.cost_benefits_text(game, resource, false, 1);
+                var max = _c.getResourceMax(game, resource);
 
                 var $div = $('<div>')
                     .addClass('icon resource-holder')
                     .appendTo($pointers.secondary_resources);
                 $('<span>')
                     .text(name + ":")
+                    .css({verticalAlign:'top'})
+                    .appendTo($div);
+                var $holder = $('<span>')
+                    .css({display:'inline-block'})
                     .appendTo($div);
                 resource.$holder = $('<span>')
                     .attr('id', 'resource-' + resource.name)
+                    .addClass('number')
                     .text(0)
-                    .appendTo($div);
+                    .appendTo($holder);
+                resource.$max = $('<span>')
+                    .attr('id', 'resource-max-' + resource.name)
+                    .addClass('number_small')
+                    .text("(Max: " + max + ")")
+                    .appendTo($holder);
                 $('<img>')
                     .attr('src', resource.image)
+                    .css({verticalAlign:'top'})
                     .popover({title: name, content: description, trigger: 'hover', placement: 'right', html: false, container: $div})
                     .addClass('icon icon-lg')
                     .appendTo($div);
+
             }
         });
     }
@@ -94,7 +108,7 @@
         _.each(game.game_options.resources, function (resource) {
             if (resource.$holder) {
                 var res_data = game.data.resources[resource.name];
-                res_data = Helpers.abbreviateNumber(res_data);
+                res_data = Helpers.abbreviateNumber(res_data, false, true);
                 resource.$holder.text(res_data)
             }
 
@@ -106,7 +120,15 @@
 
             if (resource.$rate) {
                 var res_rate = Helpers.abbreviateNumber(rates[resource.name]) || 0;
-                resource.$rate.text(res_rate + "/s"); //TODO: Calculate if tick frequence not 1s
+                var rate_text;
+                if (res_rate < 0) {
+                    rate_text = '<span style="color:red">' + res_rate + '/s';
+                } else if (res_rate > 0) {
+                    rate_text = '<span style="color:green">+' + res_rate + '/s';
+                } else {
+                    rate_text = res_rate + '/s';
+                }
+                resource.$rate.html(rate_text); //TODO: Calculate if tick frequency not 1s
             }
         });
 
@@ -123,7 +145,6 @@
     function show_building_buttons(game) {
         $('<h3>')
             .text('Buildings')
-            .hide()
             .appendTo($pointers.building_list);
         var $table = $('<table>')
             .appendTo($pointers.building_list);
@@ -205,9 +226,9 @@
                 });
             }
         });
-        if (buildings_shown) {
-            $pointers.building_list.find('h3').show();
-        }
+//        if (buildings_shown) {
+//            $pointers.building_list.find('h3').show();
+//        }
     }
 
     //------------------------------------------

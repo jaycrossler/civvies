@@ -151,8 +151,11 @@ Helpers.expandExponential = function (value) {
         return value;
     }
 };
-Helpers.abbreviateNumber = function (value, useLongSuffixes) {
+Helpers.abbreviateNumber = function (value, useLongSuffixes, hide_decimals) {
     //Modified From: http://stackoverflow.com/questions/10599933/convert-long-number-into-abbreviated-string-in-javascript-with-a-special-shortn
+    if (hide_decimals && value < 1000000) {
+        value = parseInt(value);
+    }
     var newValue = value;
     if (value >= 10000) {
         value = Helpers.expandExponential(value);

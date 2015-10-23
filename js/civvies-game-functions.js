@@ -1,11 +1,8 @@
 (function (Civvies) {
     var _c = new Civvies('get_private_functions');
 
-    //TODO: Producing/consuming is a bit off with the higher levels - all resources hitting max of 120
-    //TODO: Food running out slower, food maxes a little flexible
-    //TODO: Only show upgrade category titles if any are displayed
-
     _c.increment_from_click = function (game, resource) {
+        //Increment basic resource when it's clicked on to manually gather
         _c.increment_resource(game, resource, resource.amount_from_click || 1);
         _c.redraw_data(game);
         //TODO: Add in a delay, and a gui-countdown wipe in orange
@@ -56,8 +53,11 @@
 
         return val;
     };
+    _c.variable = function(game, var_name) {
+        return game.data.variables[var_name];
+    };
     _c.getResourceMax = function (game, resource) {
-        var storage = game.game_options.storage_initial;
+        var storage = _c.variable(game, 'storageInitial');
         _.each(game.game_options.buildings, function (building) {
             if (building.supports && building.supports[resource.name]) {
                 var num_buildings = game.data.buildings[building.name];
