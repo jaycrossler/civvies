@@ -242,8 +242,11 @@
         var population = _c.population(game);
         var population_current = population.current;
         var population_max = population.max;
+        var land_current = population.land_current;
+        var land_max = population.land_max;
 
         var $d1 = $('<div>')
+            .addClass('population_holder')
             .appendTo($pointers.population_info);
         $("<span>")
             .text("Current Population: ")
@@ -253,6 +256,7 @@
             .appendTo($d1);
 
         var $d2 = $('<div>')
+            .addClass('population_holder')
             .appendTo($pointers.population_info);
         $("<span>")
             .text("Maximum Population: ")
@@ -261,7 +265,33 @@
             .text(population_max)
             .appendTo($d2);
 
+        $('<br/>')
+            .appendTo($pointers.population_info);
 
+        var $d4 = $('<div>')
+            .addClass('population_holder')
+            .popover({title:"Population", content:"If there are more buildings that this land can hold, then population happiness will decrease.", placement:'top', trigger:'hover'})
+            .appendTo($pointers.population_info);
+        $("<span>")
+            .text("Current Land Use: ")
+            .appendTo($d4);
+        $pointers.land_current = $("<span>")
+            .text(land_current)
+            .appendTo($d4);
+
+        var $d5 = $('<div>')
+            .addClass('population_holder')
+            .popover({title:"Population", content:"If there are more buildings that this land can hold, then population happiness will decrease.", placement:'top', trigger:'hover'})
+            .appendTo($pointers.population_info);
+        $("<span>")
+            .text("Maximum Land Use: ")
+            .appendTo($d5);
+        $pointers.land_max = $("<span>")
+            .text(land_max)
+            .appendTo($d5);
+
+
+        //Build create workers buttons
         var $d3 = $("<div>")
             .appendTo($pointers.population_info);
         _.each(purchase_multiples, function (times) {
@@ -289,11 +319,12 @@
 
     function update_population_data(game) {
         var population = _c.population(game);
-        var population_current = population.current;
-        var population_max = population.max;
 
-        $pointers.population_current.text(population_current);
-        $pointers.population_max.text(population_max);
+        $pointers.population_current.text(population.current);
+        $pointers.population_max.text(population.max);
+        $pointers.land_current.text(population.land_current);
+        $pointers.land_max.text(population.land_max);
+
 
         _.each(purchase_multiples, function (times) {
             var food_cost = _c.worker_food_cost(game, times);

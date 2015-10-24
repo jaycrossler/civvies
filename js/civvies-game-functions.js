@@ -11,35 +11,25 @@
     _c.buildInitialData = function (game) {
         game.data = game.data || {};
 
-        game.data.resources = game.data.resources || {};
-        _.each(game.game_options.resources, function (resource) {
-            game.data.resources[resource.name] = resource.initial || 0;
+        var arrays_to_data_objects = 'resources,buildings,populations,variables,upgrades,achievements'.split(',');
+        _.each(arrays_to_data_objects, function(game_options_name){
+    //        Does the same thing as:
+    //        game.data.resources = game.data.resources || {};
+    //        _.each(game.game_options.resources, function (resource) {
+    //            game.data.resources[resource.name] = resource.initial || 0;
+    //        });
+            game.data[game_options_name] = game.data[game_options_name] || {};
+            _.each(game.game_options[game_options_name], function (item) {
+                game.data[game_options_name][item.name] = item.initial || 0;
+            });
         });
 
-        game.data.buildings = game.data.buildings || {};
-        _.each(game.game_options.buildings, function (building) {
-            game.data.buildings[building.name] = building.initial || 0;
+        //Add an array for land
+        game.data.land = game.data.land || [];
+        _.each(game.game_options.land, function (land) {
+            game.data.land.push(JSON.parse(JSON.stringify(land)));
         });
 
-        game.data.populations = game.data.populations || {};
-        _.each(game.game_options.populations, function (population) {
-            game.data.populations[population.name] = population.initial || 0;
-        });
-
-        game.data.variables = game.data.variables || {};
-        _.each(game.game_options.variables, function (variable) {
-            game.data.variables[variable.name] = variable.value || 0;
-        });
-
-        game.data.upgrades = game.data.upgrades || {};
-        _.each(game.game_options.upgrades, function (upgrade) {
-            game.data.upgrades[upgrade.name] = upgrade.initial || false;
-        });
-
-        game.data.achievements = game.data.achievements || {};
-        _.each(game.game_options.achievements, function (achievement) {
-            game.data.achievements[achievement.name] = achievement.initial || false;
-        });
     };
     _c.info = function (game, kind, name, sub_var, if_not_listed) {
         //Usage:  var info = _c.info(game, 'buildings', resource.name);
@@ -53,7 +43,7 @@
 
         return val;
     };
-    _c.variable = function(game, var_name) {
+    _c.variable = function (game, var_name) {
         return game.data.variables[var_name];
     };
     _c.getResourceMax = function (game, resource) {
@@ -219,7 +209,7 @@
             if (as_html) {
                 style = "<b>Type: <span class='notes_text'>" + style + "</span></b>";
             } else {
-                style = "Type: "+style;
+                style = "Type: " + style;
             }
         }
 
@@ -334,7 +324,7 @@
         }
     };
     _c.population = function (game) {
-        var pop = {current: 0, max: 0, current_that_eats: 0};
+        var pop = {current: 0, max: 0, current_that_eats: 0, land_current:0, land_max:0};
 
         var people = 0;
         var eaters = 0;
@@ -348,13 +338,24 @@
         pop.current_that_eats = eaters;
 
         var storage = 0;
+        var building_count = 0;
         _.each(game.game_options.buildings, function (building) {
+            var num_buildings = game.data.buildings[building.name];
             if (building.population_supports) {
-                var num_buildings = game.data.buildings[building.name];
                 storage += (num_buildings * building.population_supports);
             }
+            building_count += num_buildings;
         });
+        pop.land_current = building_count;
         pop.max = storage;
+
+        var land_size = 0;
+        _.each(game.data.land, function(land){
+            if (land.size) {
+                land_size += land.size;
+            }
+        });
+        pop.land_max = land_size;
 
         return pop;
     };
@@ -468,13 +469,13 @@
             game.data.upgrades[upgrade.name] = true;
         }
     };
-    _c.calculate_increment_costs = function(game) {
+    _c.calculate_increment_costs = function (game) {
         var increments = {};
-        _.each(game.game_options.resources, function(resource){
+        _.each(game.game_options.resources, function (resource) {
             if (resource.grouping == 1) {
                 var rate = 0;
                 //How much is being produced and consumed
-                _.each(game.game_options.populations, function(job){
+                _.each(game.game_options.populations, function (job) {
                     var amount = game.data.populations[job.name];
                     if (amount && job.produces && job.produces[resource.name]) {
                         var rate_per = job.produces[resource.name];

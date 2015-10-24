@@ -59,6 +59,13 @@ body{
 .notes_text {
     color: orangered;
 }
+.population_holder {
+    display: inline-block;
+    padding: 6px;
+    margin: 2px;
+    border: 1px solid black;
+    border-radius: 4px;
+}
 
 button{
 	width:170px;

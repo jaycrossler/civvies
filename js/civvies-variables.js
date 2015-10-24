@@ -78,22 +78,22 @@
             {name: 'siege', type: 'warfare', costs: {metal: 10, wood: 100}, supports: {battle: .1}, upgrades: {construction: true, mathematics:true}, doesnt_require_office: true, doesnt_consume_food: true}
         ],
         variables: [
-            {name: "storageInitial", value: 120},
-            {name: "happiness", value: 1},
-            {name: "farmers", value: 1.2},
-            {name: "pestBonus", value: 0},
-            {name: "woodcutters", value: 0.5},
-            {name: "miners", value: 0.2},
-            {name: "tanners", value: 0.5},
-            {name: "blacksmiths", value: 0.5},
-            {name: "apothecaries", value: 0.1},
-            {name: "clerics", value: 0.05},
-            {name: "soldiers", value: 0.05},
-            {name: "cavalry", value: 0.08},
-            {name: "foodSpecialChance", value: 0.02},
-            {name: "woodSpecialChance", value: 0.02},
-            {name: "stoneSpecialChance", value: 0.01},
-            {name: "foodCostInitial", value: 20}
+            {name: "storageInitial", initial: 120},
+            {name: "happiness", initial: 1},
+            {name: "farmers", initial: 1.2},
+            {name: "pestBonus", initial: 0},
+            {name: "woodcutters", initial: 0.5},
+            {name: "miners", initial: 0.2},
+            {name: "tanners", initial: 0.5},
+            {name: "blacksmiths", initial: 0.5},
+            {name: "apothecaries", initial: 0.1},
+            {name: "clerics", initial: 0.05},
+            {name: "soldiers", initial: 0.05},
+            {name: "cavalry", initial: 0.08},
+            {name: "foodSpecialChance", initial: 0.02},
+            {name: "woodSpecialChance", initial: 0.02},
+            {name: "stoneSpecialChance", initial: 0.01},
+            {name: "foodCostInitial", initial: 20}
         ],
         upgrades: [
             {name: "skinning", type: 'stone age', costs: {skins: 10}},
@@ -196,6 +196,9 @@
             {name: "merchant"},
             {name: "rushed"},
             {name: "neverclick", title: "Never Click"}
+        ],
+        land: [
+            {name:'Starting area', size:1000}
         ]
     };
 
