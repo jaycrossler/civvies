@@ -37,8 +37,11 @@ body{
 	text-shadow:none;
 }
 .resource-holder{
-    width: 220px;
     display: inline-block;
+    border: 1px solid black;
+    border-radius: 4px;
+    margin: 2px;
+    padding: 2px;
 }
 .resource-holder span{
     width: 70px;

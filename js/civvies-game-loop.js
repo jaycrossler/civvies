@@ -62,7 +62,9 @@
             to_remove = Math.round(to_remove);
             if (to_remove < 0) return;
 
-            game.logMessage("Not enough food, need to cull the population: " + to_remove, true);
+            //TODO: population eats corpses instead, and gets sick
+
+            game.logMessage("Not enough food, " + to_remove + " workers starved to death", true);
 
             var culling_order = game.game_options.populations.sort(function (a, b) {
                 var a_ord = a.cull_order || ((a.doesnt_consume_food) ? 15 : 5);
@@ -88,7 +90,14 @@
         }
     }
 
+    function populations_possibly_get_sick (game) {
+        //TODO: Have a disease factor
+        //TODO: More unburied corpses means more disease
+        //TODO: Have health variable that removes disease
+        //TODO: Sick people move to being ill, then swap back to their positions if healed, or to more ill, until dead (have a counter?)
+    }
 
+    //---------------------------
     var game_loop_timer = null;
     _c.start_game_loop = function (game, game_options) {
         game_options = game_options || {};
@@ -110,9 +119,19 @@
 //        //The whole game runs on a single setInterval clock.
         _c.autosave_if_time(game);
 
+        //TODO: Have a buffer so that food can be over the limit for the loop
+
 //        //Resource-related
         eat_food_or_die(game);
         populations_produce_products(game);
+        populations_possibly_get_sick(game);
+//        check_for_attacks(game);
+//        check_for_accidents(game);
+//        check_for_traders(game);
+//        bury_the_dead(game);
+//        heal_the_wounded(game);
+//        build_a_wonder(game);
+
 
 //
 //        var millMod = 1;

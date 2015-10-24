@@ -16,8 +16,8 @@
             {name: 'skins', grouping: 2, image: '../images/civclicker/skins.png', notes: "Found sometimes when collecting wood or by woodcutters"},
             {name: 'ore', grouping: 2, image: '../images/civclicker/ore.png', notes: "Found sometimes when mining ore or by miners"},
 
-            {name: 'leather', grouping: 2, image: '../images/civclicker/leather.png', notes: "Created by Tanners working in a Tannery"},
-            {name: 'metal', grouping: 2, image: '../images/civclicker/metal.png', notes: "Created by Blacksmiths working in a Smithy"},
+            {name: 'leather', grouping: 2, image: '../images/civclicker/leather.png', notes: "Created from Skins by Tanners working in a Tannery"},
+            {name: 'metal', grouping: 2, image: '../images/civclicker/metal.png', notes: "Created from Ore by Blacksmiths working in a Smithy"},
 
             {name: 'gold', grouping: 2, image: '../images/civclicker/gold.png', notes: "Created from trading goods with Traders"},
             {name: 'piety', grouping: 2, image: '../images/civclicker/piety.png', notes: "Created by Clerics working in a Temple"},
@@ -36,9 +36,9 @@
             {name: 'house', type: 'home', costs: {stone: 70, wood: 30}, population_supports: 10, upgrades: {masonry: true}},
             {name: 'mansion', type: 'home', costs: {stone: 200, wood: 200, leather: 20}, population_supports: 20, upgrades: {architecture: true}},
 
-            {name: 'barn', type: 'storage', costs: {wood: 100}, supports: {food: 100, herbs: 1000}, upgrades: {harvesting: true}, notes: "Increase the food you can store"},
-            {name: 'woodstock', type: 'storage', costs: {wood: 100}, supports: {wood: 100, skins: 1000, leather:100}, notes: "Increase the wood you can store"},
-            {name: 'stonestock', type: 'storage', costs: {wood: 100}, supports: {stone: 100, ore: 1000, metal:100}, upgrades: {prospecting: true}, notes: "Increase the stone you can store"},
+            {name: 'barn', type: 'storage', costs: {wood: 100}, supports: {food: 100, herbs: 300}, upgrades: {harvesting: true}, notes: "Increase the food you can store"},
+            {name: 'woodstock', type: 'storage', costs: {wood: 100}, supports: {wood: 100, skins: 200, leather:100}, notes: "Increase the wood you can store"},
+            {name: 'stonestock', type: 'storage', costs: {wood: 100}, supports: {stone: 100, ore: 300, metal:100}, upgrades: {prospecting: true}, notes: "Increase the stone you can store"},
 
             {name: 'tannery', type: 'business', costs: {wood: 30, stone: 70, skins: 2}, supports: {tanners: 2}, upgrades: {skinning: true}},
             {name: 'smithy', type: 'business', costs: {wood: 30, stone: 70, ore: 2}, supports: {blacksmiths: 2}, upgrades: {prospecting: true}},
@@ -57,7 +57,7 @@
             {name: 'catAltar', title: "Cat Altar", type: 'altar', costs: {devotion: 1, herbs: 100, stone: 200, piety: 200}, upgrades:{deity:true}}
         ],
         populations: [
-            {name: 'unemployed', title: 'Unemployed Worker', type: 'basic', notes: "Unassigned Workers that eat up food", unassignable: true, cull_order: 2},
+            {name: 'unemployed', title: 'Unemployed Worker', type: 'basic', notes: "Unassigned Workers that eat up food", unassignable: true, cull_order: 2, doesnt_consume_food:true},
             {name: 'sick', type: 'basic', notes: "Sick workers that need medical help", unassignable: true, cull_order: 1},
 
             {name: 'farmers', type: 'basic', produces: {food: "farmers"}, doesnt_require_office: true, cull_order: 10},
