@@ -382,12 +382,14 @@
         var city_type = 'Thorp';
         _.each(game.game_options.land_names, function(land_name){
             if (current >= land_name.population_min) {
-                city_type = _.str.titleize(land_name.title || land_name.name);
+                city_type = land_name.name;
             }
         });
-        game.data.variables.land_name = city_type;
+        game.data.achievements[city_type] = true;
+        game.data.variables.land_name = _.str.titleize(city_type.title || city_type);
+
         $('#civType')
-            .text(city_type);
+            .text(game.data.variables.land_name);
     };
     _c.worker_food_cost = function (game, times) {
         var initial_cost = _c.info(game, 'variables', 'foodCostInitial', 'value', 20);
@@ -462,6 +464,10 @@
             if (_.isNumber(times)) {
                 game.data.populations[job.name] += times;
                 game.data.populations.unemployed -= times;
+
+                if (job.achievement) {
+                    game.data.achievements[job.achievement] = true;
+                }
             }
         }
     };
