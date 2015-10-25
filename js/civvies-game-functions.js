@@ -1,3 +1,11 @@
+//TODO: Mood
+//TODO: Trading - plugin
+//TODO: Fighting
+//TODO: Raiding
+//TODO: Burying dead
+//TODO: Raising dead
+
+
 (function (Civvies) {
     var _c = new Civvies('get_private_functions');
 
@@ -344,7 +352,11 @@
             if (building.population_supports) {
                 storage += (num_buildings * building.population_supports);
             }
-            building_count += num_buildings;
+            var building_size = 1;
+            if (building.land_size !== undefined) {
+                building_size = building.land_size;
+            }
+            building_count += (num_buildings * building_size);
         });
         pop.land_current = building_count;
         pop.max = storage;
@@ -357,7 +369,25 @@
         });
         pop.land_max = land_size;
 
+        var highest_pop = game.data.variables.highest_population || 0;
+        if (pop.current > highest_pop) {
+            _c.update_highest_population(game, pop.current);
+        }
+
         return pop;
+    };
+    _c.update_highest_population = function(game, current) {
+        game.data.variables.highest_population = current;
+
+        var city_type = 'Thorp';
+        _.each(game.game_options.land_names, function(land_name){
+            if (current >= land_name.population_min) {
+                city_type = _.str.titleize(land_name.title || land_name.name);
+            }
+        });
+        game.data.variables.land_name = city_type;
+        $('#civType')
+            .text(city_type);
     };
     _c.worker_food_cost = function (game, times) {
         var initial_cost = _c.info(game, 'variables', 'foodCostInitial', 'value', 20);

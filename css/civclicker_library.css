@@ -61,7 +61,7 @@ body{
 }
 .population_holder {
     display: inline-block;
-    padding: 6px;
+    padding: .1em .4em;
     margin: 2px;
     border: 1px solid black;
     border-radius: 4px;
@@ -110,8 +110,9 @@ button.multiplier {
     border:2px solid black;
     font-size: .8em;
     width: 80px;
-    padding: 2px;
-    margin: 2px;
+    padding: .2em;
+    margin: .2em;
+    text-align: center;
     display: inline-block;
 }
 /*.btn.disabled {*/
@@ -241,10 +242,10 @@ h3{
 }
 
 .paneSelector{
-	width:15%;
 	float:left;
 	text-align:center;
 	margin:1em 0;
+    padding:0 .6em;
 	line-height:2em;
 	border:2px solid black;
 	background-color:#fff;

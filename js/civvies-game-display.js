@@ -252,6 +252,7 @@
             .text("Current Population: ")
             .appendTo($d1);
         $pointers.population_current = $("<span>")
+            .addClass('number')
             .text(population_current)
             .appendTo($d1);
 
@@ -262,6 +263,7 @@
             .text("Maximum Population: ")
             .appendTo($d2);
         $pointers.population_max = $("<span>")
+            .addClass('number')
             .text(population_max)
             .appendTo($d2);
 
@@ -276,6 +278,7 @@
             .text("Current Land Use: ")
             .appendTo($d4);
         $pointers.land_current = $("<span>")
+            .addClass('number')
             .text(land_current)
             .appendTo($d4);
 
@@ -287,8 +290,13 @@
             .text("Maximum Land Use: ")
             .appendTo($d5);
         $pointers.land_max = $("<span>")
+            .addClass('number')
             .text(land_max)
             .appendTo($d5);
+        $('<br/>')
+            .appendTo($pointers.population_info);
+        $('<br/>')
+            .appendTo($pointers.population_info);
 
 
         //Build create workers buttons
@@ -303,7 +311,7 @@
             var food_cost = _c.worker_food_cost(game, times);
             var description = "Consume " + food_cost + " food";
 
-            $pointers["create_workers_x" + times] = $('<button>')
+            var $btn = $('<button>')
                 .text(text)
                 .prop({disabled: true})
                 .on('click', function () {
@@ -311,9 +319,16 @@
                     _c.redraw_data(game);
                 })
                 .appendTo($inner);
-            $pointers["create_workers_x" + times + "_cost"] = $("<span>")
+            var $btn_text = $("<span>")
                 .text(description)
                 .appendTo($inner);
+
+            if (times > 1){
+                $btn.hide();
+                $btn_text.hide();
+            }
+            $pointers["create_workers_x" + times] = $btn;
+            $pointers["create_workers_x" + times + "_cost"] = $btn_text;
         });
     }
 
@@ -330,10 +345,17 @@
             var food_cost = _c.worker_food_cost(game, times);
             var description = "Consume " + food_cost + " food";
 
-            $pointers["create_workers_x" + times]
-                .prop({disabled: !_c.workers_are_creatable(game, times)});
+            var $btn = $pointers["create_workers_x" + times];
+            var $btn_text = $pointers["create_workers_x" + times + "_cost"];
 
-            $pointers["create_workers_x" + times + "_cost"]
+            if (population.current >= (times*4)) {
+                $btn.show();
+                $btn_text.show();
+            }
+
+            $btn
+                .prop({disabled: !_c.workers_are_creatable(game, times)});
+            $btn_text
                 .text(description);
         });
     }
@@ -397,7 +419,7 @@
 
                 if (show) {
                     if (use_button) {
-                        job["$btn_x" + times] = $('<button>')
+                        var $btn = $('<button>')
                             .text(times_text)
                             .popover({title: "Assign " + title, content: description, trigger: 'hover', placement: 'bottom', html: true})
                             .prop({disabled: true})
@@ -407,6 +429,14 @@
                                 _c.redraw_data(game);
                             })
                             .appendTo($td1);
+
+                        if (times == 1 || times == -1) {
+                            $btn.show();
+                        } else {
+                            $btn.hide();
+                        }
+                        job["$btn_x" + times] = $btn;
+
                     } else {
                         var $inner = $('<div>')
                             .addClass('multiplier_holder')
@@ -456,6 +486,10 @@
                             $btn.popover('hide');
                         }
                         $btn.prop({disabled: !enabled});
+
+                        if (game.data.variables.highest_population >= (4 * Math.abs(times))) {
+                            $btn.show();
+                        }
                     }
                 });
             }

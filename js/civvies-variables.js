@@ -28,22 +28,22 @@
             {name: 'wonder', grouping: 3, image: '../images/civclicker/piety.png', notes: "Created by Labourers working on a Wonder"}
         ],
         buildings: [
-            {name: 'cave', type: 'home', costs: {wood: 2, food:1, stone:1}, population_supports: 1, initial: 1},
+            {name: 'cave', type: 'home', costs: {wood: 2, food:1, stone:1}, population_supports: 1, initial: 1, land_size:0},
             {name: 'tent', type: 'home', costs: {skins: 2, wood: 2}, population_supports: 2},
             {name: 'hovel', type: 'home', costs: {food: 15, wood: 20, stone:5}, population_supports: 3},
             {name: 'hut', type: 'home', costs: {skins: 1, wood: 20}, population_supports: 4},
-            {name: 'cottage', type: 'home', costs: {stone: 30, wood: 10}, population_supports: 6, upgrades: {harvesting: true}},
-            {name: 'house', type: 'home', costs: {stone: 70, wood: 30}, population_supports: 10, upgrades: {masonry: true}},
-            {name: 'mansion', type: 'home', costs: {stone: 200, wood: 200, leather: 20}, population_supports: 20, upgrades: {architecture: true}},
+            {name: 'cottage', type: 'home', costs: {stone: 30, wood: 10}, population_supports: 6, upgrades: {harvesting: true}, land_size:2},
+            {name: 'house', type: 'home', costs: {stone: 70, wood: 30}, population_supports: 10, upgrades: {masonry: true}, land_size:2},
+            {name: 'mansion', type: 'home', costs: {stone: 200, wood: 200, leather: 20}, population_supports: 20, upgrades: {architecture: true}, land_size:3},
 
-            {name: 'barn', type: 'storage', costs: {wood: 100}, supports: {food: 100, herbs: 300}, upgrades: {harvesting: true}, notes: "Increase the food you can store"},
-            {name: 'woodstock', type: 'storage', costs: {wood: 100}, supports: {wood: 100, skins: 200, leather:100}, notes: "Increase the wood you can store"},
-            {name: 'stonestock', type: 'storage', costs: {wood: 100}, supports: {stone: 100, ore: 300, metal:100}, upgrades: {prospecting: true}, notes: "Increase the stone you can store"},
+            {name: 'barn', type: 'storage', costs: {wood: 100}, supports: {food: 100, herbs: 300}, upgrades: {harvesting: true}, notes: "Increase the food you can store",land_size:3},
+            {name: 'woodstock', type: 'storage', costs: {wood: 100}, supports: {wood: 100, skins: 200, leather:100}, notes: "Increase the wood you can store", land_size:3},
+            {name: 'stonestock', type: 'storage', costs: {wood: 100}, supports: {stone: 100, ore: 300, metal:100}, upgrades: {prospecting: true}, notes: "Increase the stone you can store", land_size:3},
 
-            {name: 'tannery', type: 'business', costs: {wood: 30, stone: 70, skins: 2}, supports: {tanners: 2}, upgrades: {skinning: true}},
-            {name: 'smithy', type: 'business', costs: {wood: 30, stone: 70, ore: 2}, supports: {blacksmiths: 2}, upgrades: {prospecting: true}},
-            {name: 'apothecary', type: 'business', costs: {wood: 30, stone: 70, herbs: 2}, supports: {apothecaries: 2}, upgrades: {harvesting: true}},
-            {name: 'temple', type: 'business', costs: {wood: 30, stone: 120, herbs: 10}, supports: {clerics: 1, piety:2000, gold:5}, upgrades:{masonry:true}},
+            {name: 'tannery', type: 'business', costs: {wood: 30, stone: 70, skins: 2}, supports: {tanners: 2}, upgrades: {skinning: true}, land_size:2},
+            {name: 'smithy', type: 'business', costs: {wood: 30, stone: 70, ore: 2}, supports: {blacksmiths: 2}, upgrades: {prospecting: true}, land_size:2},
+            {name: 'apothecary', type: 'business', costs: {wood: 30, stone: 70, herbs: 2}, supports: {apothecaries: 2}, upgrades: {harvesting: true}, land_size:2},
+            {name: 'temple', type: 'business', costs: {wood: 30, stone: 120, herbs: 10}, supports: {clerics: 1, piety:2000, gold:5}, upgrades:{masonry:true}, land_size:2},
             {name: 'barracks', type: 'business', costs: {food: 20, wood: 60, stone: 120}, supports: {soldiers: 5, gold:2}, upgrades: {weaponry: true, masonry:true}},
             {name: 'stable', type: 'business', costs: {food: 60, wood: 60, stone: 120, leather: 10}, supports: {cavalry: 5}, upgrades: {horseback: true}},
 
@@ -167,14 +167,15 @@
         achievements: [
             {name: "hamlet"},
             {name: "village"},
-            {name: "smallTown", title: "Small Town"},
-            {name: "largeTown", title: "Large Town"},
-            {name: "smallCity", title: "Small City"},
-            {name: "largeCity", title: "Large City"},
+            {name: "small town", title: "Small Town"},
+            {name: "large town", title: "Large Town"},
+            {name: "small city", title: "Small City"},
+            {name: "large city", title: "Large City"},
             {name: "metropolis"},
-            {name: "smallNation", title: "Small Nation"},
+            {name: "small nation", title: "Small Nation"},
             {name: "nation"},
-            {name: "largeNation", title: "Large Nation"},
+            {name: "large nation", title: "Large Nation"},
+
             {name: "empire"},
             {name: "raider"},
             {name: "engineer"},
@@ -198,7 +199,41 @@
             {name: "neverclick", title: "Never Click"}
         ],
         land: [
-            {name:'Starting area', size:1000}
+            {name:'homeland', size:1000}
+        ],
+        enemies: [
+            {name: 'wolves', humans:false, technology:'none', warfare:'medium', strength:'low', size_min:4, size_max:40, siege_weapons:false, scouts:false},
+            {name: 'lions', humans:false, technology:'none', warfare:'medium', strength:'medium', size_min:4, size_max:40, siege_weapons:false, scouts:false},
+            {name: 'rampaging elephants', humans:false, technology:'none', warfare:'low', strength:'high', size_min:10, size_max:60, siege_weapons:false, scouts:false},
+            {name: 'locusts', humans:false, technology:'none', warfare:'none', strength:'low', size_min:10000, size_max:100000, siege_weapons:false, scouts:false},
+            {name: 'fire ants', humans:false, technology:'none', warfare:'low', strength:'tiny', size_min:10000, size_max:100000, siege_weapons:false, scouts:false},
+            {name: 'pillaging dragon', humans:false, basic:false, magic:true, technology:'medium', warfare:'great', strength:'great', weapon:'fireball', armor:'impenetrable scales', damage_bonus:'great', defense_bonus:'great', size_min:1, size_max:1, siege_weapons:false, scouts:false},
+            {name: 'zombie swarm', humans:false, basic:false, undead:true, technology:'none', warfare:'none', strength:'great', size_min:10, size_max:4000, siege_weapons:false, scouts:false, no_tribute:true},
+            {name: 'dragon riders', humans:false, basic:false, magic:true, technology:'medium', warfare:'high', strength:'great', weapon:'fireball', armor:'impenetrable scales', damage_bonus:'high', defense_bonus:'high', size_min:2, size_max:8, siege_weapons:false, scouts:false},
+
+            {name: 'barbarians', humans:true, technology:'low', mounted:.3, warfare:'medium', strength:'medium', size_min:20, size_max:200, siege_weapons:false, scouts:true},
+            {name: 'raiders', humans:true, technology:'low', mounted:.5, warfare:'medium', strength:'high', size_min:30, size_max:600, siege_weapons:false, scouts:true},
+            {name: 'horse warriors', humans:true, technology:'medium', mounted:.9, warfare:'high', strength:'medium', size_min:100, size_max:2000, siege_weapons:true, scouts:true},
+            {name: 'refugees', humans:true, basic:false, technology:'low', mounted:.1, warfare:'none', strength:'low', size_min:100, size_max:2000, siege_weapons:false, scouts:false, can_welcome:true},
+            {name: 'heroic knights', humans:true, technology:'medium', mounted:.9, warfare:'high', strength:'great', size_min:10, size_max:100, siege_weapons:true, scouts:true},
+            {name: 'army', humans:true, technology:'medium', mounted:.1, warfare:'high', strength:'medium', size_min:100, size_max:2000, siege_weapons:true, scouts:true},
+            {name: 'inquisition army', humans:true, technology:'medium', mounted:.2, warfare:'high', strength:'low', size_min:200, size_max:4000, siege_weapons:true, scouts:true},
+            {name: 'crusaders', humans:true, technology:'medium', mounted:.3, warfare:'high', strength:'medium', size_min:300, size_max:4000, siege_weapons:true, scouts:true, no_tribute:true}
+        ],
+        land_names: [
+            {name: 'thorp', population_min: 0},
+            {name: 'hamlet', population_min: 20},
+            {name: 'village', population_min: 60},
+            {name: 'small town', population_min: 200},
+            {name: 'large town', population_min: 2000},
+            {name: 'small city', population_min: 5000},
+            {name: 'large city', population_min: 10000},
+            {name: 'metropolis', population_min: 20000},
+            {name: 'small nation', population_min: 50000},
+            {name: 'nation', population_min: 100000},
+            {name: 'large nation', population_min: 200000},
+            {name: 'empire', population_min: 500000}
+            //TODO: How to have necropolis: {name: 'necropolis', population_min: '1000', zombie_multiplier:2}
         ]
     };
 
