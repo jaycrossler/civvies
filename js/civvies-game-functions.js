@@ -467,6 +467,22 @@
                 _c.increment_resource(game, _c.info(game, 'resources', cost), -amount);
             }
             game.data.upgrades[upgrade.name] = true;
+
+            if (upgrade.variable_increase) {
+                for (var val in upgrade.variable_increase) {
+                    var inc_amount = upgrade.variable_increase[val];
+                    if (game.data.variables[val] === undefined) {
+                        game.data.variables[val] = inc_amount;
+                    } else {
+                        game.data.variables[val] += inc_amount;
+                    }
+                }
+            }
+            if (upgrade.variable_set) {
+                for (var val in upgrade.variable_increase) {
+                    game.data.variables[val] = upgrade.variable_increase[val];
+                }
+            }
         }
     };
     _c.calculate_increment_costs = function (game) {
@@ -501,45 +517,6 @@
 
 
     //-Not implemented yet------------------
-    _c.increment = function () {
-
-    };
-    _c.createBuilding = function () {
-
-    };
-    _c.buildCustom = function () {
-
-    };
-    _c.calcCost = function () {
-
-    };
-    _c.spawn = function () {
-
-    };
-    _c.spawnCustom = function () {
-
-    };
-    _c.jobCull = function () {
-
-    };
-    _c.hire = function () {
-
-    };
-    _c.hireAll = function () {
-
-    };
-    _c.fire = function () {
-
-    };
-    _c.fireAll = function () {
-
-    };
-    _c.fireCustom = function () {
-
-    };
-    _c.hireCustom = function () {
-
-    };
     _c.raiseDead = function () {
 
     };
