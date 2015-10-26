@@ -793,6 +793,7 @@
             .on('click', function(){select_workflow_pane($pointers.panes.upgrades)})
             .appendTo($titles);
         $pointers.panes.upgrades.content = $('<div>')
+            .hide()
             .appendTo($content);
         show_upgrades_list(game, $pointers.panes.upgrades);
 
@@ -812,6 +813,7 @@
                 .on('click', function(){select_workflow_pane($pointers.panes[name])})
                 .appendTo($titles);
             $pointers.panes[name].content = $('<div>')
+                .hide()
                 .appendTo($content);
             show_upgrades_list(game, $pointers.panes[name], workflow);
         });
