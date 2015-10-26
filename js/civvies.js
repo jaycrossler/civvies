@@ -67,9 +67,12 @@ var Civvies = (function ($, _, Helpers, maths) {
         game.randomSetSeed(rand_seed);
 
         if (!game.data.gui_drawn && game._private_functions.buildInitialDisplay) {
+            var game_was_loaded = game._private_functions.load(game, 'localStorage');
+            if (!game_was_loaded) {
+                game._private_functions.buildInitialData(game);
+                game._private_functions.buildInitialDisplay(game);
+            }
             game.data.gui_drawn = true;
-            game._private_functions.buildInitialData(game);
-            game._private_functions.buildInitialDisplay(game);
         }
 
         //Begin Game Simulation

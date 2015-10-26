@@ -23,7 +23,7 @@
             {name: 'piety', grouping: 2, image: '../images/civclicker/piety.png', notes: "Created by Clerics working in a Temple"},
             {name: 'corpses', grouping: 2, image: '../images/civclicker/piety.png', notes: "Created when towns people die from starvation or fighting"},
 
-            //TODO: Haven't applied these yet
+            //TODO: Haven't applied these yet, move wonder to a plugin
             {name: 'healing', grouping: 3, image: '../images/civclicker/piety.png', notes: "Created by Clerics and Apothecaries"},
             {name: 'wonder', grouping: 3, image: '../images/civclicker/piety.png', notes: "Created by Labourers working on a Wonder"}
         ],
@@ -73,7 +73,7 @@
             {name: 'cats', type: 'mystical', cull_order: 11},  //TODO: What makes cats?
             {name: 'zombies', type: 'mystical', costs: {corpses: 1}, doesnt_consume_food: true},
 
-            {name: 'soldiers', type: 'warfare', consumes: {food: 2}, supports: {battle: "soldiers"}, upgrades: {weaponry: true}, cull_order: 8},
+            {name: 'soldiers', type: 'warfare', consumes: {food: 2}, supports: {battle: "soldiers"}, upgrades: {}, cull_order: 8},
             {name: 'cavalry', type: 'warfare', consumes: {food: 1, herbs: 1}, supports: {battle: "cavalry"}, upgrades: {horseback: true}, cull_order: 7},
             {name: 'siege', type: 'warfare', costs: {metal: 10, wood: 100}, supports: {battle: .1}, upgrades: {construction: true, mathematics:true}, doesnt_require_office: true, doesnt_consume_food: true, achievement:'siege'}
         ],

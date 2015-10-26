@@ -210,7 +210,7 @@
 
             if (!building.shown_before && purchasable) {
                 building.shown_before = true;
-                building.$display.css({display: "block"});
+                if (building.$display) building.$display.css({display: "block"});
             }
             if (building.shown_before) {
                 buildings_shown = true;
@@ -742,29 +742,125 @@
         });
     }
 
-    //-------------------------------------------------
+    //------------------------------------------
+    function show_settings(game, $holder) {
+        var $div_settings = $('<div>')
+            .attr('id','settings')
+            .appendTo($holder);
+
+        var $div_stats = $('<div>')
+            .attr('id','stats')
+            .appendTo($holder);
+
+        $('<h3>')
+            .text('Settings')
+            .appendTo($div_settings);
+        $('<button>')
+            .on('click', function () {
+                _c.save(game, 'manual');
+            })
+            .text('Manual Save')
+            .appendTo($div_settings);
+        $('<button>')
+            .on('click', function () {
+                _c.toggleAutosave(game);
+            })
+            .text('Toggle AutoSave')
+            .appendTo($div_settings);
+        $('<button>')
+            .on('click', function () {
+                _c.load(game, 'localStorage');
+            })
+            .text('Manual Load')
+            .appendTo($div_settings);
+        $('<button>')
+            .on('click', function () {
+                _c.reset(game);
+            })
+            .text('Reset Game to gain new deities')
+            .appendTo($div_settings);
+        $('<button>')
+            .on('click', function () {
+                _c.deleteSave(game);
+            })
+            .text('Delete saved games')
+            .appendTo($div_settings);
+        $('<button>')
+            .on('click', function () {
+                _c.rename_game_object(game, 'civ');
+            })
+            .text('Rename Civilization')
+            .appendTo($div_settings);
+        $('<button>')
+            .on('click', function () {
+                _c.rename_game_object(game, 'ruler');
+            })
+            .text('Rename Ruler')
+            .appendTo($div_settings);
+        $('<button>')
+            .on('click', function () {
+                _c.rename_game_object(game, 'deity');
+            })
+            .text('Rename Deity')
+            .appendTo($div_settings);
+        $('<button>')
+            .on('click', function () {
+                _c.text(-1);
+            })
+            .text('Smaller Text')
+            .appendTo($div_settings);
+        $('<button>')
+            .on('click', function () {
+                _c.text(1);
+            })
+            .text('Larger Text')
+            .appendTo($div_settings);
+        $('<button>')
+            .on('click', function () {
+                _c.toggleWorksafe();
+            })
+            .text('Toggle Worksafe mode')
+            .appendTo($div_settings);
+
+
+        $('<h3>')
+            .text('Stats')
+            .appendTo($div_stats);
+
+        var $d1 = $('<div>')
+            .appendTo($div_stats);
+        $('<span>')
+            .text('Happiness: ')
+            .appendTo($d1);
+        $('<span>')
+            .text('Content')
+            .css({color: 'blue'})
+            .appendTo($d1);
+
+    }
+
+    //------------------------------------------
     var _c = new Civvies('get_private_functions');
     _c.buildInitialDisplay = function (game) {
-        $pointers.basic_resources = $('#basic_resources');
+        $pointers.basic_resources = $('#basic_resources').empty();
         show_basic_resources(game);
 
-        $pointers.secondary_resources = $('#secondary_resources');
+        $pointers.secondary_resources = $('#secondary_resources').empty();
         show_secondary_resources(game);
 
-        $pointers.population_info = $('#populationContainer');
+        $pointers.population_info = $('#populationContainer').empty();
         show_population_data(game);
 
-        $pointers.jobs_list = $('#jobsContainer');
+        $pointers.jobs_list = $('#jobsContainer').empty();
         show_jobs_list(game);
 
-        $pointers.logs = $('#eventsContainer');
+        $pointers.logs = $('#eventsContainer').empty();
 
-        $pointers.achievements_list = $('#achievementsList');
+        $pointers.achievements_list = $('#achievementsList').empty();
         show_achievements_list(game);
 
-
         //====Build Panes======
-        $pointers.workflow_panes = $('#panesSelectors');
+        $pointers.workflow_panes = $('#panesSelectors').empty();
         var $titles = $('<div>')
             .attr('id','selectors')
             .appendTo($pointers.workflow_panes);
@@ -825,14 +921,16 @@
             .addClass('paneSelector')
             .on('click', function(){select_workflow_pane($pointers.panes.stats)})
             .appendTo($titles);
-        $pointers.panes.stats.content = $('#statsPane')
+        $pointers.panes.stats.content = $('<div>')
             .hide()
             .appendTo($content);
+        show_settings(game, $pointers.panes.stats.content);
 
         $('<br>')
             .appendTo($titles);
-
     };
+
+
 
     _c.redraw_data = function (game) {
         //TODO: OPTIMIZATION: Don't show these every tick, only when content is modified
@@ -872,6 +970,53 @@
             });
             $pointers.logs.html(log);
         }
+    };
+
+    //------------------------------------------
+
+
+    _c.rename_game_object = function(game, type) {
+        //Prompts player, uses result as new civName
+        var n;
+
+        if (type == 'civ') {
+            n = prompt('Please name your civilisation', game.data.civ_name);
+            if (n != null) {
+                game.data.civ_name = n;
+                $('#civName').text(game.data.civ_name);
+            }
+        } else if (type == 'ruler') {
+            n = prompt('What is your name?', game.data.ruler_name);
+            if (n != null) {
+                game.data.ruler_name = n;
+                $('#rulerName').text(game.data.ruler_name);
+            }
+        } else if (type == 'deity') {
+            n = prompt('Who do your people worship?', game.data.deity_name);
+            if (n != null) {
+                game.data.deity_name = n;
+                $('#civName').text(game.data.deity_name);
+            }
+        }
+    };
+
+    var font_size = 1;
+    _c.text = function(scale) {
+        if (scale > 0) {
+            font_size += 0.1 * scale;
+        } else {
+            if (font_size > 0.7) {
+                font_size += 0.1 * scale;
+            }
+        }
+        $('body').css('fontSize', font_size + "em");
+    };
+
+    _c.toggleWorksafe = function() {
+        var $body = $('body');
+        $('.icon').toggle();
+
+        $body.css('backgroundImage', $body.css('backgroundImage') == 'none' ? 'url("../images/civclicker/constable.jpg")' : 'none');
     };
 
 //    _c.updateBuildingTotals = function () {

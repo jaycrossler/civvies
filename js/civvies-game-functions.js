@@ -19,6 +19,8 @@
     _c.buildInitialData = function (game) {
         game.data = game.data || {};
 
+        //TODO: Check that some upgrades aren't being written to workflows, savedgame data seems to show they are
+
         var arrays_to_data_objects = 'resources,buildings,populations,variables,upgrades,achievements'.split(',');
         _.each(arrays_to_data_objects, function (game_options_name) {
             //Add objects for each game_objects array to the game data
@@ -36,6 +38,8 @@
                 game.data[game_options_name].push(JSON.parse(JSON.stringify(item)));
             });
         });
+
+        game.data.rand_seed = game.game_options.rand_seed;
     };
     _c.info = function (game, kind, name, sub_var, if_not_listed) {
         //Usage:  var info = _c.info(game, 'buildings', resource.name);
@@ -570,83 +574,83 @@
 
 
     //-Not implemented yet------------------
-    _c.raiseDead = function () {
-
-    };
-    _c.shade = function () {
-
-    };
-    _c.upgrade = function () {
-
-    };
-    _c.digGraves = function () {
-
-    };
-    _c.randomWorker = function () {
-
-    };
-    _c.wickerman = function () {
-
-    };
-    _c.walk = function () {
-
-    };
-    _c.pestControl = function () {
-
-    };
-    _c.plague = function () {
-
-    };
-    _c.spawnMob = function () {
-
-    };
-    _c.smite = function () {
-
-    };
-    _c.party = function () {
-
-    };
-    _c.partyCustom = function () {
-
-    };
-    _c.invade = function () {
-
-    };
-    _c.plunder = function () {
-
-    };
-    _c.glory = function () {
-
-    };
-    _c.grace = function () {
-
-    };
-    _c.mood = function () {
-
-    };
-    _c.startWonder = function () {
-
-    };
-    _c.renameWonder = function () {
-
-    };
-    _c.wonderBonus = function () {
-
-    };
-    _c.updateWonderLimited = function () {
-
-    };
-    _c.tradeTimer = function () {
-
-    };
-    _c.trade = function () {
-
-    };
-    _c.buy = function () {
-
-    };
-    _c.speedWonder = function () {
-
-    };
+//    _c.raiseDead = function () {
+//
+//    };
+//    _c.shade = function () {
+//
+//    };
+//    _c.upgrade = function () {
+//
+//    };
+//    _c.digGraves = function () {
+//
+//    };
+//    _c.randomWorker = function () {
+//
+//    };
+//    _c.wickerman = function () {
+//
+//    };
+//    _c.walk = function () {
+//
+//    };
+//    _c.pestControl = function () {
+//
+//    };
+//    _c.plague = function () {
+//
+//    };
+//    _c.spawnMob = function () {
+//
+//    };
+//    _c.smite = function () {
+//
+//    };
+//    _c.party = function () {
+//
+//    };
+//    _c.partyCustom = function () {
+//
+//    };
+//    _c.invade = function () {
+//
+//    };
+//    _c.plunder = function () {
+//
+//    };
+//    _c.glory = function () {
+//
+//    };
+//    _c.grace = function () {
+//
+//    };
+//    _c.mood = function () {
+//
+//    };
+//    _c.startWonder = function () {
+//
+//    };
+//    _c.renameWonder = function () {
+//
+//    };
+//    _c.wonderBonus = function () {
+//
+//    };
+//    _c.updateWonderLimited = function () {
+//
+//    };
+//    _c.tradeTimer = function () {
+//
+//    };
+//    _c.trade = function () {
+//
+//    };
+//    _c.buy = function () {
+//
+//    };
+//    _c.speedWonder = function () {
+//
+//    };
 
 })(Civvies);
