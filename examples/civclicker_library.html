@@ -78,25 +78,8 @@
             <div id="basic_resources"></div>
             <div id="secondary_resources"></div>
         </div>
-        <div id="panesSelectors">
-            <div id="selectors">
-                <div id="selectBuildings" class="paneSelector selected" onclick="paneSelect('buildings')">Buildings</div>
-                <div id="selectUpgrades" class="paneSelector" onclick="paneSelect('upgrades')">Upgrades</div>
-                <div id="selectDeity" class="paneSelector" onclick="paneSelect('deity')">Deity</div>
-                <div id="selectConquest" class="paneSelector" onclick="paneSelect('conquest')">Conquest</div>
-                <div id="selectTrade" class="paneSelector" onclick="paneSelect('trade')">Trade</div>
-                <div id="selectStats" class="paneSelector" onclick="paneSelect('stats')">Stats</div>
-                <div style="clear:both;"></div>
-            </div>
+        <div id="panesSelectors"></div>
 
-            <div id="buildingsPane"></div>
-
-            <div id="upgradesPane"></div>
-
-            <!--TODO: Auto-enter these-->
-            <div id="deityPane"></div>
-            <div id="conquestPane"></div>
-            <div id="tradePane"></div>
 
             <!--<div id="deityPane">-->
             <!--<h3>Deity</h3>-->
@@ -254,6 +237,7 @@
                     <!--<div id="iconoclasmList"></div>-->
                 <!--</div>-->
             <!--</div>-->
+
             <!--<div id="conquestPane">-->
             <!--<h3>Conquest</h3>-->
                 <!--<span id="standardLine"><button id="standard" onmousedown="upgrade('standard')" disabled>Battle Standard<br />(1000 metal & leather)</button><span class="note">Lets you build an army (requires barracks)</span><br /></span>-->
@@ -376,6 +360,7 @@
                     <!--</span>-->
                 <!--</div>-->
             <!--</div>-->
+
             <!--<div id="tradePane">-->
             <!--<h3>Trade</h3>-->
                 <!--<span id="tradeLine"><button id="tradeUpgrade" onmousedown="upgrade('trade')" disabled>Trade<br />(1 gold)</button><span class="note">Open the trading post</span><br /><br /></span>-->
@@ -433,7 +418,7 @@
                     </div>
 
             </div>
-        </div>
+        <!--</div>-->
     </div>
 
     <!--Right Column-->

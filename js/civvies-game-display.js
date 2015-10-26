@@ -77,10 +77,10 @@
                     .appendTo($pointers.secondary_resources);
                 $('<span>')
                     .text(name + ":")
-                    .css({verticalAlign:'top'})
+                    .css({verticalAlign: 'top'})
                     .appendTo($div);
                 var $holder = $('<span>')
-                    .css({display:'inline-block'})
+                    .css({display: 'inline-block'})
                     .appendTo($div);
                 resource.$holder = $('<span>')
                     .attr('id', 'resource-' + resource.name)
@@ -94,7 +94,7 @@
                     .appendTo($holder);
                 $('<img>')
                     .attr('src', resource.image)
-                    .css({verticalAlign:'top'})
+                    .css({verticalAlign: 'top'})
                     .popover({title: name, content: description, trigger: 'hover', placement: 'right', html: false, container: $div})
                     .addClass('icon icon-lg')
                     .appendTo($div);
@@ -142,12 +142,12 @@
     }
 
     //------------------------------------------
-    function show_building_buttons(game) {
+    function show_building_buttons(game, $pane_holder) {
         $('<h3>')
             .text('Buildings')
-            .appendTo($pointers.building_list);
+            .appendTo($pane_holder);
         var $table = $('<table>')
-            .appendTo($pointers.building_list);
+            .appendTo($pane_holder);
 
         var last_displayed_type = game.game_options.buildings[0].type;
 
@@ -179,7 +179,7 @@
                 building["$btn_x" + times] = $('<button>')
                     .text(text)
                     .popover({title: "Build " + title, content: description, trigger: 'hover', placement: 'top', html: true})
-                    .attr({title:tooltip_text})
+                    .attr({title: tooltip_text})
                     .prop({disabled: true})
                     .addClass(btn_class)
                     .on('click', function () {
@@ -272,7 +272,7 @@
 
         var $d4 = $('<div>')
             .addClass('population_holder')
-            .popover({title:"Population", content:"If there are more buildings that this land can hold, then population happiness will decrease.", placement:'top', trigger:'hover'})
+            .popover({title: "Population", content: "If there are more buildings that this land can hold, then population happiness will decrease.", placement: 'top', trigger: 'hover'})
             .appendTo($pointers.population_info);
         $("<span>")
             .text("Current Land Use: ")
@@ -284,7 +284,7 @@
 
         var $d5 = $('<div>')
             .addClass('population_holder')
-            .popover({title:"Population", content:"If there are more buildings that this land can hold, then population happiness will decrease.", placement:'top', trigger:'hover'})
+            .popover({title: "Population", content: "If there are more buildings that this land can hold, then population happiness will decrease.", placement: 'top', trigger: 'hover'})
             .appendTo($pointers.population_info);
         $("<span>")
             .text("Maximum Land Use: ")
@@ -323,7 +323,7 @@
                 .text(description)
                 .appendTo($inner);
 
-            if (times > 1){
+            if (times > 1) {
                 $btn.hide();
                 $btn_text.hide();
             }
@@ -348,7 +348,7 @@
             var $btn = $pointers["create_workers_x" + times];
             var $btn_text = $pointers["create_workers_x" + times + "_cost"];
 
-            if (population.current >= (times*4)) {
+            if (population.current >= (times * 4)) {
                 $btn.show();
                 $btn_text.show();
             }
@@ -500,52 +500,47 @@
     }
 
     //------------------------------------------
-    function show_upgrades_list(game, $list_holder, workflow) {
+    function show_upgrades_list(game, pane, workflow) {
         var workflow_title = '';
         var upgrade_grouping = 'basic';
         if (workflow) {
             workflow_title = _.str.titleize(workflow.title || workflow.name);
             upgrade_grouping = workflow.name;
         }
-        var text_upgrade = 'Available '+workflow_title+ ' upgrades';
-        var text_upgrade_no = 'No '+workflow_title+ ' upgrades currently available';
-        var text_upgraded = 'Researched '+workflow_title+ ' upgrades';
-        var text_upgraded_no = 'No '+workflow_title+ ' upgrades have been researched';
+        var text_upgrade = 'Available ' + workflow_title + ' upgrades';
+        var text_upgrade_no = 'No ' + workflow_title + ' upgrades currently available';
+        var text_upgraded = 'Researched ' + workflow_title + ' upgrades';
+        var text_upgraded_no = 'No ' + workflow_title + ' upgrades have been researched';
 
-        $pointers.upgrade_available = $pointers.upgrade_available || {};
-        $pointers.upgrade_available_alt = $pointers.upgrade_available_alt || {};
-        $pointers.upgrade_researched = $pointers.upgrade_researched || {};
-        $pointers.upgrade_researched_alt = $pointers.upgrade_researched_alt || {};
 
-        $pointers.upgrade_available[upgrade_grouping] = $('<h4>')
+        pane.upgrade_available = $('<h4>')
             .text(text_upgrade)
-            .appendTo($list_holder);
+            .appendTo(pane.content);
         $("<div>")
-            .appendTo($pointers.upgrade_available[upgrade_grouping]);
-        $pointers.upgrade_available_alt[upgrade_grouping] = $('<h4>')
+            .appendTo(pane.upgrade_available);
+        pane.upgrade_available_alt = $('<h4>')
             .text(text_upgrade_no)
             .hide()
-            .appendTo($list_holder);
+            .appendTo(pane.content);
 
         //If workflow was passed in and it has a draw function, call it and add to the pane
         if (workflow && workflow.setup_function) {
             var $setup = workflow.setup_function(game);
             if ($setup) {
-                var pointer_name = 'workflow_' + workflow.name + '_display';
-                $pointers[pointer_name] = $('<div>').appendTo($list_holder);
-                $setup.appendTo($pointers[pointer_name]);
+                pane.workflow_content = $('<div>').appendTo(pane.content);
+                $setup.appendTo(pane.workflow_content);
             }
         }
 
-        $pointers.upgrade_researched[upgrade_grouping] = $('<h4>')
+        pane.upgrade_researched = $('<h4>')
             .text(text_upgraded)
-            .appendTo($list_holder);
+            .appendTo(pane.content);
         $("<div>")
-            .appendTo($pointers.upgrade_researched[upgrade_grouping]);
-        $pointers.upgrade_researched_alt[upgrade_grouping] = $('<h4>')
+            .appendTo(pane.upgrade_researched);
+        pane.upgrade_researched_alt = $('<h4>')
             .text(text_upgraded_no)
             .hide()
-            .appendTo($list_holder);
+            .appendTo(pane.content);
 
         var last_displayed_type = '';
         var $last_displayed_type_div;
@@ -567,7 +562,7 @@
                     .css({fontSize: '9px'})
                     .hide()
                     .text(_.str.titleize(upgrade.type) + ":")
-                    .appendTo($pointers.upgrade_available[upgrade_grouping]);
+                    .appendTo(pane.upgrade_available);
             }
             last_displayed_type = upgrade.type;
 
@@ -584,7 +579,7 @@
                 $last_displayed_type_div.show();
                 number_available++;
             }
-            if (has_upgrade){
+            if (has_upgrade) {
                 number_purchased++;
             }
 
@@ -600,42 +595,37 @@
                     _c.redraw_data(game);
                 })
                 .addClass('icon upgrade_holder')
-                .appendTo($pointers.upgrade_available[upgrade_grouping]);
+                .appendTo(pane.upgrade_available);
 
             upgrade.$holder_purchased = $('<div>')
                 .text(name)
                 .css({backgroundColor: 'lightgreen', display: has_upgrade ? 'inline-block' : 'none'})
                 .popover({title: 'Purchased ' + title, content: description, trigger: 'hover', placement: 'top', html: true})
                 .addClass('icon upgrade_holder')
-                .appendTo($pointers.upgrade_researched[upgrade_grouping]);
+                .appendTo(pane.upgrade_researched);
         });
         if (number_available > 0) {
-            $pointers.upgrade_available[upgrade_grouping].show();
-            $pointers.upgrade_available_alt[upgrade_grouping].hide();
+            pane.upgrade_available.show();
+            pane.upgrade_available_alt.hide();
         } else {
-            $pointers.upgrade_available[upgrade_grouping].hide();
-            $pointers.upgrade_available_alt[upgrade_grouping].show();
-
+            pane.upgrade_available.hide();
+            pane.upgrade_available_alt.show();
         }
         if (number_purchased > 0) {
-            $pointers.upgrade_researched[upgrade_grouping].show();
-            $pointers.upgrade_researched_alt[upgrade_grouping].hide();
+            pane.upgrade_researched.show();
+            pane.upgrade_researched_alt.hide();
         } else {
-            $pointers.upgrade_researched[upgrade_grouping].hide();
-            $pointers.upgrade_researched_alt[upgrade_grouping].show();
+            pane.upgrade_researched.hide();
+            pane.upgrade_researched_alt.show();
         }
 
     }
 
-    function update_upgrade_list(game, $list_holder, workflow) {
+    function update_upgrade_list(game, pane, workflow) {
         var count_of_categories = 0;
         var last_displayed_type = '';
         var number_available = 0;
         var number_purchased = 0;
-        var upgrade_grouping = 'basic';
-        if (workflow) {
-            upgrade_grouping = workflow.name;
-        }
 
         //Redraw all upgrade categories associated with this workflow, or all the others if not a workflow
         var upgrades_to_show = workflow ? _c.upgrades_in_workflow(game, workflow) || [] : _c.upgrades_not_in_workflows(game);
@@ -658,7 +648,7 @@
                 count_of_categories++;
                 number_available++;
             }
-            if (has_upgrade){
+            if (has_upgrade) {
                 number_purchased++;
             }
             upgrade.$holder
@@ -680,25 +670,23 @@
 
         });
         if (number_available > 0) {
-            $pointers.upgrade_available[upgrade_grouping].show();
-            $pointers.upgrade_available_alt[upgrade_grouping].hide();
+            pane.upgrade_available.show();
+            pane.upgrade_available_alt.hide();
         } else {
-            $pointers.upgrade_available[upgrade_grouping].hide();
-            $pointers.upgrade_available_alt[upgrade_grouping].show();
-
+            pane.upgrade_available.hide();
+            pane.upgrade_available_alt.show();
         }
         if (number_purchased > 0) {
-            $pointers.upgrade_researched[upgrade_grouping].show();
-            $pointers.upgrade_researched_alt[upgrade_grouping].hide();
+            pane.upgrade_researched.show();
+            pane.upgrade_researched_alt.hide();
         } else {
-            $pointers.upgrade_researched[upgrade_grouping].hide();
-            $pointers.upgrade_researched_alt[upgrade_grouping].show();
+            pane.upgrade_researched.hide();
+            pane.upgrade_researched_alt.show();
         }
 
         //If there is a workflow passed in, redraw info within it
         if (workflow && workflow.redraw_function) {
-            var pointer_name = 'workflow_' + workflow.name + '_display';
-            workflow.redraw_function(game, $pointers[pointer_name]);
+            workflow.redraw_function(game, pane.workflow_content);
         }
     }
 
@@ -740,6 +728,20 @@
         });
     }
 
+    function select_workflow_pane(pane_selected) {
+        //Called when user switches between the various panes on the left hand side of the interface
+
+        _.each($pointers.panes, function(pane){
+            if (pane == pane_selected) {
+                pane.title.addClass('selected');
+                pane.content.show();
+            } else {
+                pane.title.removeClass('selected');
+                pane.content.hide();
+            }
+        });
+    }
+
     //-------------------------------------------------
     var _c = new Civvies('get_private_functions');
     _c.buildInitialDisplay = function (game) {
@@ -749,9 +751,6 @@
         $pointers.secondary_resources = $('#secondary_resources');
         show_secondary_resources(game);
 
-        $pointers.building_list = $('#buildingsPane');
-        show_building_buttons(game);
-
         $pointers.population_info = $('#populationContainer');
         show_population_data(game);
 
@@ -760,20 +759,77 @@
 
         $pointers.logs = $('#eventsContainer');
 
-        $pointers.upgrade_list = $('#upgradesPane');
-        show_upgrades_list(game, $pointers.upgrade_list);
-
-        //TODO: Put into a loop
-        $pointers.deity_pane = $('#deityPane');
-        show_upgrades_list(game, $pointers.deity_pane, game.game_options.workflows[0]);
-        $pointers.conquest_pane = $('#conquestPane');
-        show_upgrades_list(game, $pointers.conquest_pane, game.game_options.workflows[1]);
-        $pointers.trade_pane = $('#tradePane');
-        show_upgrades_list(game, $pointers.trade_pane, game.game_options.workflows[2]);
-
-
         $pointers.achievements_list = $('#achievementsList');
         show_achievements_list(game);
+
+
+        //====Build Panes======
+        $pointers.workflow_panes = $('#panesSelectors');
+        var $titles = $('<div>')
+            .attr('id','selectors')
+            .appendTo($pointers.workflow_panes);
+        var $content = $('<div>')
+            .appendTo($pointers.workflow_panes);
+
+        $pointers.panes = {};
+
+        //---Buildings----
+        $pointers.panes.buildings = {};
+        $pointers.panes.buildings.title = $('<div>')
+            .text('Buildings')
+            .addClass('paneSelector selected')
+            .on('click', function(){select_workflow_pane($pointers.panes.buildings)})
+            .appendTo($titles);
+        $pointers.panes.buildings.content = $('<div>')
+            .appendTo($content);
+        show_building_buttons(game, $pointers.panes.buildings.content);
+
+        //---Basic Upgrades----
+        $pointers.panes.upgrades = {};
+        $pointers.panes.upgrades.show_upgrades = true;
+        $pointers.panes.upgrades.title = $('<div>')
+            .text('Upgrades')
+            .addClass('paneSelector')
+            .on('click', function(){select_workflow_pane($pointers.panes.upgrades)})
+            .appendTo($titles);
+        $pointers.panes.upgrades.content = $('<div>')
+            .appendTo($content);
+        show_upgrades_list(game, $pointers.panes.upgrades);
+
+
+        //---Worflow panes----
+        var panes = _.filter(game.game_options.workflows, function (w) {
+            return w.selection_pane == true
+        });
+        _.each(panes, function (workflow) {
+            var name = workflow.name;
+            $pointers.panes[name] = {};
+            $pointers.panes[name].show_upgrades = true;
+            $pointers.panes[name].workflow = workflow;
+            $pointers.panes[name].title = $('<div>')
+                .text(_.str.titleize(workflow.title || workflow.name))
+                .addClass('paneSelector')
+                .on('click', function(){select_workflow_pane($pointers.panes[name])})
+                .appendTo($titles);
+            $pointers.panes[name].content = $('<div>')
+                .appendTo($content);
+            show_upgrades_list(game, $pointers.panes[name], workflow);
+        });
+
+        //---Stats and Settings----
+        $pointers.panes.stats = {};
+        $pointers.panes.stats.title = $('<div>')
+            .text('Settings')
+            .addClass('paneSelector')
+            .on('click', function(){select_workflow_pane($pointers.panes.stats)})
+            .appendTo($titles);
+        $pointers.panes.stats.content = $('#statsPane')
+            .hide()
+            .appendTo($content);
+
+        $('<br>')
+            .appendTo($titles);
+
     };
 
     _c.redraw_data = function (game) {
@@ -782,10 +838,12 @@
         update_building_buttons(game);
         update_population_data(game);
         update_jobs_list(game);
-        update_upgrade_list(game);
-        update_upgrade_list(game, $pointers.deity_pane, game.game_options.workflows[0]);
-        update_upgrade_list(game, $pointers.conquest_pane, game.game_options.workflows[1]);
-        update_upgrade_list(game, $pointers.trade_pane, game.game_options.workflows[2]);
+
+        _.each($pointers.panes, function(pane){
+            if (pane.show_upgrades) {
+                update_upgrade_list(game, pane, pane.workflow);
+            }
+        });
 
         update_achievements_list(game, $pointers.upgrade_list);
     };

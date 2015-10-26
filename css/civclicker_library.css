@@ -242,7 +242,7 @@ h3{
 }
 
 .paneSelector{
-	float:left;
+    display: inline-block;;
 	text-align:center;
 	margin:1em 0;
     padding:0 .6em;

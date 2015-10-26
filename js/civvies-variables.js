@@ -148,8 +148,9 @@
             {name: "currency", type: 'commerce', costs: {gold: 10, ore: 1000}, upgrades:{writing:true, trade:true}},
             {name: "commerce", type: 'commerce', costs: {gold: 100, piety: 10000}, upgrades:{currency:true, civilservice:true}},
 
+            //TODO: Move all deity stuff to a plugin
             {name: "deity", type: 'deity', costs: {piety: 1000}, special: "choose deity", upgrades:{responsibility:true, writing: true}},
-//           	{name:"deityType"}, //TODO: How to handle 4 deities?
+//           	{name:"deityType"},
 
             {name: "lure", type: 'deity', costs: {piety: 1000}, upgrades:{deity:true}},
             {name: "companion", type: 'deity', costs: {piety: 1000}, upgrades:{deity:true}},
@@ -233,7 +234,7 @@
             {name: 'nation', population_min: 100000},
             {name: 'large nation', population_min: 200000},
             {name: 'empire', population_min: 500000}
-            //TODO: How to have necropolis: {name: 'necropolis', population_min: '1000', zombie_multiplier:2}
+            //TODO: How to have necropolis in plugin: {name: 'necropolis', population_min: '1000', zombie_multiplier:2}
         ],
         workflows: []
     };
