@@ -20,12 +20,18 @@ var Civvies = (function ($, _, Helpers, maths) {
         this.times_game_drawn = 0;
         this.initialization_seed = null;
 
-        return this.initialize(option1, option2, option3);
+        return this.api(option1, option2, option3);
     }
 
-    CivviesClass.prototype.initialize = function (option1, option2, option3) {
+    CivviesClass.prototype.api = function (option1, option2, option3) {
         if (option1 == 'get_private_functions') {
             return this._private_functions;
+        } else if (option1 == 'add_game_option') {
+            _game_options[option2].push(option3);
+        } else if (option1 == 'get_game_options') {
+            return _game_options;
+        } else if (option1 == 'get_game_option_category') {
+            return _game_options[option2];
         } else if (option1 == '') {
             //Class initialized
         } else {

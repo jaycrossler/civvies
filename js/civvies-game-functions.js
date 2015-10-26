@@ -20,24 +20,22 @@
         game.data = game.data || {};
 
         var arrays_to_data_objects = 'resources,buildings,populations,variables,upgrades,achievements'.split(',');
-        _.each(arrays_to_data_objects, function(game_options_name){
-    //        Does the same thing as:
-    //        game.data.resources = game.data.resources || {};
-    //        _.each(game.game_options.resources, function (resource) {
-    //            game.data.resources[resource.name] = resource.initial || 0;
-    //        });
+        _.each(arrays_to_data_objects, function (game_options_name) {
+            //Add objects for each game_objects array to the game data
             game.data[game_options_name] = game.data[game_options_name] || {};
             _.each(game.game_options[game_options_name], function (item) {
                 game.data[game_options_name][item.name] = item.initial || 0;
             });
         });
 
-        //Add an array for land
-        game.data.land = game.data.land || [];
-        _.each(game.game_options.land, function (land) {
-            game.data.land.push(JSON.parse(JSON.stringify(land)));
+        var arrays_to_array_objects = 'land,workflows'.split(',');
+        _.each(arrays_to_array_objects, function (game_options_name) {
+            //Add an array for game_objects to the game data
+            game.data[game_options_name] = game.data[game_options_name] || [];
+            _.each(game.game_options[game_options_name], function (item) {
+                game.data[game_options_name].push(JSON.parse(JSON.stringify(item)));
+            });
         });
-
     };
     _c.info = function (game, kind, name, sub_var, if_not_listed) {
         //Usage:  var info = _c.info(game, 'buildings', resource.name);
@@ -236,6 +234,25 @@
 
         return text_pieces.join(join_text) || "";
     };
+    _c.upgrades_in_workflow = function(game, workflow) {
+        return _.filter(game.game_options.upgrades, function(up){ return _.indexOf(workflow.upgrade_categories || [], up.type) > -1}) || [];
+    };
+    _c.upgrades_not_in_workflows = function (game) {
+        var upgrades = [];
+        var blocked = [];
+        _.each(game.game_options.workflows, function (workflow) {
+            if (workflow.upgrade_categories) {
+                blocked = blocked.concat(workflow.upgrade_categories);
+            }
+        });
+        _.each(game.game_options.upgrades, function (up) {
+            if (up.type && _.indexOf(blocked, up.type) == -1) {
+                upgrades.push(up);
+            }
+        });
+        return upgrades;
+    };
+
     _c.create_building = function (game, building, amount) {
         amount = amount || 1;
         if (_c.building_is_purchasable(game, building, amount)) {
@@ -248,7 +265,7 @@
 
             game.logMessage("Purchased: " + amount + "x " + building.name, true);
         } else {
-            console.error("Can't purchase building: " + amount + "x " + building.name);
+            console.info("Can't purchase building: " + amount + "x " + building.name);
         }
     };
     _c.building_is_purchasable = function (game, building, amount) {
@@ -332,7 +349,7 @@
         }
     };
     _c.population = function (game) {
-        var pop = {current: 0, max: 0, current_that_eats: 0, land_current:0, land_max:0};
+        var pop = {current: 0, max: 0, current_that_eats: 0, land_current: 0, land_max: 0};
 
         var people = 0;
         var eaters = 0;
@@ -362,7 +379,7 @@
         pop.max = storage;
 
         var land_size = 0;
-        _.each(game.data.land, function(land){
+        _.each(game.data.land, function (land) {
             if (land.size) {
                 land_size += land.size;
             }
@@ -376,11 +393,11 @@
 
         return pop;
     };
-    _c.update_highest_population = function(game, current) {
+    _c.update_highest_population = function (game, current) {
         game.data.variables.highest_population = current;
 
         var city_type = 'Thorp';
-        _.each(game.game_options.land_names, function(land_name){
+        _.each(game.game_options.land_names, function (land_name) {
             if (current >= land_name.population_min) {
                 city_type = land_name.name;
             }

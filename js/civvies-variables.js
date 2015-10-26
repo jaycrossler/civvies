@@ -234,7 +234,8 @@
             {name: 'large nation', population_min: 200000},
             {name: 'empire', population_min: 500000}
             //TODO: How to have necropolis: {name: 'necropolis', population_min: '1000', zombie_multiplier:2}
-        ]
+        ],
+        workflows: []
     };
 
     CivviesClass.initializeOptions('game_options', _game_options);

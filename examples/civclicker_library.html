@@ -92,399 +92,309 @@
             <div id="buildingsPane"></div>
 
             <div id="upgradesPane"></div>
-            <!--<h3>Upgrades</h3>-->
-                <!--<span id="skinningLine"><button id="skinning" onmousedown="upgrade('skinning')">Skinning<br />(10 skins)</button><span class="note">Farmers can collect skins</span><br /></span>-->
-                <!--<span id="harvestingLine"><button id="harvesting" onmousedown="upgrade('harvesting')">Harvesting<br />(10 herbs)</button><span class="note">Woodcutters can collect herbs</span><br /></span>-->
-                <!--<span id="prospectingLine"><button id="prospecting" onmousedown="upgrade('prospecting')">Prospecting<br />(10 ore)</button><span class="note">Miners can collect ore</span><br /><br /></span>-->
-                <!--<div id="basicFarming">-->
-                    <!--<span id="domesticationLine"><button id="domestication" onmousedown="upgrade('domestication')">Domestication<br />(20 leather)</button><span class="note">Increase farmer food output</span><br /></span>-->
-                    <!--<span id="ploughsharesLine"><button id="ploughshares" onmousedown="upgrade('ploughshares')">Ploughshares<br />(20 metal)</button><span class="note">Increase farmer food output</span><br /></span>-->
-                    <!--<span id="irrigationLine"><button id="irrigation" onmousedown="upgrade('irrigation')">Irrigation<br />(500 wood, 200 stone)</button><span class="note">Increase farmer food output</span><br /><br /></span>-->
+
+            <!--TODO: Auto-enter these-->
+            <div id="deityPane"></div>
+            <div id="conquestPane"></div>
+            <div id="tradePane"></div>
+
+            <!--<div id="deityPane">-->
+            <!--<h3>Deity</h3>-->
+                <!--<span id="deityLine"><button id="deity" onmousedown="upgrade('deity')" disabled>Worship<br />(1000 piety)</button><span class="note">Begin worshipping a deity (requires temple)</span><br />-->
+                <!--<br /></span>-->
+                <!--<div id="deitySpecialisation">-->
+                    <!--<button id="deityBattle" onmousedown="upgrade('deityBattle')">Battle<br />(500 piety)</button><span class="note">Note: you can only pick one of these</span><br />-->
+                    <!--<button id="deityFields" onmousedown="upgrade('deityFields')">The Fields<br />(500 piety)</button><span class="note">Note: you can only pick one of these</span><br />-->
+                    <!--<button id="deityUnderworld" onmousedown="upgrade('deityUnderworld')">The Underworld<br />(500 piety)</button><span class="note">Note: you can only pick one of these</span><br />-->
+                    <!--<button id="deityCats" onmousedown="upgrade('deityCats')">Cats<br />(500 piety)</button><span class="note">Note: you can only pick one of these</span><br />-->
                 <!--</div>-->
-                <!--<div id="specialFarming">-->
-                    <!--<span id="butcheringLine"><button id="butchering" onmousedown="upgrade('butchering')" disabled>Butchering<br />(Skinning, 40 leather)</button><span class="note">More farmers collect more skins</span><br /></span>-->
-                    <!--<span id="gardeningLine"><button id="gardening" onmousedown="upgrade('gardening')" disabled>Gardening<br />(Harvesting, 40 herbs)</button><span class="note">More woodcutters collect more herbs</span><br /></span>-->
-                    <!--<span id="extractionLine"><button id="extraction" onmousedown="upgrade('extraction')" disabled>Extraction<br />(Prospecting, 40 metal)</button><span class="note">More miners collect more ore</span><br /><br /></span>-->
+                <!--<div id="battleUpgrades">-->
+                    <!--<h3>The Strength of Battle</h3>-->
+                    <!--<table>-->
+                        <!--<tr>-->
+                            <!--<td class="devcost"></td>-->
+                            <!--<td id="battleRow"><span><button onmousedown="createBuilding(battleAltar,1)">Build Altar</button></span></td>-->
+                            <!--<td><span class="cost">200 stone, 200 piety, <span id="battleAltarCost">50</span> metal</span><span class="note">: +1 devotion</span></td>-->
+                        <!--</tr>-->
+                        <!--<tr>-->
+                            <!--<td class="devcost">10d&nbsp;</td>-->
+                            <!--<td><span id="battleDevotion10"><button id="riddle" onmousedown="upgrade('riddle')" disabled>Riddle of Steel</button></td>-->
+                            <!--<td><span class="cost">1000 piety</span><span class="note">: improve soldiers</span></span></td>-->
+                        <!--</tr>-->
+                        <!--<tr>-->
+                            <!--<td class="devcost">20d&nbsp;</td>-->
+                            <!--<td><button onmousedown="smite()" id="smiteInvaders" disabled>Smite Invaders</button></td>-->
+                            <!--<td><span class="cost">100 piety per invader</span></td>-->
+                        <!--</tr>-->
+                        <!--<tr>-->
+                            <!--<td class="devcost">30d&nbsp;</td>-->
+                            <!--<td><span id="battleDevotion30"><button id="throne" onmousedown="upgrade('throne')" disabled>Throne of Skulls</button></td>-->
+                            <!--<td><span class="cost">1000 piety</span><span class="note">: slaying enemies creates temples</span></span></td>-->
+                        <!--</tr>-->
+                        <!--<tr>-->
+                            <!--<td class="devcost">40d&nbsp;</td>-->
+                            <!--<td><button onmousedown="glory(180)" id="glory" disabled>For Glory!</button></td>-->
+                            <!--<td><span class="cost">1000 piety</span><span class="note">: Temporarily makes raids more difficult, increases rewards</span></td>-->
+                        <!--</tr>-->
+                        <!--<tr>-->
+                            <!--<td class="devcost">50d&nbsp;</td>-->
+                            <!--<td><span id="battleDevotion50"><button id="lament" onmousedown="upgrade('lament')" disabled>Lament of the Defeated</button></td>-->
+                            <!--<td><span class="cost">5000 piety</span><span class="note">: Successful raids delay future invasions</span></span></td>-->
+                        <!--</tr>-->
+                    <!--</table>-->
                 <!--</div>-->
-                <!--<div id="specFreq">-->
-                    <!--<span id="flensingLine"><button id="flensing" onmousedown="upgrade('flensing')">Flensing<br />(1000 metal)</button><span class="note">Collect skins more frequently</span><br /></span>-->
-                    <!--<span id="maceratingLine"><button id="macerating" onmousedown="upgrade('macerating')">Macerating<br />(500 leather, 500 stone)</button><span class="note">Collect ore more frequently</span><br /><br /></span>-->
+                <!--<div id="fieldsUpgrades">-->
+                    <!--<h3>The Bounty of the Fields</h3>-->
+                    <!--<table>-->
+                        <!--<tr>-->
+                            <!--<td class="devcost"></td>-->
+                            <!--<td id="fieldsRow"><span><button onmousedown="createBuilding(fieldsAltar,1)">Build Altar</button></span></td>-->
+                            <!--<td><span class="cost"><span id="fieldsAltarFoodCost">500</span> food, <span id="fieldsAltarWoodCost">500</span> wood, 200 stone, 200 piety</span><span class="note">: +1 devotion</span></td>-->
+                        <!--</tr>-->
+                        <!--<tr>-->
+                            <!--<td class="devcost">10d&nbsp;</td>-->
+                            <!--<td><span id="fieldsDevotion10"><button id="blessing" onmousedown="upgrade('blessing')" disabled>Blessing of Abundance</button></td>-->
+                            <!--<td><span class="cost">1000 piety</span><span class="note">: increase farmer food output</span></span></td>-->
+                        <!--</tr>-->
+                        <!--<tr>-->
+                            <!--<td class="devcost">20d&nbsp;</td>-->
+                            <!--<td><button id="wickerman" onmousedown="wickerman()" disabled>Burn Wicker Man</button></td>-->
+                            <!--<td><span class="cost">500 wood, 1 worker</span><span class="note">: random bonus to a resource</span></td>-->
+                        <!--</tr>-->
+                        <!--<tr>-->
+                            <!--<td class="devcost">30d&nbsp;</td>-->
+                            <!--<td><span id="fieldsDevotion30"><button id="waste" onmousedown="upgrade('waste')" disabled>Abide No Waste</button></td>-->
+                            <!--<td><span class="cost">1000 piety</span><span class="note">: workers will eat corpses if there is no food left</span></span></td>-->
+                        <!--</tr>-->
+                        <!--<tr>-->
+                            <!--<td class="devcost">40d&nbsp;</td>-->
+                            <!--<td><button id="walk" onmousedown="walk(1)" disabled>Walk Behind The Rows</button><br /><button id="ceaseWalk" onmousedown="walk(0)" disabled>Cease Walking</button></td>-->
+                            <!--<td><span class="cost">1 worker per second</span><span class="note">: boost food production</span></td>-->
+                        <!--</tr>-->
+                        <!--<tr>-->
+                            <!--<td class="devcost">50d&nbsp;</td>-->
+                            <!--<td><span id="fieldsDevotion50"><button id="stay" onmousedown="upgrade('stay')" disabled>Stay With Us</button></td>-->
+                            <!--<td><span class="cost">5000 piety</span><span class="note">: traders stay longer</span></span></td>-->
+                        <!--</tr>-->
+                    <!--</table>-->
                 <!--</div>-->
-                <!--<div id="improvedFarming">-->
-                    <!--<span id="cropRotationLine"><button id="croprotation" onmousedown="upgrade('croprotation')">Crop Rotation<br />(5000 herbs, 1000 piety)</button><span class="note">Increase farmer food output</span><br /></span>-->
-                    <!--<span id="selectiveBreedingLine"><button id="selectivebreeding" onmousedown="upgrade('selectivebreeding')">Selective Breeding<br />(5000 skins, 1000 piety)</button><span class="note">Increase farmer food output</span><br /></span>-->
-                    <!--<span id="fertilisersLine"><button id="fertilisers" onmousedown="upgrade('fertilisers')">Fertilisers<br />(5000 ore, 1000 piety)</button><span class="note">Increase farmer food output</span><br /><br /></span>-->
+                <!--<div id="underworldUpgrades">-->
+                    <!--<h3>The Dread Power of the Underworld</h3>-->
+                    <!--<table>-->
+                        <!--<tr>-->
+                            <!--<td class="devcost"></td>-->
+                            <!--<td id="underworldRow"><span><button onmousedown="createBuilding(underworldAltar,1)">Build Altar</button></span></td>-->
+                            <!--<td><span class="cost">200 stone, 200 piety, <span id="underworldAltarCost">1</span> corpses</span><span class="note">: +1 devotion</span></td>-->
+                        <!--</tr>-->
+                        <!--<tr>-->
+                            <!--<td class="devcost">10d&nbsp;</td>-->
+                            <!--<td><span id="underworldDevotion10"><button id="book" onmousedown="upgrade('book')" disabled>The Book of the Dead</button></td>-->
+                            <!--<td><span class="cost">1000 piety</span><span class="note">: gain piety with deaths</span></span></td>-->
+                        <!--</tr>-->
+                        <!--<tr>-->
+                            <!--<td class="devcost">20d&nbsp;</td>-->
+                            <!--<td><button onmousedown="raiseDead(1)" id="raiseDead" disabled>Raise Dead</button><button onmousedown="raiseDead(100)" id="raiseDead100" class="x100" disabled>x100</button><button onmousedown="raiseDead('max')" id="raiseDeadMax" class="x100" disabled>Max</button></td>-->
+                            <!--<td><span class="cost">100 piety per zombie</span></td>-->
+                        <!--</tr>-->
+                        <!--<tr>-->
+                            <!--<td class="devcost">30d&nbsp;</td>-->
+                            <!--<td><span id="underworldDevotion30"><button id="feast" onmousedown="upgrade('feast')" disabled>A Feast for Crows</button></td>-->
+                            <!--<td><span class="cost">1000 piety</span><span class="note">: corpses are less likely to cause illness</span></span></td>-->
+                        <!--</tr>-->
+                        <!--<tr>-->
+                            <!--<td class="devcost">40d&nbsp;</td>-->
+                            <!--<td><button onmousedown="shade()" id="shade" disabled>Summon Shades</button></td>-->
+                            <!--<td><span class="cost">1000 piety</span><span class="note">: Souls of the defeated rise to fight for you</span></td>-->
+                        <!--</tr>-->
+                        <!--<tr>-->
+                            <!--<td class="devcost">50d&nbsp;</td>-->
+                            <!--<td><span id="underworldDevotion50"><button id="secrets" onmousedown="upgrade('secrets')" disabled>Secrets of the Tombs</button></td>-->
+                            <!--<td><span class="cost">5000 piety</span><span class="note">: graveyards increase cleric piety generation</span></span></td>-->
+                        <!--</tr>-->
+                    <!--</table>-->
                 <!--</div>-->
-                <!--<span id="masonryLine"><button id="masonry" onmousedown="upgrade('masonry')">Masonry<br />(100 wood, 100 stone)</button><span class="note">Unlock more buildings and upgrades</span><br /></span>-->
-                <!--<span id="constructionLine"><button id="construction" onmousedown="upgrade('construction')">Construction<br />(1000 wood, 1000 stone)</button><span class="note">Unlock more buildings and upgrades</span><br /></span>-->
-                <!--<span id="architectureLine"><button id="architecture" onmousedown="upgrade('architecture')">Architecture<br />(10000 wood, 10000 stone)</button><span class="note">Unlock more buildings and upgrades</span><br /><br /></span>-->
-                <!--<span id="tenementsLine"><button id="tenements" onmousedown="upgrade('tenements')">Tenements<br />(200 food, 500 wood, 500 stone)</button><span class="note">Houses support +2 workers</span><br /></span>-->
-                <!--<span id="slumsLine"><button id="slums" onmousedown="upgrade('slums')">Slums<br />(500 food, 1000 wood, 1000 stone)</button><span class="note">Houses support +2 workers</span><br /></span>-->
-                <!--<span id="granariesLine"><button id="granaries" onmousedown="upgrade('granaries')">Granaries<br />(1000 wood, 1000 stone)</button><span class="note">Barns store double the amount of food</span><br /></span>-->
-                <!--<span id="palisadeLine"><button id="palisade" onmousedown="upgrade('palisade')">Palisade<br />(2000 wood, 1000 stone)</button><span class="note">Enemies do less damage</span><br /><br /></span>-->
-                <!--<span id="masonryTech">-->
-                    <!--<span id="weaponryLine"><button id="weaponry" onmousedown="upgrade('weaponry')">Basic Weaponry<br />(500 wood, 500 metal)</button><span class="note">Improve soldiers</span><br /></span>-->
-                    <!--<span id="shieldsLine"><button id="shields" onmousedown="upgrade('shields')">Basic Shields<br />(500 wood, 500 leather)</button><span class="note">Improve soldiers</span><br /><br /></span>-->
-                    <!--<span id="horsebackLine"><button id="horseback" onmousedown="upgrade('horseback')">Horseback Riding<br />(500 food, 500 wood)</button><span class="note">Build stables</span><br /></span>-->
-                    <!--<span id="wheelLine"><button id="wheel" onmousedown="upgrade('wheel')">The Wheel<br />(500 wood, 500 stone)</button><span class="note">Build mills</span><br /><br /></span>-->
-                    <!--<span id="writingLine"><button id="writing" onmousedown="upgrade('writing')">Writing<br />(500 skins)</button><span class="note">Increase cleric piety generation</span><br /></span>-->
-                    <!--<div id="writingTech">-->
-                        <!--<span id="administrationLine"><button id="administration" onmousedown="upgrade('administration')">Administration<br />(1000 stone, 1000 skins)</button><span class="note">Increase land gained from raiding</span><br /></span>-->
-                        <!--<span id="codeoflawsLine"><button id="codeoflaws" onmousedown="upgrade('codeoflaws')">Code of Laws<br />(1000 stone, 1000 skins)</button><span class="note">Reduce unhappiness caused by overcrowding</span><br /></span>-->
-                        <!--<span id="mathematicsLine"><button id="mathematics" onmousedown="upgrade('mathematics')">Mathematics<br />(1000 herbs, 1000 piety)</button><span class="note">Create siege engines</span><br /></span>-->
-                        <!--<span id="aestheticsLine"><button id="aesthetics" onmousedown="upgrade('aesthetics')">Aesthetics<br />(5000 piety)</button><span class="note">Building temples increases happiness</span><br /><br /></span>-->
-                    <!--</div>-->
-                    <!--<span id="civilserviceLine"><button id="civilservice" onmousedown="upgrade('civilservice')">Civil Service<br />(5000 piety)</button><span class="note">Increase basic resources from clicking</span><br /></span>-->
-                    <!--<div id="civilTech">-->
-                        <!--<span id="feudalismLine"><button id="feudalism" onmousedown="upgrade('feudalism')">Feudalism<br />(10&#8239;000 piety)</button><span class="note">Further increase basic resources from clicking</span><br /></span>-->
-                        <!--<span id="guildsLine"><button id="guilds" onmousedown="upgrade('guilds')">Guilds<br />(10&#8239;000 piety)</button><span class="note">Increase special resources from clicking</span><br /></span>-->
-                        <!--<span id="serfsLine"><button id="serfs" onmousedown="upgrade('serfs')">Serfs<br />(20&#8239;000 piety)</button><span class="note">Unemployed workers increase resources from clicking</span><br /></span>-->
-                        <!--<span id="nationalismLine"><button id="nationalism" onmousedown="upgrade('nationalism')">Nationalism<br />(50&#8239;000 piety)</button><span class="note">Soldiers increase basic resources from clicking</span><br /></span>-->
-                    <!--</div>-->
-                    <!--<span id="wonderLine"><br /><button id="startWonder" onmousedown="startWonder()">Start Building Wonder</button><br /></span>-->
-                <!--</span>-->
-                <!--<h3>Purchased Upgrades</h3>-->
-                <!--<div id="purchased">-->
-                    <!--<span id="Pskinning"><b>Skinning</b> - Farmers can collect skins</span>-->
-                    <!--<span id="Pharvesting"><b>Harvesting</b> - Woodcutters can collect herbs</span>-->
-                    <!--<span id="Pprospecting"><b>Prospecting</b> - Miners can collect ore</span>-->
-                    <!--<span id="Pdomestication"><b>Domestication</b> - Increase farmer food output</span>-->
-                    <!--<span id="Pploughshares"><b>Ploughshares</b> - Increase farmer food output</span>-->
-                    <!--<span id="Pirrigation"><b>Irrigation</b> - Increase farmer food output</span>-->
-                    <!--<span id="Pbutchering"><b>Butchering</b> - More farmers collect more skins</span>-->
-                    <!--<span id="Pgardening"><b>Gardening</b> - More woodcutters collect more herbs</span>-->
-                    <!--<span id="Pextraction"><b>Extraction</b> - More miners collect more ore</span>-->
-                    <!--<span id="Pflensing"><b>Flensing</b> - Collect skins more frequently</span>-->
-                    <!--<span id="Pmacerating"><b>Macerating</b> - Collect ore more frequently</span>-->
-                    <!--<span id="Pcroprotation"><b>Crop Rotation</b> - Increase farmer food output</span>-->
-                    <!--<span id="Pselectivebreeding"><b>Selective Breeding</b> - Increase farmer food output</span>-->
-                    <!--<span id="Pfertilisers"><b>Fertilisers</b> - Increase farmer food output</span>-->
-                    <!--<span id="Pmasonry"><b>Masonry</b> - Unlock more buildings and upgrades</span>-->
-                    <!--<span id="Pconstruction"><b>Construction</b> - Unlock more buildings and upgrades</span>-->
-                    <!--<span id="Parchitecture"><b>Architecture</b> - Unlock more buildings and upgrades</span>-->
-                    <!--<span id="Ptenements"><b>Tenements</b> - Houses support +2 workers</span>-->
-                    <!--<span id="Pslums"><b>Slums</b> - Houses support +2 workers</span>-->
-                    <!--<span id="Pgranaries"><b>Granaries</b> - Barns store double the amount of food</span>-->
-                    <!--<span id="Ppalisade"><b>Palisade</b> - Enemies do less damage</span>-->
-                    <!--<span id="Pweaponry"><b>Basic Weaponry</b> - Improve soldiers</span>-->
-                    <!--<span id="Pshields"><b>Basic Shields</b> - Improve soldiers</span>-->
-                    <!--<span id="Phorseback"><b>Horseback Riding</b> - Build stables</span>-->
-                    <!--<span id="Pwheel"><b>The Wheel</b> - Build mills</span>-->
-                    <!--<span id="Pwriting"><b>Writing</b> - Increase cleric piety generation</span>-->
-                    <!--<span id="Padministration"><b>Administration</b> - Increase land gained from raiding</span>-->
-                    <!--<span id="Pcodeoflaws"><b>Code of Laws</b> - Reduce unhappiness caused by overcrowding</span>-->
-                    <!--<span id="Pmathematics"><b>Mathematics</b> - Create siege engines</span>-->
-                    <!--<span id="Paesthetics"><b>Aesthetics</b> - Building temples increases happiness</span>-->
-                    <!--<span id="Pcivilservice"><b>Civil Service</b> - Increase basic resources from clicking</span>-->
-                    <!--<span id="Pfeudalism"><b>Feudalism</b> - Further increase basic resources from clicking</span>-->
-                    <!--<span id="Pguilds"><b>Guilds</b> - Increase special resources from clicking</span>-->
-                    <!--<span id="Pserfs"><b>Serfs</b> - Unemployed workers increase resources from clicking</span>-->
-                    <!--<span id="Pnationalism"><b>Nationalism</b> - Soldiers increase basic resources from clicking</span>-->
-                    <!--<span id="Pworship"><b>Worship</b> - Allows you to worship a deity</span>-->
-                    <!--<span id="Pstandard"><b>Battle Standard</b> - Allows you to assemble an army</span>-->
-                    <!--<span id="Ptrade"><b>Trade</b> - Opens the trading post</span>-->
-                    <!--<span id="Pcurrency"><b>Currency</b> - Traders arrive more frequently, stay longer</span>-->
-                    <!--<span id="Pcommerce"><b>Commerce</b> - Traders arrive more frequently, stay longer</span>-->
+                <!--<div id="catsUpgrades">-->
+                    <!--<h3>The Grace of Cats</h3>-->
+                    <!--<table>-->
+                        <!--<tr>-->
+                            <!--<td class="devcost"></td>-->
+                            <!--<td id="catRow"><span><button onmousedown="createBuilding(catAltar,1)">Build Altar</button></span></td>-->
+                            <!--<td><span class="cost">200 stone, 200 piety, <span id="catAltarCost">100</span> herbs</span><span class="note">: +1 devotion</span></td>-->
+                        <!--</tr>-->
+                        <!--<tr>-->
+                            <!--<td class="devcost">10d&nbsp;</td>-->
+                            <!--<td><span id="catDevotion10"><button id="lure" onmousedown="upgrade('lure')" disabled>Lure of Civilisation</button>-->
+                            <!--<td><span class="cost">1000 piety</span><span class="note">: increase chance to get cats</span></span></td>-->
+                        <!--</tr>-->
+                        <!--<tr>-->
+                            <!--<td class="devcost">20d&nbsp;</td>-->
+                            <!--<td><button onmousedown="pestControl(10)" id="pestControl" disabled>Pest Control</button>-->
+                            <!--<td><span class="cost">100 piety</span><span class="note">: Give temporary boost to food production</span></td>-->
+                        <!--</tr>-->
+                        <!--<tr>-->
+                            <!--<td class="devcost">30d&nbsp;</td>-->
+                            <!--<td><span id="catDevotion30"><button id="companion" onmousedown="upgrade('companion')" disabled>Warmth of the Companion</button>-->
+                            <!--<td><span class="cost">1000 piety</span><span class="note">: cats help heal the sick</span></span></td>-->
+                        <!--</tr>-->
+                        <!--<tr>-->
+                            <!--<td class="devcost">40d&nbsp;</td>-->
+                            <!--<td><button onmousedown="grace(0.1)" id="grace" disabled>Grace</button>-->
+                            <!--<td><span class="cost"><span id="graceCost">1000</span> piety</span><span class="note">: Increase Happiness</span></td>-->
+                        <!--</tr>-->
+                        <!--<tr>-->
+                            <!--<td class="devcost">50d&nbsp;</td>-->
+                            <!--<td><span id="catDevotion50"><button id="comfort" onmousedown="upgrade('comfort')" disabled>Comfort of the Hearthfires</button>-->
+                            <!--<td><span class="cost">5000 piety</span><span class="note">: traders marginally more frequent</span></span></td>-->
+                        <!--</tr>-->
+                    <!--</table>-->
+                <!--</div>-->
+                <!--<div id="iconoclasmGroup">-->
+                    <!--<br />-->
+                    <!--<button id="iconoclasm" onmousedown="iconoclasmList()">Iconoclasm<br />(1000 piety)</button><span class="note">Remove an old deity</span><br />-->
+                    <!--<div id="iconoclasmList"></div>-->
+                <!--</div>-->
+            <!--</div>-->
+            <!--<div id="conquestPane">-->
+            <!--<h3>Conquest</h3>-->
+                <!--<span id="standardLine"><button id="standard" onmousedown="upgrade('standard')" disabled>Battle Standard<br />(1000 metal & leather)</button><span class="note">Lets you build an army (requires barracks)</span><br /></span>-->
+                <!--<div id="conquest">-->
+                    <!--<h4>Army</h4>-->
+                    <!--<table id="party">-->
+                    <!--<tr id="customArmyIncrement">-->
+                        <!--<td class="jobNone"></td>-->
+                        <!--<td class="jobCustom"></td>-->
+                        <!--<td class="job100"></td>-->
+                        <!--<td class="job10"></td>-->
+                        <!--<td></td>-->
+                        <!--<td>Increment:</td>-->
+                        <!--<td><input id="armyCustom" type="number" min="1" step="1" value="1"></td>-->
+                        <!--<td></td>-->
+                        <!--<td class="job10"></td>-->
+                        <!--<td class="job100"></td>-->
+                        <!--<td class="jobCustom"></td>-->
+                        <!--<td class="jobAll"></td>-->
+                        <!--<td><span class="note"></span></td>-->
+                    <!--</tr>-->
+                    <!--<tr id="fsoldiergroup">-->
+                        <!--<td class="jobNone"><button onmousedown="party('soldiers','leaveAll');">-All</button></td>-->
+                        <!--<td class="jobCustom"><button onmousedown="partyCustom('soldiers',-1);">-Custom</button></td>-->
+                        <!--<td class="job100"><button onmousedown="party('soldiers',-100);">-100</button></td>-->
+                        <!--<td class="job10"><button onmousedown="party('soldiers',-10);">-10</button></td>-->
+                        <!--<td><button onmousedown="party('soldiers',-1);">&lt;</button></td>-->
+                        <!--<td class="job">Soldiers: </td>-->
+                        <!--<td class="number"><span id="partySoldiers">0</span></td>-->
+                        <!--<td><button onmousedown="party('soldiers',1);">&gt;</button></td>-->
+                        <!--<td class="job10"><button onmousedown="party('soldiers',10);">+10</button></td>-->
+                        <!--<td class="job100"><button onmousedown="party('soldiers',100);">+100</button></td>-->
+                        <!--<td class="jobCustom"><button onmousedown="partyCustom('soldiers',+1);">+Custom</button></td>-->
+                        <!--<td class="jobAll"><button onmousedown="party('soldiers','takeAll');">All</button></td>-->
+                        <!--<td><span class="note"></span></td>-->
+                    <!--</tr>-->
+                    <!--<tr id="fcavalrygroup">-->
+                        <!--<td class="jobNone"><button onmousedown="party('cavalry','leaveAll');">-All</button></td>-->
+                        <!--<td class="jobCustom"><button onmousedown="partyCustom('cavalry',-1);">-Custom</button></td>-->
+                        <!--<td class="job100"><button onmousedown="party('cavalry',-100);">-100</button></td>-->
+                        <!--<td class="job10"><button onmousedown="party('cavalry',-10);">-10</button></td>-->
+                        <!--<td><button onmousedown="party('cavalry',-1);">&lt;</button></td>-->
+                        <!--<td class="job"><span id="ecavName">Cavalry</span>: </td>-->
+                        <!--<td class="number"><span id="partyCavalry">0</span></td>-->
+                        <!--<td><button onmousedown="party('cavalry',1);">&gt;</button></td>-->
+                        <!--<td class="job10"><button onmousedown="party('cavalry',10);">+10</button></td>-->
+                        <!--<td class="job100"><button onmousedown="party('cavalry',100);">+100</button></td>-->
+                        <!--<td class="jobCustom"><button onmousedown="partyCustom('cavalry',+1);">+Custom</button></td>-->
+                        <!--<td class="jobAll"><button onmousedown="party('cavalry','takeAll');">All</button></td>-->
+                        <!--<td><span class="note"></span></td>-->
+                    <!--</tr>-->
+                    <!--<tr id="fsiegegroup">-->
+                        <!--<td class="jobNone"></td>-->
+                        <!--<td class="jobCustom"></td>-->
+                        <!--<td class="job100"></td>-->
+                        <!--<td class="job10"></td>-->
+                        <!--<td></td>-->
+                        <!--<td class="job">Siege Engines: </td>-->
+                        <!--<td class="number"><span id="partySiege">0</span></td>-->
+                        <!--<td><button onmousedown="party('siege',1);">&gt;</button></td>-->
+                        <!--<td class="job10"><button onmousedown="party('siege',10);">+10</button></td>-->
+                        <!--<td class="job100"><button onmousedown="party('siege',100);">+100</button></td>-->
+                        <!--<td class="jobCustom"><button onmousedown="partyCustom('siege',+1);">+Custom</button></td>-->
+                        <!--<td class="jobAll"><button onmousedown="party('siege','max');">Max</button></td>-->
+                        <!--<td><span class="cost">50 metal, 50 leather, 200 wood</span></td>-->
+                    <!--</tr>-->
+                    <!--<tr id="esoldiergroup">-->
+                        <!--<td class="jobNone"></td>-->
+                        <!--<td class="jobCustom"></td>-->
+                        <!--<td class="job100"></td>-->
+                        <!--<td class="job10"></td>-->
+                        <!--<td></td>-->
+                        <!--<td class="enemy">Enemy Soldiers: </td>-->
+                        <!--<td class="number"><span id="esoldiers">0</span></td>-->
+                        <!--<td></td>-->
+                        <!--<td class="job10"></td>-->
+                        <!--<td class="job100"></td>-->
+                        <!--<td class="jobCustom"></td>-->
+                        <!--<td class="jobAll"></td>-->
+                        <!--<td><span class="note"></span></td>-->
+                    <!--</tr>-->
+                    <!--<tr id="efortgroup">-->
+                        <!--<td class="jobNone"></td>-->
+                        <!--<td class="jobCustom"></td>-->
+                        <!--<td class="job100"></td>-->
+                        <!--<td class="job10"></td>-->
+                        <!--<td></td>-->
+                        <!--<td class="enemy">Fortifications: </td>-->
+                        <!--<td class="number"><span id="eforts">0</span></td>-->
+                        <!--<td></td>-->
+                        <!--<td class="job10"></td>-->
+                        <!--<td class="job100"></td>-->
+                        <!--<td class="jobCustom"></td>-->
+                        <!--<td class="jobAll"></td>-->
+                        <!--<td><span class="note"></span></td>-->
+                    <!--</tr>-->
+                    <!--</table>-->
+                    <!--<br />-->
+                    <!--<span id="raidGroup">-->
+                        <!--<h4>To War!</h4>-->
+                        <!--<p id="gloryGroup">-->
+                            <!--Glory: <span id="gloryTimer">0</span> seconds remain-->
+                        <!--</p>-->
+                        <!--<button id="raidThorp" onmousedown="invade('thorp')">Raid Thorp</button><br />-->
+                        <!--<button id="raidHamlet" onmousedown="invade('hamlet')" disabled>Raid Hamlet</button><br />-->
+                        <!--<button id="raidVillage" onmousedown="invade('village')" disabled>Raid Village</button><br />-->
+                        <!--<button id="raidSmallTown" onmousedown="invade('smallTown')" disabled>Raid Small Town</button><br />-->
+                        <!--<button id="raidLargeTown" onmousedown="invade('largeTown')" disabled>Raid Large Town</button><br />-->
+                        <!--<button id="raidSmallCity" onmousedown="invade('smallCity')" disabled>Raid Small City</button><br />-->
+                        <!--<button id="raidLargeCity" onmousedown="invade('largeCity')" disabled>Raid Large City</button><br />-->
+                        <!--<button id="raidMetropolis" onmousedown="invade('metropolis')" disabled>Raid Metropolis</button><br />-->
+                        <!--<button id="raidSmallNation" onmousedown="invade('smallNation')" disabled>Raid Small Nation</button><br />-->
+                        <!--<button id="raidNation" onmousedown="invade('nation')" disabled>Raid Nation</button><br />-->
+                        <!--<button id="raidLargeNation" onmousedown="invade('largeNation')" disabled>Raid Large Nation</button><br />-->
+                        <!--<button id="raidEmpire" onmousedown="invade('empire')" disabled>Raid Empire</button><br />-->
+                    <!--</span>-->
+                    <!--<span id="victoryGroup">-->
+                        <!--<h4>Victory!</h4>-->
+                        <!--<button id="plunder" onmousedown="plunder()">Plunder Resources</button><br />-->
+                    <!--</span>-->
+                <!--</div>-->
+            <!--</div>-->
+            <!--<div id="tradePane">-->
+            <!--<h3>Trade</h3>-->
+                <!--<span id="tradeLine"><button id="tradeUpgrade" onmousedown="upgrade('trade')" disabled>Trade<br />(1 gold)</button><span class="note">Open the trading post</span><br /><br /></span>-->
+                <!--<div id="tradeUpgradeContainer">-->
+                    <!--<span id="currencyLine"><button id="currency" onmousedown="upgrade('currency')" disabled>Currency<br />(10 gold, 1000 ore)</button><span class="note">Traders arrive more frequently, stay longer</span><br /></span>-->
+                    <!--<span id="commerceLine"><button id="commerce" onmousedown="upgrade('commerce')" disabled>Commerce<br />(100 gold, 10000 piety)</button><span class="note">Traders arrive more frequently, stay longer</span><br /></span>-->
+                    <!--<div id="speedWonderGroup"><br /><button id="speedWonder" onmousedown="speedWonder()">Speed Wonder<br />(100 Gold)</button><span class="note">Increase wonder progress</span></div>-->
+                    <!--<h4>Buy Resources (1 gold)</h4>-->
+                    <!--<button class="tradeResource" onmousedown="buy(food)">Buy 5000 Food</button><br />-->
+                    <!--<button class="tradeResource" onmousedown="buy(wood)">Buy 5000 Wood</button><br />-->
+                    <!--<button class="tradeResource" onmousedown="buy(stone)">Buy 5000 Stone</button><br />-->
+                    <!--<button class="tradeResource" onmousedown="buy(skins)">Buy 500 Skins</button><br />-->
+                    <!--<button class="tradeResource" onmousedown="buy(herbs)">Buy 500 Herbs</button><br />-->
+                    <!--<button class="tradeResource" onmousedown="buy(ore)">Buy 500 Ore</button><br />-->
+                    <!--<button class="tradeResource" onmousedown="buy(leather)">Buy 250 Leather</button><br />-->
+                    <!--<button class="tradeResource" onmousedown="buy(metal)">Buy 250 Metal</button><br />-->
                 <!--</div>-->
             <!--</div>-->
 
-
-            <div id="deityPane">
-            <h3>Deity</h3>
-                <span id="deityLine"><button id="deity" onmousedown="upgrade('deity')" disabled>Worship<br />(1000 piety)</button><span class="note">Begin worshipping a deity (requires temple)</span><br />
-                <br /></span>
-                <div id="deitySpecialisation">
-                    <button id="deityBattle" onmousedown="upgrade('deityBattle')">Battle<br />(500 piety)</button><span class="note">Note: you can only pick one of these</span><br />
-                    <button id="deityFields" onmousedown="upgrade('deityFields')">The Fields<br />(500 piety)</button><span class="note">Note: you can only pick one of these</span><br />
-                    <button id="deityUnderworld" onmousedown="upgrade('deityUnderworld')">The Underworld<br />(500 piety)</button><span class="note">Note: you can only pick one of these</span><br />
-                    <button id="deityCats" onmousedown="upgrade('deityCats')">Cats<br />(500 piety)</button><span class="note">Note: you can only pick one of these</span><br />
-                </div>
-                <div id="battleUpgrades">
-                    <h3>The Strength of Battle</h3>
-                    <table>
-                        <tr>
-                            <td class="devcost"></td>
-                            <td id="battleRow"><span><button onmousedown="createBuilding(battleAltar,1)">Build Altar</button></span></td>
-                            <td><span class="cost">200 stone, 200 piety, <span id="battleAltarCost">50</span> metal</span><span class="note">: +1 devotion</span></td>
-                        </tr>
-                        <tr>
-                            <td class="devcost">10d&nbsp;</td>
-                            <td><span id="battleDevotion10"><button id="riddle" onmousedown="upgrade('riddle')" disabled>Riddle of Steel</button></td>
-                            <td><span class="cost">1000 piety</span><span class="note">: improve soldiers</span></span></td>
-                        </tr>
-                        <tr>
-                            <td class="devcost">20d&nbsp;</td>
-                            <td><button onmousedown="smite()" id="smiteInvaders" disabled>Smite Invaders</button></td>
-                            <td><span class="cost">100 piety per invader</span></td>
-                        </tr>
-                        <tr>
-                            <td class="devcost">30d&nbsp;</td>
-                            <td><span id="battleDevotion30"><button id="throne" onmousedown="upgrade('throne')" disabled>Throne of Skulls</button></td>
-                            <td><span class="cost">1000 piety</span><span class="note">: slaying enemies creates temples</span></span></td>
-                        </tr>
-                        <tr>
-                            <td class="devcost">40d&nbsp;</td>
-                            <td><button onmousedown="glory(180)" id="glory" disabled>For Glory!</button></td>
-                            <td><span class="cost">1000 piety</span><span class="note">: Temporarily makes raids more difficult, increases rewards</span></td>
-                        </tr>
-                        <tr>
-                            <td class="devcost">50d&nbsp;</td>
-                            <td><span id="battleDevotion50"><button id="lament" onmousedown="upgrade('lament')" disabled>Lament of the Defeated</button></td>
-                            <td><span class="cost">5000 piety</span><span class="note">: Successful raids delay future invasions</span></span></td>
-                        </tr>
-                    </table>
-                </div>
-                <div id="fieldsUpgrades">
-                    <h3>The Bounty of the Fields</h3>
-                    <table>
-                        <tr>
-                            <td class="devcost"></td>
-                            <td id="fieldsRow"><span><button onmousedown="createBuilding(fieldsAltar,1)">Build Altar</button></span></td>
-                            <td><span class="cost"><span id="fieldsAltarFoodCost">500</span> food, <span id="fieldsAltarWoodCost">500</span> wood, 200 stone, 200 piety</span><span class="note">: +1 devotion</span></td>
-                        </tr>
-                        <tr>
-                            <td class="devcost">10d&nbsp;</td>
-                            <td><span id="fieldsDevotion10"><button id="blessing" onmousedown="upgrade('blessing')" disabled>Blessing of Abundance</button></td>
-                            <td><span class="cost">1000 piety</span><span class="note">: increase farmer food output</span></span></td>
-                        </tr>
-                        <tr>
-                            <td class="devcost">20d&nbsp;</td>
-                            <td><button id="wickerman" onmousedown="wickerman()" disabled>Burn Wicker Man</button></td>
-                            <td><span class="cost">500 wood, 1 worker</span><span class="note">: random bonus to a resource</span></td>
-                        </tr>
-                        <tr>
-                            <td class="devcost">30d&nbsp;</td>
-                            <td><span id="fieldsDevotion30"><button id="waste" onmousedown="upgrade('waste')" disabled>Abide No Waste</button></td>
-                            <td><span class="cost">1000 piety</span><span class="note">: workers will eat corpses if there is no food left</span></span></td>
-                        </tr>
-                        <tr>
-                            <td class="devcost">40d&nbsp;</td>
-                            <td><button id="walk" onmousedown="walk(1)" disabled>Walk Behind The Rows</button><br /><button id="ceaseWalk" onmousedown="walk(0)" disabled>Cease Walking</button></td>
-                            <td><span class="cost">1 worker per second</span><span class="note">: boost food production</span></td>
-                        </tr>
-                        <tr>
-                            <td class="devcost">50d&nbsp;</td>
-                            <td><span id="fieldsDevotion50"><button id="stay" onmousedown="upgrade('stay')" disabled>Stay With Us</button></td>
-                            <td><span class="cost">5000 piety</span><span class="note">: traders stay longer</span></span></td>
-                        </tr>
-                    </table>
-                </div>
-                <div id="underworldUpgrades">
-                    <h3>The Dread Power of the Underworld</h3>
-                    <table>
-                        <tr>
-                            <td class="devcost"></td>
-                            <td id="underworldRow"><span><button onmousedown="createBuilding(underworldAltar,1)">Build Altar</button></span></td>
-                            <td><span class="cost">200 stone, 200 piety, <span id="underworldAltarCost">1</span> corpses</span><span class="note">: +1 devotion</span></td>
-                        </tr>
-                        <tr>
-                            <td class="devcost">10d&nbsp;</td>
-                            <td><span id="underworldDevotion10"><button id="book" onmousedown="upgrade('book')" disabled>The Book of the Dead</button></td>
-                            <td><span class="cost">1000 piety</span><span class="note">: gain piety with deaths</span></span></td>
-                        </tr>
-                        <tr>
-                            <td class="devcost">20d&nbsp;</td>
-                            <td><button onmousedown="raiseDead(1)" id="raiseDead" disabled>Raise Dead</button><button onmousedown="raiseDead(100)" id="raiseDead100" class="x100" disabled>x100</button><button onmousedown="raiseDead('max')" id="raiseDeadMax" class="x100" disabled>Max</button></td>
-                            <td><span class="cost">100 piety per zombie</span></td>
-                        </tr>
-                        <tr>
-                            <td class="devcost">30d&nbsp;</td>
-                            <td><span id="underworldDevotion30"><button id="feast" onmousedown="upgrade('feast')" disabled>A Feast for Crows</button></td>
-                            <td><span class="cost">1000 piety</span><span class="note">: corpses are less likely to cause illness</span></span></td>
-                        </tr>
-                        <tr>
-                            <td class="devcost">40d&nbsp;</td>
-                            <td><button onmousedown="shade()" id="shade" disabled>Summon Shades</button></td>
-                            <td><span class="cost">1000 piety</span><span class="note">: Souls of the defeated rise to fight for you</span></td>
-                        </tr>
-                        <tr>
-                            <td class="devcost">50d&nbsp;</td>
-                            <td><span id="underworldDevotion50"><button id="secrets" onmousedown="upgrade('secrets')" disabled>Secrets of the Tombs</button></td>
-                            <td><span class="cost">5000 piety</span><span class="note">: graveyards increase cleric piety generation</span></span></td>
-                        </tr>
-                    </table>
-                </div>
-                <div id="catsUpgrades">
-                    <h3>The Grace of Cats</h3>
-                    <table>
-                        <tr>
-                            <td class="devcost"></td>
-                            <td id="catRow"><span><button onmousedown="createBuilding(catAltar,1)">Build Altar</button></span></td>
-                            <td><span class="cost">200 stone, 200 piety, <span id="catAltarCost">100</span> herbs</span><span class="note">: +1 devotion</span></td>
-                        </tr>
-                        <tr>
-                            <td class="devcost">10d&nbsp;</td>
-                            <td><span id="catDevotion10"><button id="lure" onmousedown="upgrade('lure')" disabled>Lure of Civilisation</button>
-                            <td><span class="cost">1000 piety</span><span class="note">: increase chance to get cats</span></span></td>
-                        </tr>
-                        <tr>
-                            <td class="devcost">20d&nbsp;</td>
-                            <td><button onmousedown="pestControl(10)" id="pestControl" disabled>Pest Control</button>
-                            <td><span class="cost">100 piety</span><span class="note">: Give temporary boost to food production</span></td>
-                        </tr>
-                        <tr>
-                            <td class="devcost">30d&nbsp;</td>
-                            <td><span id="catDevotion30"><button id="companion" onmousedown="upgrade('companion')" disabled>Warmth of the Companion</button>
-                            <td><span class="cost">1000 piety</span><span class="note">: cats help heal the sick</span></span></td>
-                        </tr>
-                        <tr>
-                            <td class="devcost">40d&nbsp;</td>
-                            <td><button onmousedown="grace(0.1)" id="grace" disabled>Grace</button>
-                            <td><span class="cost"><span id="graceCost">1000</span> piety</span><span class="note">: Increase Happiness</span></td>
-                        </tr>
-                        <tr>
-                            <td class="devcost">50d&nbsp;</td>
-                            <td><span id="catDevotion50"><button id="comfort" onmousedown="upgrade('comfort')" disabled>Comfort of the Hearthfires</button>
-                            <td><span class="cost">5000 piety</span><span class="note">: traders marginally more frequent</span></span></td>
-                        </tr>
-                    </table>
-                </div>
-                <div id="iconoclasmGroup">
-                    <br />
-                    <button id="iconoclasm" onmousedown="iconoclasmList()">Iconoclasm<br />(1000 piety)</button><span class="note">Remove an old deity</span><br />
-                    <div id="iconoclasmList"></div>
-                </div>
-            </div>
-            <div id="conquestPane">
-            <h3>Conquest</h3>
-                <span id="standardLine"><button id="standard" onmousedown="upgrade('standard')" disabled>Battle Standard<br />(1000 metal & leather)</button><span class="note">Lets you build an army (requires barracks)</span><br /></span>
-                <div id="conquest">
-                    <h4>Army</h4>
-                    <table id="party">
-                    <tr id="customArmyIncrement">
-                        <td class="jobNone"></td>
-                        <td class="jobCustom"></td>
-                        <td class="job100"></td>
-                        <td class="job10"></td>
-                        <td></td>
-                        <td>Increment:</td>
-                        <td><input id="armyCustom" type="number" min="1" step="1" value="1"></td>
-                        <td></td>
-                        <td class="job10"></td>
-                        <td class="job100"></td>
-                        <td class="jobCustom"></td>
-                        <td class="jobAll"></td>
-                        <td><span class="note"></span></td>
-                    </tr>
-                    <tr id="fsoldiergroup">
-                        <td class="jobNone"><button onmousedown="party('soldiers','leaveAll');">-All</button></td>
-                        <td class="jobCustom"><button onmousedown="partyCustom('soldiers',-1);">-Custom</button></td>
-                        <td class="job100"><button onmousedown="party('soldiers',-100);">-100</button></td>
-                        <td class="job10"><button onmousedown="party('soldiers',-10);">-10</button></td>
-                        <td><button onmousedown="party('soldiers',-1);">&lt;</button></td>
-                        <td class="job">Soldiers: </td>
-                        <td class="number"><span id="partySoldiers">0</span></td>
-                        <td><button onmousedown="party('soldiers',1);">&gt;</button></td>
-                        <td class="job10"><button onmousedown="party('soldiers',10);">+10</button></td>
-                        <td class="job100"><button onmousedown="party('soldiers',100);">+100</button></td>
-                        <td class="jobCustom"><button onmousedown="partyCustom('soldiers',+1);">+Custom</button></td>
-                        <td class="jobAll"><button onmousedown="party('soldiers','takeAll');">All</button></td>
-                        <td><span class="note"></span></td>
-                    </tr>
-                    <tr id="fcavalrygroup">
-                        <td class="jobNone"><button onmousedown="party('cavalry','leaveAll');">-All</button></td>
-                        <td class="jobCustom"><button onmousedown="partyCustom('cavalry',-1);">-Custom</button></td>
-                        <td class="job100"><button onmousedown="party('cavalry',-100);">-100</button></td>
-                        <td class="job10"><button onmousedown="party('cavalry',-10);">-10</button></td>
-                        <td><button onmousedown="party('cavalry',-1);">&lt;</button></td>
-                        <td class="job"><span id="ecavName">Cavalry</span>: </td>
-                        <td class="number"><span id="partyCavalry">0</span></td>
-                        <td><button onmousedown="party('cavalry',1);">&gt;</button></td>
-                        <td class="job10"><button onmousedown="party('cavalry',10);">+10</button></td>
-                        <td class="job100"><button onmousedown="party('cavalry',100);">+100</button></td>
-                        <td class="jobCustom"><button onmousedown="partyCustom('cavalry',+1);">+Custom</button></td>
-                        <td class="jobAll"><button onmousedown="party('cavalry','takeAll');">All</button></td>
-                        <td><span class="note"></span></td>
-                    </tr>
-                    <tr id="fsiegegroup">
-                        <td class="jobNone"></td>
-                        <td class="jobCustom"></td>
-                        <td class="job100"></td>
-                        <td class="job10"></td>
-                        <td></td>
-                        <td class="job">Siege Engines: </td>
-                        <td class="number"><span id="partySiege">0</span></td>
-                        <td><button onmousedown="party('siege',1);">&gt;</button></td>
-                        <td class="job10"><button onmousedown="party('siege',10);">+10</button></td>
-                        <td class="job100"><button onmousedown="party('siege',100);">+100</button></td>
-                        <td class="jobCustom"><button onmousedown="partyCustom('siege',+1);">+Custom</button></td>
-                        <td class="jobAll"><button onmousedown="party('siege','max');">Max</button></td>
-                        <td><span class="cost">50 metal, 50 leather, 200 wood</span></td>
-                    </tr>
-                    <tr id="esoldiergroup">
-                        <td class="jobNone"></td>
-                        <td class="jobCustom"></td>
-                        <td class="job100"></td>
-                        <td class="job10"></td>
-                        <td></td>
-                        <td class="enemy">Enemy Soldiers: </td>
-                        <td class="number"><span id="esoldiers">0</span></td>
-                        <td></td>
-                        <td class="job10"></td>
-                        <td class="job100"></td>
-                        <td class="jobCustom"></td>
-                        <td class="jobAll"></td>
-                        <td><span class="note"></span></td>
-                    </tr>
-                    <tr id="efortgroup">
-                        <td class="jobNone"></td>
-                        <td class="jobCustom"></td>
-                        <td class="job100"></td>
-                        <td class="job10"></td>
-                        <td></td>
-                        <td class="enemy">Fortifications: </td>
-                        <td class="number"><span id="eforts">0</span></td>
-                        <td></td>
-                        <td class="job10"></td>
-                        <td class="job100"></td>
-                        <td class="jobCustom"></td>
-                        <td class="jobAll"></td>
-                        <td><span class="note"></span></td>
-                    </tr>
-                    </table>
-                    <br />
-                    <span id="raidGroup">
-                        <h4>To War!</h4>
-                        <p id="gloryGroup">
-                            Glory: <span id="gloryTimer">0</span> seconds remain
-                        </p>
-                        <button id="raidThorp" onmousedown="invade('thorp')">Raid Thorp</button><br />
-                        <button id="raidHamlet" onmousedown="invade('hamlet')" disabled>Raid Hamlet</button><br />
-                        <button id="raidVillage" onmousedown="invade('village')" disabled>Raid Village</button><br />
-                        <button id="raidSmallTown" onmousedown="invade('smallTown')" disabled>Raid Small Town</button><br />
-                        <button id="raidLargeTown" onmousedown="invade('largeTown')" disabled>Raid Large Town</button><br />
-                        <button id="raidSmallCity" onmousedown="invade('smallCity')" disabled>Raid Small City</button><br />
-                        <button id="raidLargeCity" onmousedown="invade('largeCity')" disabled>Raid Large City</button><br />
-                        <button id="raidMetropolis" onmousedown="invade('metropolis')" disabled>Raid Metropolis</button><br />
-                        <button id="raidSmallNation" onmousedown="invade('smallNation')" disabled>Raid Small Nation</button><br />
-                        <button id="raidNation" onmousedown="invade('nation')" disabled>Raid Nation</button><br />
-                        <button id="raidLargeNation" onmousedown="invade('largeNation')" disabled>Raid Large Nation</button><br />
-                        <button id="raidEmpire" onmousedown="invade('empire')" disabled>Raid Empire</button><br />
-                    </span>
-                    <span id="victoryGroup">
-                        <h4>Victory!</h4>
-                        <button id="plunder" onmousedown="plunder()">Plunder Resources</button><br />
-                    </span>
-                </div>
-            </div>
-            <div id="tradePane">
-            <h3>Trade</h3>
-                <span id="tradeLine"><button id="tradeUpgrade" onmousedown="upgrade('trade')" disabled>Trade<br />(1 gold)</button><span class="note">Open the trading post</span><br /><br /></span>
-                <div id="tradeUpgradeContainer">
-                    <span id="currencyLine"><button id="currency" onmousedown="upgrade('currency')" disabled>Currency<br />(10 gold, 1000 ore)</button><span class="note">Traders arrive more frequently, stay longer</span><br /></span>
-                    <span id="commerceLine"><button id="commerce" onmousedown="upgrade('commerce')" disabled>Commerce<br />(100 gold, 10000 piety)</button><span class="note">Traders arrive more frequently, stay longer</span><br /></span>
-                    <div id="speedWonderGroup"><br /><button id="speedWonder" onmousedown="speedWonder()">Speed Wonder<br />(100 Gold)</button><span class="note">Increase wonder progress</span></div>
-                    <h4>Buy Resources (1 gold)</h4>
-                    <button class="tradeResource" onmousedown="buy(food)">Buy 5000 Food</button><br />
-                    <button class="tradeResource" onmousedown="buy(wood)">Buy 5000 Wood</button><br />
-                    <button class="tradeResource" onmousedown="buy(stone)">Buy 5000 Stone</button><br />
-                    <button class="tradeResource" onmousedown="buy(skins)">Buy 500 Skins</button><br />
-                    <button class="tradeResource" onmousedown="buy(herbs)">Buy 500 Herbs</button><br />
-                    <button class="tradeResource" onmousedown="buy(ore)">Buy 500 Ore</button><br />
-                    <button class="tradeResource" onmousedown="buy(leather)">Buy 250 Leather</button><br />
-                    <button class="tradeResource" onmousedown="buy(metal)">Buy 250 Metal</button><br />
-                </div>
-            </div>
             <div id="statsPane" style="display:none">
                     <div id="settings">
                         <h3>Settings</h3>

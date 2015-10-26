@@ -500,39 +500,61 @@
     }
 
     //------------------------------------------
-    function show_upgrades_list(game) {
-        $pointers.upgrade_available = $('<h3>')
-            .text('Available Upgrades')
-            .appendTo($pointers.upgrade_list);
+    function show_upgrades_list(game, $list_holder, workflow) {
+        var workflow_title = '';
+        var upgrade_grouping = 'basic';
+        if (workflow) {
+            workflow_title = _.str.titleize(workflow.title || workflow.name);
+            upgrade_grouping = workflow.name;
+        }
+        var text_upgrade = 'Available '+workflow_title+ ' upgrades';
+        var text_upgrade_no = 'No '+workflow_title+ ' upgrades currently available';
+        var text_upgraded = 'Researched '+workflow_title+ ' upgrades';
+        var text_upgraded_no = 'No '+workflow_title+ ' upgrades have been researched';
+
+        $pointers.upgrade_available = $pointers.upgrade_available || {};
+        $pointers.upgrade_available_alt = $pointers.upgrade_available_alt || {};
+        $pointers.upgrade_researched = $pointers.upgrade_researched || {};
+        $pointers.upgrade_researched_alt = $pointers.upgrade_researched_alt || {};
+
+        $pointers.upgrade_available[upgrade_grouping] = $('<h4>')
+            .text(text_upgrade)
+            .appendTo($list_holder);
         $("<div>")
-            .appendTo($pointers.upgrade_available);
-        $pointers.upgrade_available_alt = $('<h3>')
-            .text('No upgrades currently purchasable')
+            .appendTo($pointers.upgrade_available[upgrade_grouping]);
+        $pointers.upgrade_available_alt[upgrade_grouping] = $('<h4>')
+            .text(text_upgrade_no)
             .hide()
-            .appendTo($pointers.upgrade_list);
+            .appendTo($list_holder);
 
+        //If workflow was passed in and it has a draw function, call it and add to the pane
+        if (workflow && workflow.setup_function) {
+            var $setup = workflow.setup_function(game);
+            if ($setup) {
+                var pointer_name = 'workflow_' + workflow.name + '_display';
+                $pointers[pointer_name] = $('<div>').appendTo($list_holder);
+                $setup.appendTo($pointers[pointer_name]);
+            }
+        }
 
-
-        $pointers.upgrades_researched = $('<h3>')
-            .text('Researched Upgrades')
-            .appendTo($pointers.upgrade_list);
+        $pointers.upgrade_researched[upgrade_grouping] = $('<h4>')
+            .text(text_upgraded)
+            .appendTo($list_holder);
         $("<div>")
-            .appendTo($pointers.upgrades_researched);
-        $pointers.upgrade_researched_alt = $('<h3>')
-            .text('No upgrades purchased')
+            .appendTo($pointers.upgrade_researched[upgrade_grouping]);
+        $pointers.upgrade_researched_alt[upgrade_grouping] = $('<h4>')
+            .text(text_upgraded_no)
             .hide()
-            .appendTo($pointers.upgrade_list);
+            .appendTo($list_holder);
 
         var last_displayed_type = '';
         var $last_displayed_type_div;
         var number_available = 0;
         var number_purchased = 0;
 
-        //TODO: Show deity (and trade, conquest, trade) elsewhere
-        var upgrades_non_deity = _.filter(game.game_options.upgrades, function (up) {
-            return up.type != 'deity'
-        });
-        _.each(upgrades_non_deity, function (upgrade) {
+        //Show all upgrade categories associated with this workflow, or all the others if not a workflow
+        var upgrades_to_show = workflow ? _c.upgrades_in_workflow(game, workflow) || [] : _c.upgrades_not_in_workflows(game);
+        _.each(upgrades_to_show, function (upgrade) {
             var name = _.str.titleize(upgrade.title || upgrade.name);
             var has_upgrade = game.data.upgrades[upgrade.name];
             var can_purchase = _c.can_purchase_upgrade(game, upgrade);
@@ -545,7 +567,7 @@
                     .css({fontSize: '9px'})
                     .hide()
                     .text(_.str.titleize(upgrade.type) + ":")
-                    .appendTo($pointers.upgrade_available);
+                    .appendTo($pointers.upgrade_available[upgrade_grouping]);
             }
             last_displayed_type = upgrade.type;
 
@@ -578,43 +600,46 @@
                     _c.redraw_data(game);
                 })
                 .addClass('icon upgrade_holder')
-                .appendTo($pointers.upgrade_available);
+                .appendTo($pointers.upgrade_available[upgrade_grouping]);
 
             upgrade.$holder_purchased = $('<div>')
                 .text(name)
                 .css({backgroundColor: 'lightgreen', display: has_upgrade ? 'inline-block' : 'none'})
                 .popover({title: 'Purchased ' + title, content: description, trigger: 'hover', placement: 'top', html: true})
                 .addClass('icon upgrade_holder')
-                .appendTo($pointers.upgrades_researched);
+                .appendTo($pointers.upgrade_researched[upgrade_grouping]);
         });
         if (number_available > 0) {
-            $pointers.upgrade_available.show();
-            $pointers.upgrade_available_alt.hide();
+            $pointers.upgrade_available[upgrade_grouping].show();
+            $pointers.upgrade_available_alt[upgrade_grouping].hide();
         } else {
-            $pointers.upgrade_available.hide();
-            $pointers.upgrade_available_alt.show();
+            $pointers.upgrade_available[upgrade_grouping].hide();
+            $pointers.upgrade_available_alt[upgrade_grouping].show();
 
         }
         if (number_purchased > 0) {
-            $pointers.upgrades_researched.show();
-            $pointers.upgrade_researched_alt.hide();
+            $pointers.upgrade_researched[upgrade_grouping].show();
+            $pointers.upgrade_researched_alt[upgrade_grouping].hide();
         } else {
-            $pointers.upgrades_researched.hide();
-            $pointers.upgrade_researched_alt.show();
+            $pointers.upgrade_researched[upgrade_grouping].hide();
+            $pointers.upgrade_researched_alt[upgrade_grouping].show();
         }
 
     }
 
-    function update_upgrade_list(game) {
-        var upgrades_non_deity = _.filter(game.game_options.upgrades, function (up) {
-            return up.type != 'deity'
-        });
+    function update_upgrade_list(game, $list_holder, workflow) {
         var count_of_categories = 0;
         var last_displayed_type = '';
         var number_available = 0;
         var number_purchased = 0;
+        var upgrade_grouping = 'basic';
+        if (workflow) {
+            upgrade_grouping = workflow.name;
+        }
 
-        _.each(upgrades_non_deity, function (upgrade) {
+        //Redraw all upgrade categories associated with this workflow, or all the others if not a workflow
+        var upgrades_to_show = workflow ? _c.upgrades_in_workflow(game, workflow) || [] : _c.upgrades_not_in_workflows(game);
+        _.each(upgrades_to_show, function (upgrade) {
             var has_upgrade = game.data.upgrades[upgrade.name];
             var can_purchase = _c.can_purchase_upgrade(game, upgrade);
 
@@ -629,7 +654,7 @@
             }
 
             if (show_purchasable) {
-                upgrade.$holder_category.show();
+                if (upgrade.$holder_category) upgrade.$holder_category.show();
                 count_of_categories++;
                 number_available++;
             }
@@ -647,7 +672,7 @@
             if (upgrade.type != last_displayed_type) {
                 // New category
                 if (count_of_categories == 0) {
-                    upgrade.$holder_category.hide();
+                    if (upgrade.$holder_category) upgrade.$holder_category.hide();
                 }
                 count_of_categories = 0;
             }
@@ -655,19 +680,25 @@
 
         });
         if (number_available > 0) {
-            $pointers.upgrade_available.show();
-            $pointers.upgrade_available_alt.hide();
+            $pointers.upgrade_available[upgrade_grouping].show();
+            $pointers.upgrade_available_alt[upgrade_grouping].hide();
         } else {
-            $pointers.upgrade_available.hide();
-            $pointers.upgrade_available_alt.show();
+            $pointers.upgrade_available[upgrade_grouping].hide();
+            $pointers.upgrade_available_alt[upgrade_grouping].show();
 
         }
         if (number_purchased > 0) {
-            $pointers.upgrades_researched.show();
-            $pointers.upgrade_researched_alt.hide();
+            $pointers.upgrade_researched[upgrade_grouping].show();
+            $pointers.upgrade_researched_alt[upgrade_grouping].hide();
         } else {
-            $pointers.upgrades_researched.hide();
-            $pointers.upgrade_researched_alt.show();
+            $pointers.upgrade_researched[upgrade_grouping].hide();
+            $pointers.upgrade_researched_alt[upgrade_grouping].show();
+        }
+
+        //If there is a workflow passed in, redraw info within it
+        if (workflow && workflow.redraw_function) {
+            var pointer_name = 'workflow_' + workflow.name + '_display';
+            workflow.redraw_function(game, $pointers[pointer_name]);
         }
     }
 
@@ -730,7 +761,16 @@
         $pointers.logs = $('#eventsContainer');
 
         $pointers.upgrade_list = $('#upgradesPane');
-        show_upgrades_list(game);
+        show_upgrades_list(game, $pointers.upgrade_list);
+
+        //TODO: Put into a loop
+        $pointers.deity_pane = $('#deityPane');
+        show_upgrades_list(game, $pointers.deity_pane, game.game_options.workflows[0]);
+        $pointers.conquest_pane = $('#conquestPane');
+        show_upgrades_list(game, $pointers.conquest_pane, game.game_options.workflows[1]);
+        $pointers.trade_pane = $('#tradePane');
+        show_upgrades_list(game, $pointers.trade_pane, game.game_options.workflows[2]);
+
 
         $pointers.achievements_list = $('#achievementsList');
         show_achievements_list(game);
@@ -743,7 +783,11 @@
         update_population_data(game);
         update_jobs_list(game);
         update_upgrade_list(game);
-        update_achievements_list(game);
+        update_upgrade_list(game, $pointers.deity_pane, game.game_options.workflows[0]);
+        update_upgrade_list(game, $pointers.conquest_pane, game.game_options.workflows[1]);
+        update_upgrade_list(game, $pointers.trade_pane, game.game_options.workflows[2]);
+
+        update_achievements_list(game, $pointers.upgrade_list);
     };
 
     _c.log_display = function (game) {
@@ -770,99 +814,99 @@
         }
     };
 
-    _c.updateBuildingTotals = function () {
-
-    };
-    _c.updateSpawnButtons = function () {
-
-    };
-    _c.updateJobs = function () {
-
-    };
-    _c.updateJobButtons = function () {
-
-    };
-    _c.updateUpgrades = function () {
-
-    };
-    _c.updateDeity = function () {
-
-    };
-    _c.updateOldDeities = function () {
-
-    };
-    _c.updateMobs = function () {
-
-    };
-    _c.updateDevotion = function () {
-
-    };
-    _c.updateRequirements = function () {
-
-    };
-    _c.updateAchievements = function () {
-
-    };
-    _c.updateParty = function () {
-
-    };
-    _c.updatePartyButtons = function () {
-
-    };
-    _c.updateTargets = function () {
-
-    };
-    _c.updateHappiness = function () {
-
-    };
-    _c.updateWonder = function () {
-
-    };
-    _c.updateWonderList = function () {
-
-    };
-    _c.updateReset = function () {
-
-    };
-    _c.paneSelect = function () {
-
-    };
-    _c.toggleCustomIncrements = function () {
-
-    };
-    _c.toggleNotes = function () {
-
-    };
-    _c.impExp = function () {
-
-    };
-    _c.tips = function () {
-
-    };
-    _c.versionAlert = function () {
-
-    };
-    _c.text = function () {
-
-    };
-    _c.textShadow = function () {
-
-    };
-    _c.iconToggle = function () {
-
-    };
-    _c.prettify = function () {
-
-    };
-    _c.toggleDelimiters = function () {
-
-    };
-    _c.toggleWorksafe = function () {
-
-    };
-    _c.gameLog = function () {
-
-    };
+//    _c.updateBuildingTotals = function () {
+//
+//    };
+//    _c.updateSpawnButtons = function () {
+//
+//    };
+//    _c.updateJobs = function () {
+//
+//    };
+//    _c.updateJobButtons = function () {
+//
+//    };
+//    _c.updateUpgrades = function () {
+//
+//    };
+//    _c.updateDeity = function () {
+//
+//    };
+//    _c.updateOldDeities = function () {
+//
+//    };
+//    _c.updateMobs = function () {
+//
+//    };
+//    _c.updateDevotion = function () {
+//
+//    };
+//    _c.updateRequirements = function () {
+//
+//    };
+//    _c.updateAchievements = function () {
+//
+//    };
+//    _c.updateParty = function () {
+//
+//    };
+//    _c.updatePartyButtons = function () {
+//
+//    };
+//    _c.updateTargets = function () {
+//
+//    };
+//    _c.updateHappiness = function () {
+//
+//    };
+//    _c.updateWonder = function () {
+//
+//    };
+//    _c.updateWonderList = function () {
+//
+//    };
+//    _c.updateReset = function () {
+//
+//    };
+//    _c.paneSelect = function () {
+//
+//    };
+//    _c.toggleCustomIncrements = function () {
+//
+//    };
+//    _c.toggleNotes = function () {
+//
+//    };
+//    _c.impExp = function () {
+//
+//    };
+//    _c.tips = function () {
+//
+//    };
+//    _c.versionAlert = function () {
+//
+//    };
+//    _c.text = function () {
+//
+//    };
+//    _c.textShadow = function () {
+//
+//    };
+//    _c.iconToggle = function () {
+//
+//    };
+//    _c.prettify = function () {
+//
+//    };
+//    _c.toggleDelimiters = function () {
+//
+//    };
+//    _c.toggleWorksafe = function () {
+//
+//    };
+//    _c.gameLog = function () {
+//
+//    };
 
 
 })(Civvies);
