@@ -105,15 +105,14 @@
     };
 
     _c.toggleAutosave = function (game, saveType) {
-
+        //TODO: Toggle autosave and have some visual indicator switch
     };
     _c.deleteSave = function (game) {
         bake_cookie(cookie_name, '');
         localStorage.setItem(cookie_name, '');
     };
     _c.reset = function (saveType) {
-
+        //TODO: Reset, but keep achievements and deities and maybe other unlocks
     };
-
 
 })(Civvies);

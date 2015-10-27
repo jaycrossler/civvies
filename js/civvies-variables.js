@@ -19,13 +19,10 @@
             {name: 'leather', grouping: 2, image: '../images/civclicker/leather.png', notes: "Created from Skins by Tanners working in a Tannery"},
             {name: 'metal', grouping: 2, image: '../images/civclicker/metal.png', notes: "Created from Ore by Blacksmiths working in a Smithy"},
 
-            {name: 'gold', grouping: 2, image: '../images/civclicker/gold.png', notes: "Created from trading goods with Traders"},
             {name: 'piety', grouping: 2, image: '../images/civclicker/piety.png', notes: "Created by Clerics working in a Temple"},
             {name: 'corpses', grouping: 2, image: '../images/civclicker/piety.png', notes: "Created when towns people die from starvation or fighting"},
 
-            //TODO: Haven't applied these yet, move wonder to a plugin
-            {name: 'healing', grouping: 3, image: '../images/civclicker/piety.png', notes: "Created by Clerics and Apothecaries"},
-            {name: 'wonder', grouping: 3, image: '../images/civclicker/piety.png', notes: "Created by Labourers working on a Wonder"}
+            {name: 'healing', grouping: 3, image: '../images/civclicker/piety.png', notes: "Created by Clerics and Apothecaries"}
         ],
         buildings: [
             {name: 'cave', type: 'home', costs: {wood: 2, food:1, stone:1}, population_supports: 1, initial: 1, land_size:0},
@@ -125,12 +122,6 @@
             {name: "granaries", type: 'city efficiency', costs: {wood: 1000, stone: 1000}, upgrades:{construction:true}},
             {name: "palisade", type: 'city efficiency', costs: {wood: 2000, stone: 1000}, upgrades:{architecture:true}},
 
-            {name: "weaponry", type: 'weaponry', costs: {wood: 500, metal: 500}, variable_increase: {soldier: 0.01, cavalry: 0.01}},
-            {name: "shields", type: 'weaponry', costs: {wood: 500, leather: 500}, variable_increase: {soldier: 0.01, cavalry: 0.01}},
-            {name: "horseback", type: 'weaponry', costs: {wood: 500, food: 500}},
-            {name: "wheel", type: 'weaponry', costs: {wood: 500, stone: 500}, upgrades:{masonry:true, domestication:true}},
-            {name: "standard", type: 'weaponry', title: "Battle Standard", costs: {leather: 1000, metal: 1000}, upgrades:{writing:true, weaponry:true, shields:true}},
-
             {name: "writing", type: 'writing', costs: {skins: 500}},
             {name: "administration", type: 'writing', costs: {skins: 1000, stone: 1000}, upgrades:{writing:true}},
             {name: "codeoflaws", type: 'writing', title: "Code of Laws", costs: {skins: 1000, stone: 1000}, upgrades:{administration:true}},
@@ -142,28 +133,7 @@
             {name: "feudalism", type: 'civil', costs: {piety: 10000}, upgrades:{civilservice:true}},
             {name: "guilds", type: 'civil', costs: {piety: 10000}, upgrades:{feudalism:true}},
             {name: "serfs", type: 'civil', costs: {piety: 20000}, upgrades:{guilds:true}},
-            {name: "nationalism", type: 'civil', costs: {piety: 50000}, upgrades:{serfs:true}},
-
-            {name: "trade", type: 'commerce', costs: {gold: 1}, upgrades:{writing:true}},
-            {name: "currency", type: 'commerce', costs: {gold: 10, ore: 1000}, upgrades:{writing:true, trade:true}},
-            {name: "commerce", type: 'commerce', costs: {gold: 100, piety: 10000}, upgrades:{currency:true, civilservice:true}},
-
-            //TODO: Move all deity stuff to a plugin
-            {name: "deity", type: 'deity', costs: {piety: 1000}, special: "choose deity", upgrades:{responsibility:true, writing: true}},
-//           	{name:"deityType"},
-
-            {name: "lure", type: 'deity', costs: {piety: 1000}, upgrades:{deity:true}},
-            {name: "companion", type: 'deity', costs: {piety: 1000}, upgrades:{deity:true}},
-            {name: "comfort", type: 'deity', costs: {piety: 5000}, upgrades:{deity:true}},
-            {name: "blessing", type: 'deity', costs: {piety: 1000}, upgrades:{deity:true}},
-            {name: "waste", type: 'deity', costs: {piety: 1000}, upgrades:{deity:true}},
-            {name: "stay", type: 'deity', costs: {piety: 5000}, upgrades:{deity:true}},
-            {name: "riddle", type: 'deity', costs: {piety: 1000}, upgrades:{deity:true}},
-            {name: "throne", type: 'deity', costs: {piety: 1000}, upgrades:{deity:true}},
-            {name: "lament", type: 'deity', costs: {piety: 5000}, upgrades:{deity:true}},
-            {name: "book", type: 'deity', costs: {piety: 1000}, upgrades:{deity:true}},
-            {name: "feast", type: 'deity', costs: {piety: 1000}, upgrades:{deity:true}},
-            {name: "secrets", type: 'deity', costs: {piety: 5000}, upgrades:{deity:true}}
+            {name: "nationalism", type: 'civil', costs: {piety: 50000}, upgrades:{serfs:true}}
         ],
         achievements: [
             {name: "hamlet"},

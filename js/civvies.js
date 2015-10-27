@@ -27,7 +27,11 @@ var Civvies = (function ($, _, Helpers, maths) {
         if (option1 == 'get_private_functions') {
             return this._private_functions;
         } else if (option1 == 'add_game_option') {
-            _game_options[option2].push(option3);
+            if (_.isArray(option3)) {
+                _game_options[option2] = _game_options[option2].concat(option3);
+            } else {
+                _game_options[option2].push(option3);
+            }
         } else if (option1 == 'get_game_options') {
             return _game_options;
         } else if (option1 == 'get_game_option_category') {
