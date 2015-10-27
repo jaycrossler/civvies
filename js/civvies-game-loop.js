@@ -121,6 +121,7 @@
 
         //TODO: Have a buffer so that food can be over the limit for the loop
         //TODO: Food seems to be eaten twice
+        //TODO: Herbs went over upper limit, check limits are always in effect on random rolls
 
 //        //Resource-related
         eat_food_or_die(game);
@@ -133,8 +134,17 @@
 //        heal_the_wounded(game);
 //        build_a_wonder(game);
 
+
+        //Run each registered function
+        _.each(game.game_options.functions_each_tick, function(func){
+            func(game);
+        });
+
         _c.redraw_data(game);
 
+        //Advance the tick clock
+        game.data.tick_count = game.data.tick_count || 0;
+        game.data.tick_count++;
     }
 
 })(Civvies);

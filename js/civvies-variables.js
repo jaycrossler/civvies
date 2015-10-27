@@ -6,6 +6,12 @@
         autosave_every: 60,
         autosave: true,
 
+        functions_on_setup:[],
+        functions_each_tick:[],
+
+        arrays_to_map_to_objects: 'resources,buildings,populations,variables,upgrades,achievements'.split(','),
+        arrays_to_map_to_arrays: 'land,workflows'.split(','),
+
         resources: [
             //Note: Grouping 1 is clickable by user to gather resources manually
             {name: 'food', grouping: 1, image: '../images/civclicker/food.png', chances: [{chance: "foodSpecialChance", resource: 'herbs'}], amount_from_click: 1},
@@ -41,17 +47,9 @@
             {name: 'smithy', type: 'business', costs: {wood: 30, stone: 70, ore: 2}, supports: {blacksmiths: 2}, upgrades: {prospecting: true}, land_size:2},
             {name: 'apothecary', type: 'business', costs: {wood: 30, stone: 70, herbs: 2}, supports: {apothecaries: 2}, upgrades: {harvesting: true}, land_size:2},
             {name: 'temple', type: 'business', costs: {wood: 30, stone: 120, herbs: 10}, supports: {clerics: 1, piety:2000, gold:5}, upgrades:{masonry:true}, land_size:2},
-            {name: 'barracks', type: 'business', costs: {food: 20, wood: 60, stone: 120}, supports: {soldiers: 5, gold:2}, upgrades: {weaponry: true, masonry:true}},
-            {name: 'stable', type: 'business', costs: {food: 60, wood: 60, stone: 120, leather: 10}, supports: {cavalry: 5}, upgrades: {horseback: true}},
 
             {name: 'mill', type: 'upgrade', costs: {wood: 100, stone: 100}, options: {food_efficiency: .1}, upgrades: {wheel: true}, notes: "Improves Farming Efficiency"},
-            {name: 'graveyard', type: 'upgrade', costs: {wood: 50, stone: 200, herbs: 50}, options: {grave_spot: 100}, notes: "Increases Grave Plots", upgrades:{writing:true}}, //TODO: Should graves be a resource?
-            {name: 'fortification', type: 'upgrade', costs: {stone: 100}, options: {defense_improvement: 5}, supports: {gold:10}, notes: "Improves Defenses", upgrades:{codeoflaws:true, palisade:true}},
-
-            {name: 'battleAltar', title: "Battle Altar", type: 'altar', costs: {devotion: 1, stone: 200, metal: 50, piety: 200}, upgrades:{deity:true}},
-            {name: 'fieldsAltar', title: "Fields Altar", type: 'altar', costs: {devotion: 1, food: 500, wood: 500, stone: 200, piety: 200}, upgrades:{deity:true}},
-            {name: 'underworldAltar', title: "Underworld Altar", type: 'altar', costs: {devotion: 1, stone: 200, piety: 200, corpses: 1}, upgrades:{deity:true}},
-            {name: 'catAltar', title: "Cat Altar", type: 'altar', costs: {devotion: 1, herbs: 100, stone: 200, piety: 200}, upgrades:{deity:true}}
+            {name: 'graveyard', type: 'upgrade', costs: {wood: 50, stone: 200, herbs: 50}, options: {grave_spot: 100}, notes: "Increases Grave Plots", upgrades:{writing:true}} //TODO: Should graves be a resource?
         ],
         populations: [
             {name: 'unemployed', title: 'Unemployed Worker', type: 'basic', notes: "Unassigned Workers that eat up food", unassignable: true, cull_order: 2, doesnt_consume_food:true},
@@ -65,14 +63,7 @@
             {name: 'blacksmiths', type: 'medieval', consumes: {ore: 1}, produces: {metal: "blacksmiths"}},
             {name: 'apothecaries', type: 'medieval', consumes: {herbs: 1}, supports: {healing: "apothecaries"}},
             {name: 'clerics', type: 'medieval', consumes: {food: 2, herbs: 1}, supports: {healing: .1, burying: 5}, produces: {piety: "clerics"}, cull_order: 6},
-            {name: 'labourers', type: 'medieval', consumes: {herbs: 10, leather: 10, metal: 10, piety: 10}, produces: {wonder: 1}, cull_order: 2},
-
-            {name: 'cats', type: 'mystical', cull_order: 11},  //TODO: What makes cats?
-            {name: 'zombies', type: 'mystical', costs: {corpses: 1}, doesnt_consume_food: true},
-
-            {name: 'soldiers', type: 'warfare', consumes: {food: 2}, supports: {battle: "soldiers"}, upgrades: {}, cull_order: 8},
-            {name: 'cavalry', type: 'warfare', consumes: {food: 1, herbs: 1}, supports: {battle: "cavalry"}, upgrades: {horseback: true}, cull_order: 7},
-            {name: 'siege', type: 'warfare', costs: {metal: 10, wood: 100}, supports: {battle: .1}, upgrades: {construction: true, mathematics:true}, doesnt_require_office: true, doesnt_consume_food: true, achievement:'siege'}
+            {name: 'labourers', type: 'medieval', consumes: {herbs: 10, leather: 10, metal: 10, piety: 10}, produces: {wonder: 1}, cull_order: 2}
         ],
         variables: [
             {name: "storageInitial", initial: 120},
@@ -85,8 +76,6 @@
             {name: "blacksmiths", initial: 0.5},
             {name: "apothecaries", initial: 0.1},
             {name: "clerics", initial: 0.05},
-            {name: "soldiers", initial: 0.05},
-            {name: "cavalry", initial: 0.08},
             {name: "foodSpecialChance", initial: 0.02},
             {name: "woodSpecialChance", initial: 0.02},
             {name: "stoneSpecialChance", initial: 0.01},
@@ -204,7 +193,7 @@
             {name: 'nation', population_min: 100000},
             {name: 'large nation', population_min: 200000},
             {name: 'empire', population_min: 500000}
-            //TODO: How to have necropolis in plugin: {name: 'necropolis', population_min: '1000', zombie_multiplier:2}
+            //TODO: How to have necropolis in plugin: {name: 'necropolis', population_min: '1000', zombie_multiplier:2}. Pass in a logic test function
         ],
         workflows: []
     };

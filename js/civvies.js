@@ -32,6 +32,8 @@ var Civvies = (function ($, _, Helpers, maths) {
             } else {
                 _game_options[option2].push(option3);
             }
+        } else if (option1 == 'set_game_option') {
+            _game_options[option2] = option3;
         } else if (option1 == 'get_game_options') {
             return _game_options;
         } else if (option1 == 'get_game_option_category') {
@@ -72,12 +74,17 @@ var Civvies = (function ($, _, Helpers, maths) {
 
         if (!game.data.gui_drawn && game._private_functions.buildInitialDisplay) {
             var game_was_loaded = game._private_functions.load(game, 'localStorage');
+            game._private_functions.buildInitialData(game);
             if (!game_was_loaded) {
-                game._private_functions.buildInitialData(game);
                 game._private_functions.buildInitialDisplay(game);
             }
             game.data.gui_drawn = true;
         }
+
+        //Run all functions added by plugins
+        _.each(game.game_options.functions_on_setup, function(func){
+            func(game);
+        });
 
         //Begin Game Simulation
         game.start(game_options);

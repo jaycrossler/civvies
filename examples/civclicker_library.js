@@ -2,10 +2,11 @@ var options = {
     rand_seed: Helpers.randInt(100000)
 };
 
+var game;
 $(function () {
 
     console.log("Create a Civvies game");
-    var game = new Civvies(options);
+    game = new Civvies(options);
     game.log(true); //Show basic log to console
 
 

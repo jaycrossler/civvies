@@ -9,7 +9,7 @@ function redraw_ui_controls (game) {
 //--Build some specialized upgrades-------------
 var upgrades = [
     {name: "deity", type: 'deity', costs: {piety: 1000}, special: "choose deity", upgrades:{responsibility:true, writing: true}},
-//  TODO: Figure out how to use this - maybe a variable?
+//  TODO: Figure out how to use type of deity - maybe a variable that can be chosen between options?
 //  {name:"deityType"},
 
     {name: "lure", type: 'deity', costs: {piety: 1000}, upgrades:{deity:true}},
@@ -26,6 +26,15 @@ var upgrades = [
     {name: "secrets", type: 'deity', costs: {piety: 5000}, upgrades:{deity:true}}
 ];
 new Civvies('add_game_option', 'upgrades', upgrades);
+
+
+var buildings = [
+    {name: 'battleAltar', title: "Battle Altar", type: 'altar', costs: {devotion: 1, stone: 200, metal: 50, piety: 200}, upgrades:{deity:true}},
+    {name: 'fieldsAltar', title: "Fields Altar", type: 'altar', costs: {devotion: 1, food: 500, wood: 500, stone: 200, piety: 200}, upgrades:{deity:true}},
+    {name: 'underworldAltar', title: "Underworld Altar", type: 'altar', costs: {devotion: 1, stone: 200, piety: 200, corpses: 1}, upgrades:{deity:true}},
+    {name: 'catAltar', title: "Cat Altar", type: 'altar', costs: {devotion: 1, herbs: 100, stone: 200, piety: 200}, upgrades:{deity:true}}
+];
+new Civvies('add_game_option', 'buildings', buildings);
 
 
 //--Build a workflow that will show on a custom pane-------------

@@ -19,27 +19,30 @@
     _c.buildInitialData = function (game) {
         game.data = game.data || {};
 
-        //TODO: Check that some upgrades aren't being written to workflows, savedgame data seems to show they are
-
-        var arrays_to_data_objects = 'resources,buildings,populations,variables,upgrades,achievements'.split(',');
+        var arrays_to_data_objects = game.game_options.arrays_to_map_to_objects || [];
         _.each(arrays_to_data_objects, function (game_options_name) {
             //Add objects for each game_objects array to the game data
             game.data[game_options_name] = game.data[game_options_name] || {};
             _.each(game.game_options[game_options_name], function (item) {
-                game.data[game_options_name][item.name] = item.initial || 0;
+                game.data[game_options_name][item.name] = game.data[game_options_name][item.name] || item.initial || 0;
             });
         });
 
-        var arrays_to_array_objects = 'land,workflows'.split(',');
+        var arrays_to_array_objects = game.game_options.arrays_to_map_to_arrays || [];
         _.each(arrays_to_array_objects, function (game_options_name) {
             //Add an array for game_objects to the game data
-            game.data[game_options_name] = game.data[game_options_name] || [];
-            _.each(game.game_options[game_options_name], function (item) {
-                game.data[game_options_name].push(JSON.parse(JSON.stringify(item)));
-            });
+            if (game.data[game_options_name] !== undefined) {
+                //Already exists, don't add it
+            } else {
+                game.data[game_options_name] = game.data[game_options_name] || [];
+                _.each(game.game_options[game_options_name], function (item) {
+                    game.data[game_options_name].push(JSON.parse(JSON.stringify(item)));
+                });
+            }
         });
 
-        game.data.rand_seed = game.game_options.rand_seed;
+        game.data.rand_seed = game.data.rand_seed || game.game_options.rand_seed;
+        game.data.tick_count = game.data.tick_count || 0;
     };
     _c.info = function (game, kind, name, sub_var, if_not_listed) {
         //Usage:  var info = _c.info(game, 'buildings', resource.name);
