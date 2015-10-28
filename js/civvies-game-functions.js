@@ -366,6 +366,26 @@
                 eaters += game.data.populations[key];
             }
         }
+        //TODO: Move this into the conquest plugin?
+        //Count population and eaters in army
+        if (game.data.armies) {
+            _.each(game.data.armies, function(army){
+                for (var key in army) {
+                    if (key != 'name') {
+                        var valid_person = (game.data.populations[key] !== undefined);
+
+                        if (valid_person) {
+                            people += army[key];
+
+                            if (!_c.info(game, 'populations', key, 'doesnt_consume_food', false)) {
+                                eaters += army[key];
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
         pop.current = people;
         pop.current_that_eats = eaters;
 
@@ -456,7 +476,7 @@
                     if ((current + times) >= 0) assignable = true;
                 }
             }
-            if (assignable && !job.doesnt_require_office) {
+            if (assignable && !job.doesnt_require_building) {
                 //Check through buildings
                 var offices_total = 0;
                 _.each(game.game_options.buildings, function (building) {
@@ -545,26 +565,47 @@
             }
         }
     };
-    _c.calculate_increment_costs = function (game) {
+    _c.rate_of_job_from_resource = function (game, job, resource, amount) {
+        var rate = 0;
+        if (amount && job.produces && job.produces[resource.name]) {
+            var rate_per = job.produces[resource.name];
+            if (_.isString(rate_per)) rate_per = game.data.variables[rate_per];
+            rate += (rate_per * amount);
+        }
+
+        if (amount && job.consumes && job.consumes[resource.name]) {
+            var rate_less = job.consumes[resource.name];
+            if (_.isString(rate_less)) rate_less = game.data.variables[rate_less];
+            rate -= (rate_less * amount);
+        }
+        return rate;
+    };
+    _c.calculate_resource_rates = function (game) {
         var increments = {};
         _.each(game.game_options.resources, function (resource) {
             if (resource.grouping == 1) {
                 var rate = 0;
                 //How much is being produced and consumed
                 _.each(game.game_options.populations, function (job) {
-                    var amount = game.data.populations[job.name];
-                    if (amount && job.produces && job.produces[resource.name]) {
-                        var rate_per = job.produces[resource.name];
-                        if (_.isString(rate_per)) rate_per = game.data.variables[rate_per];
-                        rate += (rate_per * amount);
-                    }
-
-                    if (amount && job.consumes && job.consumes[resource.name]) {
-                        var rate_less = job.consumes[resource.name];
-                        if (_.isString(rate_less)) rate_less = game.data.variables[rate_less];
-                        rate -= (rate_less * amount);
-                    }
+                    rate += _c.rate_of_job_from_resource(game, job, resource, game.data.populations[job.name]);
                 });
+                //TODO: Move to conquest plugin?
+
+                //Also count consumbales from armies
+                if (game.data.armies) {
+                    _.each(game.data.armies, function(army){
+                        for (var key in army) {
+                            if (key != 'name') {
+                                var job = _c.info(game, 'populations', key);
+
+                                if (job !== undefined) {
+                                    rate += _c.rate_of_job_from_resource(game, job, resource, army[key]);
+                                }
+                            }
+                        }
+                    });
+                }
+
                 if (resource.name == 'food') {
                     var population = _c.population(game);
                     rate -= population.current_that_eats;

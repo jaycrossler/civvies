@@ -104,7 +104,7 @@
     }
 
     function update_resources(game) {
-        var rates = _c.calculate_increment_costs(game);
+        var rates = _c.calculate_resource_rates(game);
         _.each(game.game_options.resources, function (resource) {
             if (resource.$holder) {
                 var res_data = game.data.resources[resource.name];

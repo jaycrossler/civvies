@@ -55,9 +55,9 @@
             {name: 'unemployed', title: 'Unemployed Worker', type: 'basic', notes: "Unassigned Workers that eat up food", unassignable: true, cull_order: 2, doesnt_consume_food:true},
             {name: 'sick', type: 'basic', notes: "Sick workers that need medical help", unassignable: true, cull_order: 1},
 
-            {name: 'farmers', type: 'basic', produces: {food: "farmers"}, doesnt_require_office: true, cull_order: 10},
-            {name: 'woodcutters', type: 'basic', produces: {wood: "woodcutters"}, doesnt_require_office: true, cull_order: 9},
-            {name: 'miners', type: 'basic', produces: {stone: "miners"}, doesnt_require_office: true},
+            {name: 'farmers', type: 'basic', produces: {food: "farmers"}, doesnt_require_building: true, cull_order: 10},
+            {name: 'woodcutters', type: 'basic', produces: {wood: "woodcutters"}, doesnt_require_building: true, cull_order: 9},
+            {name: 'miners', type: 'basic', produces: {stone: "miners"}, doesnt_require_building: true},
 
             {name: 'tanners', type: 'medieval', consumes: {skins: 1}, produces: {leather: "tanners"}},
             {name: 'blacksmiths', type: 'medieval', consumes: {ore: 1}, produces: {metal: "blacksmiths"}},
