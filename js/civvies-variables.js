@@ -145,7 +145,6 @@
             {name: "cat", title: "Cat!"},
             {name: "glaring"},
             {name: "clowder"},
-            {name: "battle"},
             {name: "cats"},
             {name: "fields"},
             {name: "underworld"},

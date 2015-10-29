@@ -92,7 +92,7 @@ var Civvies = (function ($, _, Helpers, maths) {
         //Log timing information
         var timing_end = window.performance.now();
         var time_elapsed = (timing_end - timing_start);
-        game.timing_log.push({name: "build-elapsed", elapsed: time_elapsed, times_redrawn: game.times_game_drawn});
+        game.timing_log.push({name: "Game UI built", elapsed: time_elapsed, times_redrawn: game.times_game_drawn});
     };
 
     //-----------------------------
