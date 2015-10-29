@@ -1,7 +1,5 @@
 (function (Civvies) {
 
-    //TODO: City honorific not updating
-
     var $pointers = {};
 
     var purchase_multiples = [1, 10, 100, 1000];
@@ -952,6 +950,7 @@
         update_building_buttons(game);
         update_population_data(game);
         update_jobs_list(game);
+        _c.redraw_city_honorific(game);
 
         _.each($pointers.panes, function(pane){
             if (pane.show_upgrades) {

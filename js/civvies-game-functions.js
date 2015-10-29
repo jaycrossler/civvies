@@ -422,18 +422,24 @@
     };
     _c.update_highest_population = function (game, current) {
         game.data.variables.highest_population = current;
+        var city_type = _c.redraw_city_honorific(game);
+        game.data.achievements[city_type] = true;
+    };
 
+    _c.redraw_city_honorific = function (game) {
+        var current = game.data.variables.highest_population || 1;
         var city_type = 'Thorp';
         _.each(game.game_options.land_names, function (land_name) {
             if (current >= land_name.population_min) {
                 city_type = land_name.name;
             }
         });
-        game.data.achievements[city_type] = true;
         game.data.variables.land_name = _.str.titleize(city_type.title || city_type);
 
         $('#civType')
             .text(game.data.variables.land_name);
+
+        return city_type;
     };
     _c.worker_food_cost = function (game, times) {
         var initial_cost = _c.info(game, 'variables', 'foodCostInitial', 'value', 20);
