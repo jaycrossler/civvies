@@ -728,8 +728,13 @@
         });
     }
 
-    function select_workflow_pane(pane_selected) {
+    function select_workflow_pane(game, pane_selected) {
         //Called when user switches between the various panes on the left hand side of the interface
+
+        if (_.isString(pane_selected)) {
+            pane_selected = $pointers.panes[pane_selected];
+        }
+        game.data.last_pane_selected = pane_selected.name;
 
         _.each($pointers.panes, function(pane){
             if (pane == pane_selected) {
@@ -870,23 +875,24 @@
         $pointers.panes = {};
 
         //---Buildings----
-        $pointers.panes.buildings = {};
+        $pointers.panes.buildings = {name:'buildings'};
         $pointers.panes.buildings.title = $('<div>')
             .text('Buildings')
-            .addClass('paneSelector selected')
-            .on('click', function(){select_workflow_pane($pointers.panes.buildings)})
+            .addClass('paneSelector')
+            .on('click', function(){select_workflow_pane(game, $pointers.panes.buildings)})
             .appendTo($titles);
         $pointers.panes.buildings.content = $('<div>')
+            .hide()
             .appendTo($content);
         show_building_buttons(game, $pointers.panes.buildings.content);
 
         //---Basic Upgrades----
-        $pointers.panes.upgrades = {};
+        $pointers.panes.upgrades = {name:'upgrades'};
         $pointers.panes.upgrades.show_upgrades = true;
         $pointers.panes.upgrades.title = $('<div>')
             .text('Upgrades')
             .addClass('paneSelector')
-            .on('click', function(){select_workflow_pane($pointers.panes.upgrades)})
+            .on('click', function(){select_workflow_pane(game, $pointers.panes.upgrades)})
             .appendTo($titles);
         $pointers.panes.upgrades.content = $('<div>')
             .hide()
@@ -900,13 +906,13 @@
         });
         _.each(panes, function (workflow) {
             var name = workflow.name;
-            $pointers.panes[name] = {};
+            $pointers.panes[name] = {name: name};
             $pointers.panes[name].show_upgrades = true;
             $pointers.panes[name].workflow = workflow;
             $pointers.panes[name].title = $('<div>')
                 .text(_.str.titleize(workflow.title || workflow.name))
                 .addClass('paneSelector')
-                .on('click', function(){select_workflow_pane($pointers.panes[name])})
+                .on('click', function(){select_workflow_pane(game, $pointers.panes[name])})
                 .appendTo($titles);
             $pointers.panes[name].content = $('<div>')
                 .hide()
@@ -919,12 +925,16 @@
         $pointers.panes.stats.title = $('<div>')
             .text('Settings')
             .addClass('paneSelector')
-            .on('click', function(){select_workflow_pane($pointers.panes.stats)})
+            .on('click', function(){select_workflow_pane(game, $pointers.panes.stats)})
             .appendTo($titles);
         $pointers.panes.stats.content = $('<div>')
             .hide()
             .appendTo($content);
         show_settings(game, $pointers.panes.stats.content);
+
+
+        game.data.last_pane_selected = game.data.last_pane_selected || 'buildings';
+        select_workflow_pane(game, game.data.last_pane_selected);
 
         $('<br>')
             .appendTo($titles);
