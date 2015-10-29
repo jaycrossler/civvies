@@ -1,5 +1,5 @@
 //--Add special resource
-var resource = {name: 'wonder', grouping: 3, image: '../images/civclicker/piety.png', notes: "Created by Labourers working on a Wonder"};
+var resource = {name: 'wonder', grouping: 3, image: '../images/civclicker/piety.png', notes: "Created by Labourers working on a Wonder", dont_capture:true};
 new Civvies('add_game_option', 'resources', resource);
 
 //--Build a workflow that will show on a custom pane-------------

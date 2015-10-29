@@ -5,7 +5,6 @@ var $pointers_conquest = {forces: [], lands: []};
 //TODO: Save game after each battle round
 //TODO: Move much of this to main so that it's extensible
 //TODO: Allow multiple armies
-//TODO: Don't capture corpses or zombies
 
 
 _c.assign_to_army = function (game, job, amount, army_id) {
@@ -30,6 +29,8 @@ _c.attack_with_army = function (game, army_id, land_name, options, func_finish) 
     var enemy = enemy_from_land_name(game, land_name, true);
 
     var battle = {player_state: 'attacker', in_progress: true, started: game.data.tick_count, defender: enemy, attacker: game.data.armies[army_id], options: {}, func_finish: func_finish, tie_after_ticks: 20};
+
+    battle.attacker.id = army_id;
 
     battle.attacker_size_initial = army_size(game, battle.attacker);
     battle.defender_size_initial = army_size(game, battle.defender);
@@ -71,27 +72,33 @@ function enemy_from_land_name(game, land_name, is_defensive) {
         economy: economy, land_size: Math.round(Math.sqrt(land_name.population_min))};
 }
 function calculate_reward(game, battle) {
-    var economoy = battle.defender.economy / 2;
+    var economoy = battle.defender.economy / 4;
     var chest = {resources: {food: Math.round(economoy * 10)}, buildings: {}, populations: {}, upgrades: {}};
 
     var treasure_options = [];
     var last_resource = game.game_options.resources.length;
     var i;
-    for (i = 0; i < 5; i++) {
-        _.each(game.game_options.resources, function (resource, i) {
+
+    var resources = _.filter(game.game_options.resources, function(res){return !res.dont_capture});
+    var populations = _.filter(game.game_options.populations, function(res){return !res.dont_capture});
+    var buildings = _.filter(game.game_options.buildings, function(res){return !res.dont_capture});
+    var upgrades = _.filter(game.game_options.upgrades, function(res){return !res.dont_capture});
+
+    for (i = 0; i < 8; i++) {
+        _.each(resources, function (resource, i) {
             treasure_options.push({type: 'resources', name: resource, amount: economoy * (last_resource - i)});
         });
     }
-    for (i = 0; i < 3; i++) {
-        _.each(game.game_options.populations, function (resource) {
+    for (i = 0; i < 2; i++) {
+        _.each(populations, function (resource) {
             treasure_options.push({type: 'populations', name: resource, amount: economoy / 5});
         });
     }
-    _.each(game.game_options.populations, function (resource) {
+    _.each(buildings, function (resource) {
         treasure_options.push({type: 'buildings', name: resource, amount: economoy / 10});
     });
     if (economoy > 3000) {
-        _.each(game.game_options.upgrades, function (resource) {
+        _.each(upgrades, function (resource) {
             treasure_options.push({type: 'upgrades', name: resource, amount: 1});
         });
     }
@@ -306,7 +313,7 @@ function battle_result_details(game, battle_result) {
 function open_battle_chest(game, rewards, $holder) {
 
     var loot = [];
-    for (var key_c in rewards) {
+    _.each(['buildings', 'populations', 'resources', 'upgrades'], function(key_c) {
         var category = rewards[key_c];
 
         for (var key_i in category) {
@@ -320,7 +327,7 @@ function open_battle_chest(game, rewards, $holder) {
                 game.data[key_c][key_i] += count;
             }
         }
-    }
+    });
 
     if (rewards.land) {
         loot.push("Gained " + rewards.land.size + " land!")
@@ -337,6 +344,7 @@ function open_battle_chest(game, rewards, $holder) {
     if (game.data.populations.cats) {
         game.data.achievements.cat = true;
     }
+    game.data.achievements.raider = true;
 
     $holder
         .html(msg);
@@ -353,77 +361,89 @@ function build_ui_controls(game) {
     var $holder = $('<div>');
     $('<hr>').appendTo($holder);
 
-    $('<div>')
-        .text('Your Army')
-        .css({fontWeight: 'bold'})
-        .popover({title: "Build up an invading armed force", content: "Transfer soldiers and cavalry between your city and your army.", trigger: 'hover', placement: 'bottom'})
-        .appendTo($holder);
+    _.each(game.data.armies, function(army, army_id){
 
-    _.each(game.game_options.populations, function (job) {
-        if (job.can_join_army) {
-            var army = game.data.armies[army_id_to_assign_to] || {};
+        $pointers_conquest.armies = $pointers_conquest.armies || [];
+        $pointers_conquest.armies[army_id] = $pointers_conquest.armies[army_id] || {};
+        $pointers_conquest.armies[army_id].army_holder = $('<div>')
+            .css({fontWeight: 'bold'})
+            .popover({title: "Build up an invading armed force", content: "Transfer soldiers and cavalry between your city and your army.", trigger: 'hover', placement: 'bottom'})
+            .appendTo($holder);
 
-            army[job.name] = army[job.name] || 0;
-            $pointers_conquest.forces[job.name] = $pointers_conquest.forces[job.name] || {};
+        $pointers_conquest.armies[army_id].army_name =$('<span>')
+            .text(army.name || 'Your Army')
+            .appendTo($pointers_conquest.armies[army_id].army_holder);
 
-            var amount = army[job.name];//game.data.populations[job.name];
-            var $unit = $('<div>')
-                .appendTo($holder);
+        $pointers_conquest.armies[army_id].army_note = $('<span>')
+            .text('')
+            .css({fontWeight:'normal'})
+            .appendTo($pointers_conquest.armies[army_id].army_holder);
 
-            $pointers_conquest.forces[job.name].remove10 = $('<button>')
-                .text('-10')
-                .popover({title: "Remove 10 from army", content: "Remove 10 " + job.name, trigger: 'hover', placement: 'bottom'})
-                .prop({disabled: true})
-                .addClass('multiplier')
-                .on('click', function () {
-                    _c.assign_to_army(game, job, -10, army_id_to_assign_to);
-                    _c.redraw_data(game);
-                })
-                .appendTo($unit);
-            $pointers_conquest.forces[job.name].remove1 = $('<button>')
-                .text('-1')
-                .popover({title: "Remove 1 from army", content: "Remove 1 " + job.name, trigger: 'hover', placement: 'bottom'})
-                .prop({disabled: true})
-                .addClass('multiplier')
-                .on('click', function () {
-                    _c.assign_to_army(game, job, -1, army_id_to_assign_to);
-                    _c.redraw_data(game);
-                })
-                .appendTo($unit);
+        _.each(game.game_options.populations, function (job) {
+            if (job.can_join_army) {
 
-            var $div = $('<div>')
-                .css({width: '120px', display: 'inline-block', textAlign: 'center'})
-                .appendTo($unit);
+                army[job.name] = army[job.name] || 0;
+                $pointers_conquest.forces[job.name] = $pointers_conquest.forces[job.name] || {};
 
-            $('<span>')
-                .text(_.str.titleize(job.title || job.name) + ": ")
-                .appendTo($div);
-            $pointers_conquest.forces[job.name].number = $('<span>')
-                .text(amount)
-                .addClass('number')
-                .appendTo($div);
+                var amount = army[job.name];//game.data.populations[job.name];
+                var $unit = $('<div>')
+                    .appendTo($holder);
 
-            $pointers_conquest.forces[job.name].add1 = $('<button>')
-                .text('+1')
-                .popover({title: "Add 1 to army", content: "Add 1 " + job.name, trigger: 'hover', placement: 'bottom'})
-                .prop({disabled: true})
-                .addClass('multiplier')
-                .on('click', function () {
-                    _c.assign_to_army(game, job, 1, army_id_to_assign_to);
-                    _c.redraw_data(game);
-                })
-                .appendTo($unit);
-            $pointers_conquest.forces[job.name].add10 = $('<button>')
-                .text('+10')
-                .popover({title: "Add 10 to army", content: "Add 10 " + job.name, trigger: 'hover', placement: 'bottom'})
-                .prop({disabled: true})
-                .addClass('multiplier')
-                .on('click', function () {
-                    _c.assign_to_army(game, job, 10, army_id_to_assign_to);
-                    _c.redraw_data(game);
-                })
-                .appendTo($unit);
-        }
+                $pointers_conquest.forces[job.name].remove10 = $('<button>')
+                    .text('-10')
+                    .popover({title: "Remove 10 from army", content: "Remove 10 " + job.name, trigger: 'hover', placement: 'bottom'})
+                    .prop({disabled: true})
+                    .addClass('multiplier')
+                    .on('click', function () {
+                        _c.assign_to_army(game, job, -10, army_id_to_assign_to);
+                        _c.redraw_data(game);
+                    })
+                    .appendTo($unit);
+                $pointers_conquest.forces[job.name].remove1 = $('<button>')
+                    .text('-1')
+                    .popover({title: "Remove 1 from army", content: "Remove 1 " + job.name, trigger: 'hover', placement: 'bottom'})
+                    .prop({disabled: true})
+                    .addClass('multiplier')
+                    .on('click', function () {
+                        _c.assign_to_army(game, job, -1, army_id_to_assign_to);
+                        _c.redraw_data(game);
+                    })
+                    .appendTo($unit);
+
+                var $div = $('<div>')
+                    .css({width: '120px', display: 'inline-block', textAlign: 'center'})
+                    .appendTo($unit);
+
+                $('<span>')
+                    .text(_.str.titleize(job.title || job.name) + ": ")
+                    .appendTo($div);
+                $pointers_conquest.forces[job.name].number = $('<span>')
+                    .text(amount)
+                    .addClass('number')
+                    .appendTo($div);
+
+                $pointers_conquest.forces[job.name].add1 = $('<button>')
+                    .text('+1')
+                    .popover({title: "Add 1 to army", content: "Add 1 " + job.name, trigger: 'hover', placement: 'bottom'})
+                    .prop({disabled: true})
+                    .addClass('multiplier')
+                    .on('click', function () {
+                        _c.assign_to_army(game, job, 1, army_id_to_assign_to);
+                        _c.redraw_data(game);
+                    })
+                    .appendTo($unit);
+                $pointers_conquest.forces[job.name].add10 = $('<button>')
+                    .text('+10')
+                    .popover({title: "Add 10 to army", content: "Add 10 " + job.name, trigger: 'hover', placement: 'bottom'})
+                    .prop({disabled: true})
+                    .addClass('multiplier')
+                    .on('click', function () {
+                        _c.assign_to_army(game, job, 10, army_id_to_assign_to);
+                        _c.redraw_data(game);
+                    })
+                    .appendTo($unit);
+            }
+        });
     });
 
     $('<hr>').appendTo($holder);
@@ -541,6 +561,33 @@ function redraw_ui_controls(game) {
         }
     });
 
+
+    _.each(game.data.armies, function(army, army_id) {
+        $pointers_conquest.armies[army_id].army_name.text(army.name || "Your Army");
+
+        var note_text = '';
+        var active_battle = _.find(game.data.battles, function (battle) {
+            return battle.in_progress && battle.attacker.id == army_id;
+        });
+
+        var army_count = army_size(game, army);
+        if (active_battle && active_battle.attacker) {
+            var last_round = _.last(active_battle.history);
+            if (last_round && last_round.time) {
+                var current_count = army_size(game, active_battle.attacker);
+                army_count = active_battle.attacker_size_initial;
+                var round = last_round.time - active_battle.started;
+                note_text = " (Attacking, casualties: " + current_count + " of " + army_count + ", round: " + round + ")";
+            }
+        } else {
+            note_text = " (size: "+army_count+")";
+        }
+
+
+        $pointers_conquest.armies[army_id].army_note.text(note_text);
+    });
+
+    //TODO: Support multiple armies
     var army = game.data.armies[army_id_to_assign_to];
     var army_count = army_size(game, army);
     _.each(game.game_options.land_names, function (land_name) {
@@ -584,7 +631,7 @@ new Civvies('add_game_option', 'populations', jobs);
 
 //Add a new set of variables to track armies
 new Civvies('set_game_option', 'armies', [
-    {name: 'home army'}
+    {name: 'Your army'}
 ]);
 new Civvies('set_game_option', 'battles', []);
 new Civvies('add_game_option', 'arrays_to_map_to_arrays', ['armies', 'battles']);

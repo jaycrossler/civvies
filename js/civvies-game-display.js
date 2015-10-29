@@ -1,5 +1,7 @@
 (function (Civvies) {
 
+    //TODO: City honorific not updating
+
     var $pointers = {};
 
     var purchase_multiples = [1, 10, 100, 1000];
@@ -187,14 +189,16 @@
                     })
                     .appendTo($td1);
             });
-            $('<td>')//TODO: UI: These aren't aligning properly, replace with divs
+            $('<span>')
                 .text(Helpers.pluralize(name) + ": ")
-                .appendTo($tr);
-            building.$holder = $('<td>')
+                .css({fontSize:'.8em'})
+                .appendTo($td1);
+            building.$holder = $('<span>')
                 .addClass('number')
+                .css({fontSize:'.8em'})
                 .attr('id', 'building-' + building.name)
                 .text(amount)
-                .appendTo($tr);
+                .appendTo($td1);
 
             building.$display = $tr;
         });

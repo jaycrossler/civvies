@@ -25,10 +25,10 @@
             {name: 'leather', grouping: 2, image: '../images/civclicker/leather.png', notes: "Created from Skins by Tanners working in a Tannery"},
             {name: 'metal', grouping: 2, image: '../images/civclicker/metal.png', notes: "Created from Ore by Blacksmiths working in a Smithy"},
 
-            {name: 'piety', grouping: 2, image: '../images/civclicker/piety.png', notes: "Created by Clerics working in a Temple"},
-            {name: 'corpses', grouping: 2, image: '../images/civclicker/piety.png', notes: "Created when towns people die from starvation or fighting"},
+            {name: 'piety', grouping: 2, image: '../images/civclicker/piety.png', notes: "Created by Clerics working in a Temple", dont_capture:true},
+            {name: 'corpses', grouping: 2, image: '../images/civclicker/piety.png', notes: "Created when towns people die from starvation or fighting", dont_capture:true},
 
-            {name: 'healing', grouping: 3, image: '../images/civclicker/piety.png', notes: "Created by Clerics and Apothecaries"}
+            {name: 'healing', grouping: 3, image: '../images/civclicker/piety.png', notes: "Created by Clerics and Apothecaries", dont_capture:true}
         ],
         buildings: [
             {name: 'cave', type: 'home', costs: {wood: 2, food:1, stone:1}, population_supports: 1, initial: 1, land_size:0},
@@ -157,7 +157,7 @@
             {name: "neverclick", title: "Never Click"}
         ],
         land: [
-            {name:'homeland', size:1000}
+            {name:'homeland', size:300}
         ],
         enemies: [
             {name: 'wolves', humans:false, technology:'none', warfare:'medium', strength:'low', size_min:4, size_max:40, siege_weapons:false, scouts:false},
