@@ -3,9 +3,9 @@ var army_id_to_assign_to = 0;
 
 var $pointers_conquest = {forces: [], lands: []};
 //TODO: Save game after each battle round
-//TODO: Show more battle status
 //TODO: Move much of this to main so that it's extensible
 //TODO: Allow multiple armies
+//TODO: Don't capture corpses or zombies
 
 
 _c.assign_to_army = function (game, job, amount, army_id) {
@@ -44,6 +44,8 @@ function enemy_from_land_name(game, land_name, is_defensive) {
     var name = _.str.titleize(land_name.title || land_name.name);
     name += (is_defensive) ? ' defensive forces' : ' invading army';
 
+    //TODO: Have a random name or area name for enemy
+
     var min = (land_name.population_min / 20) * .9;
     var max = min * 10;
 
@@ -61,11 +63,52 @@ function enemy_from_land_name(game, land_name, is_defensive) {
     var cavalry = resistance * cavalry_pct;
     var siege = resistance * siege_pct;
 
-    return {name: name, soldiers: Math.round(soldiers), cavalry: Math.round(cavalry), siege: Math.round(siege)};
+    var fortification = (resistance * .01 * _c.random(game.game_options));
+
+    var economy = (fortification * 10) + (siege_pct * 6) + (cavalry * 3) + soldiers;
+
+    return {land_name: land_name.name, name: name, soldiers: Math.round(soldiers), cavalry: Math.round(cavalry), siege: Math.round(siege), fortification: Math.round(fortification),
+        economy: economy, land_size: Math.round(Math.sqrt(land_name.population_min))};
 }
 function calculate_reward(game, battle) {
-    //TODO: Make this random
-    return {resources: {food: 100, wood: 100, gold: 1}, buildings: {barn: 1, woodstock: 1, stonestock: 1}, populations: {farmers: 50, miners: 50}}
+    var economoy = battle.defender.economy / 2;
+    var chest = {resources: {food: Math.round(economoy * 10)}, buildings: {}, populations: {}, upgrades: {}};
+
+    var treasure_options = [];
+    var last_resource = game.game_options.resources.length;
+    var i;
+    for (i = 0; i < 5; i++) {
+        _.each(game.game_options.resources, function (resource, i) {
+            treasure_options.push({type: 'resources', name: resource, amount: economoy * (last_resource - i)});
+        });
+    }
+    for (i = 0; i < 3; i++) {
+        _.each(game.game_options.populations, function (resource) {
+            treasure_options.push({type: 'populations', name: resource, amount: economoy / 5});
+        });
+    }
+    _.each(game.game_options.populations, function (resource) {
+        treasure_options.push({type: 'buildings', name: resource, amount: economoy / 10});
+    });
+    if (economoy > 3000) {
+        _.each(game.game_options.upgrades, function (resource) {
+            treasure_options.push({type: 'upgrades', name: resource, amount: 1});
+        });
+    }
+
+    for (i = 0; i < economoy; i++) {
+        var rand_item = _c.randOption(treasure_options, game.game_options);
+        if (rand_item) {
+            chest[rand_item.type][rand_item.name.name] = chest[rand_item.type][rand_item.name.name] || 0;
+            chest[rand_item.type][rand_item.name.name] += rand_item.amount;
+        }
+    }
+
+    if (battle.defender.land_size) {
+        chest.land = {name: 'Conquered area from ' + battle.defender.name, size: battle.defender.land_size}
+    }
+
+    return chest;
 }
 
 function run_battle(game, battle) {
@@ -74,7 +117,7 @@ function run_battle(game, battle) {
     var battle_state = _.last(battle.history) || create_battle_state_from_battle(game, battle);
     battle_state = fight_using_battle_state(game, battle_state);
 
-    if (game.data.tick_count > battle.started + battle.tie_after_ticks) {
+    if (game.data.tick_count > (battle.started + battle.tie_after_ticks)) {
         //Battle timed out
         battle_state.victor = 'tie';
         battle_state.note = 'Time out as battle took too long.';
@@ -98,7 +141,6 @@ function run_battle(game, battle) {
             if (battle.attacker_size_initial > 500 && loses < (battle.attacker_size_initial * .2)) {
                 game.data.achievements.conquest = true;
             }
-
         }
 
         //Update the army's forces with casualties
@@ -124,6 +166,7 @@ function create_battle_state_from_battle(game, battle) {
 }
 function fight_using_battle_state(game, battle_state) {
     var state = _.clone(battle_state);
+    state.time = game.data.tick_count;
 
     //Calculate the amount of each force that hit an enemy
     //TODO: Modify by defender's technology and warfare levels, currently using player's variables
@@ -206,6 +249,9 @@ function fight_using_battle_state(game, battle_state) {
     });
     state.defender.fortification = Math.ceil(forces.defender.fortification.count);
 
+    state.attacker_count = army_size(game, state.attacker);
+    state.defender_count = army_size(game, state.defender);
+
     //Check for a victory
     state.victor = check_for_victor(game, state);
     return state;
@@ -213,9 +259,8 @@ function fight_using_battle_state(game, battle_state) {
 
 function check_for_victor(game, battle_state) {
     //If troops = 0, set victor
-    //if time > delay, set tie
-    var attacker_count = army_size(game, battle_state.attacker);
-    var defender_count = army_size(game, battle_state.defender);
+    var attacker_count = battle_state.attacker_count || 0;
+    var defender_count = battle_state.defender_count || 0;
     var victory_state = false;
 
     if ((attacker_count > 0) && (defender_count <= 0)) {
@@ -239,20 +284,67 @@ function run_battles_each_tick(game) {
 }
 function army_size(game, army) {
     var count = 0;
-    for (var key in army) {
-        if (key != 'name' && _.isNumber(army[key])) {
-            count += army[key];
+    _.each(['soldiers', 'cavalry', 'siege'], function (key) {
+        var num = army[key];
+        if (num && _.isNumber(num)) {
+            count += num;
         }
-    }
+    });
     return count;
 }
-function battle_result_details (game, battle_result){
- //TODO: Increase text
-    return "Awesome battle!"
+function battle_result_details(game, battle_result) {
+    //TODO: Increase text and details
+    var texts = [];
+    _.each(battle_result.history, function (state) {
+        var text = "Time [" + state.time + "]: Attackers: " + state.attacker_count + ", Defenders: " + state.defender_count + ". " + (state.note || '');
+
+        texts.push(text);
+    });
+
+    return "<span style='font-size: .8em'>" + texts.join("<br/>") + "</span>";
 }
-function open_battle_chest (game, rewards) {
-//TODO: Add spoils
-    console.log(rewards);
+function open_battle_chest(game, rewards, $holder) {
+
+    var loot = [];
+    for (var key_c in rewards) {
+        var category = rewards[key_c];
+
+        for (var key_i in category) {
+            var count = category[key_i];
+            count = Math.round(count);
+            if (count > 0) {
+                var text = Helpers.abbreviateNumber(count, true) + ' ' + Helpers.pluralize(key_i);
+                loot.push(text);
+
+                game.data[key_c][key_i] = game.data[key_c][key_i] || 0;
+                game.data[key_c][key_i] += count;
+            }
+        }
+    }
+
+    if (rewards.land) {
+        loot.push("Gained " + rewards.land.size + " land!")
+        game.data.land.push(rewards.land);
+    }
+
+    var msg = loot.join(",<br/>");
+    if (msg) {
+        msg = "Added to city:<br/>" + msg;
+    } else {
+        msg = "No treasure found";
+    }
+
+    if (game.data.populations.cats) {
+        game.data.achievements.cat = true;
+    }
+
+    $holder
+        .html(msg);
+    setTimeout(function () {
+        $holder
+            .hide("slow");
+    }, 8000);
+
 }
 function build_ui_controls(game) {
     //Return a $ object that will be added to a div on the corresponding pane
@@ -350,6 +442,7 @@ function build_ui_controls(game) {
 
         var func_finish = function (game, battle_result) {
             var $battle_result = $('<div>')
+                .css({padding: '10px', margin: '10px'})
                 .prependTo($pointers_conquest.battle_result_holder);
 
             if (battle_result.victor == 'attacker') {
@@ -370,20 +463,19 @@ function build_ui_controls(game) {
                     .css({backgroundColor: 'orange'});
             }
             var result_message = battle_result.victor == 'tie' ? 'Tie, no winner' : _.str.titleize(battle_result.victor) + ' wins!';
-            var result_details = battle_result_details (game, battle_result);
+            var result_details = battle_result_details(game, battle_result);
             $('<span>')
                 .text(result_message)
-                .popover({title:'Battle Results', content:result_details, trigger:'hover'})
-                .css({padding: '10px'})
+                .popover({title: 'Battle Results', content: result_details, trigger: 'hover', placement: 'top', html: true})
+                .css({padding: '10px', margin: '10px'})
                 .appendTo($battle_result);
 
             if (battle_result.reward) {
                 var $chest = $('<div>')
                     .text('Open Victory Chest!')
-                    .css({padding: '4px', backgroundColor:'brown', borderRadius:'4px', color:'gold', cursor:'pointer'})
-                    .on('click', function(){
-                        $chest.hide();
-                        open_battle_chest(game, battle_result.reward);
+                    .css({padding: '4px', backgroundColor: 'brown', borderRadius: '4px', color: 'gold', cursor: 'pointer'})
+                    .on('click', function () {
+                        open_battle_chest(game, battle_result.reward, $chest);
                     })
                     .appendTo($battle_result);
             }
@@ -458,12 +550,12 @@ function redraw_ui_controls(game) {
 
 //--Build some specialized upgrades-------------
 var upgrades = [
-    {name: "fighting", type: 'weaponry', costs: {wood: 200, food: 200, stone:100, metal:5, herbs:5}, variable_increase: {soldiers_accuracy: 0.01, cavalry_accuracy: 0.01}},
-    {name: "weaponry", type: 'weaponry', costs: {wood: 500, metal: 500}, variable_increase: {soldiers_accuracy: 0.01, cavalry_accuracy: 0.01, siege_accuracy:0.01}, upgrades: {fighting: true}},
+    {name: "fighting", type: 'weaponry', costs: {wood: 200, food: 200, stone: 100, metal: 5, herbs: 5}, variable_increase: {soldiers_accuracy: 0.01, cavalry_accuracy: 0.01}},
+    {name: "weaponry", type: 'weaponry', costs: {wood: 500, metal: 500}, variable_increase: {soldiers_accuracy: 0.01, cavalry_accuracy: 0.01, siege_accuracy: 0.01}, upgrades: {fighting: true}},
     {name: "shields", type: 'weaponry', costs: {wood: 500, leather: 500}, variable_increase: {soldiers_accuracy: 0.01, cavalry_accuracy: 0.01}, upgrades: {fighting: true}},
     {name: "horseback", type: 'weaponry', costs: {wood: 500, food: 500}, upgrades: {fighting: true}},
-    {name: "wheel", type: 'weaponry', costs: {wood: 500, stone: 500}, upgrades: {masonry: true, domestication: true}, variable_increase: {soldiers_accuracy: 0.01, siege_accuracy:0.02}},
-    {name: "standard", type: 'weaponry', title: "Battle Standard", costs: {leather: 1000, metal: 1000}, upgrades: {writing: true, weaponry: true, shields: true}, variable_increase: {soldiers_accuracy: 0.02, cavalry_accuracy: 0.02, siege_accuracy:0.02}}
+    {name: "wheel", type: 'weaponry', costs: {wood: 500, stone: 500}, upgrades: {masonry: true, domestication: true}, variable_increase: {soldiers_accuracy: 0.01, siege_accuracy: 0.02}},
+    {name: "standard", type: 'weaponry', title: "Battle Standard", costs: {leather: 1000, metal: 1000}, upgrades: {writing: true, weaponry: true, shields: true}, variable_increase: {soldiers_accuracy: 0.02, cavalry_accuracy: 0.02, siege_accuracy: 0.02}}
 ];
 new Civvies('add_game_option', 'upgrades', upgrades);
 
@@ -507,7 +599,6 @@ new Civvies('add_game_option', 'achievements', {name: "victor"});
 new Civvies('add_game_option', 'achievements', {name: "army"});
 new Civvies('add_game_option', 'achievements', {name: "conquest"});
 new Civvies('add_game_option', 'achievements', {name: "war"});
-
 
 
 //--Build a workflow that will show on a custom pane-------------

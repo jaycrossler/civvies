@@ -1,6 +1,6 @@
 //--Build some specialized upgrades-------------
 var jobs = [
-    {name: 'cats', type: 'mystical', cull_order: 11},  //TODO: What makes cats?
+    {name: 'cats', type: 'mystical', cull_order: 11},  //Cats can only be captured from invading others
     {name: 'zombies', type: 'mystical', costs: {corpses: 1}, doesnt_consume_food: true}
 ];
 new Civvies('add_game_option', 'populations', jobs);

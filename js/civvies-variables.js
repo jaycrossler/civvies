@@ -145,7 +145,6 @@
             {name: "cat", title: "Cat!"},
             {name: "glaring"},
             {name: "clowder"},
-            {name: "cats"},
             {name: "fields"},
             {name: "underworld"},
             {name: "fullHouse", title: "Full House"},
