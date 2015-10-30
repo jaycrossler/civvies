@@ -49,11 +49,13 @@
             {name: 'temple', type: 'business', costs: {wood: 30, stone: 120, herbs: 10}, supports: {clerics: 1, piety:2000, gold:5}, upgrades:{masonry:true}, land_size:2},
 
             {name: 'mill', type: 'upgrade', costs: {wood: 100, stone: 100}, options: {food_efficiency: .1}, upgrades: {wheel: true}, notes: "Improves Farming Efficiency"},
-            {name: 'graveyard', type: 'upgrade', costs: {wood: 50, stone: 200, herbs: 50}, options: {grave_spot: 100}, notes: "Increases Grave Plots", upgrades:{writing:true}} //TODO: Should graves be a resource?
+            {name: 'graveyard', type: 'upgrade', costs: {wood: 50, stone: 200, herbs: 50}, supports: {grave_spot: 100}, notes: "Increases Grave Plots", upgrades:{writing:true}}
         ],
         populations: [
-            {name: 'unemployed', title: 'Unemployed Worker', type: 'basic', notes: "Unassigned Workers that eat up food", unassignable: true, cull_order: 2, doesnt_consume_food:true},
-            {name: 'sick', type: 'basic', notes: "Sick workers that need medical help", unassignable: true, cull_order: 1},
+            {name: 'unemployed', title: 'Unemployed Worker', type: 'basic', notes: "Unassigned Workers that eat up food", unassignable: true, cull_order: 3, doesnt_consume_food:true},
+            {name: 'sick', type: 'basic', consumes: {food: 1}, notes: "Sick workers that need medical help and eat a large amount", unassignable: true, cull_order: 2},
+            {name: 'ill', type: 'basic', consumes: {food: 1}, notes: "Ill workers that are very sick", unassignable: true, cull_order: 1},
+            {name: 'dying', type: 'basic', consumes: {food: 1}, notes: "Workers that are almost dying", unassignable: true, cull_order: 1},
 
             {name: 'farmers', type: 'basic', produces: {food: "farmers"}, doesnt_require_building: true, cull_order: 10},
             {name: 'woodcutters', type: 'basic', produces: {wood: "woodcutters"}, doesnt_require_building: true, cull_order: 9},
@@ -61,8 +63,8 @@
 
             {name: 'tanners', type: 'medieval', consumes: {skins: 1}, produces: {leather: "tanners"}},
             {name: 'blacksmiths', type: 'medieval', consumes: {ore: 1}, produces: {metal: "blacksmiths"}},
-            {name: 'apothecaries', type: 'medieval', consumes: {herbs: 1}, supports: {healing: "apothecaries"}},
-            {name: 'clerics', type: 'medieval', consumes: {food: 2, herbs: 1}, supports: {healing: .1, burying: 5}, produces: {piety: "clerics"}, cull_order: 6},
+            {name: 'apothecaries', type: 'medieval', consumes: {herbs: 1}, produces: {healing: "apothecaries"}},
+            {name: 'clerics', type: 'medieval', consumes: {food: 2, herbs: 1}, supports: {healing: .1, burying: .2}, produces: {piety: "clerics"}, cull_order: 6},
             {name: 'labourers', type: 'medieval', consumes: {herbs: 10, leather: 10, metal: 10, piety: 10}, produces: {wonder: 1}, cull_order: 2}
         ],
         variables: [
@@ -79,7 +81,10 @@
             {name: "foodSpecialChance", initial: 0.02},
             {name: "woodSpecialChance", initial: 0.02},
             {name: "stoneSpecialChance", initial: 0.01},
-            {name: "foodCostInitial", initial: 20}
+            {name: "foodCostInitial", initial: 20},
+            {name: "gravesFilled", initial: 0},
+            {name: "diseaseCurrent", initial: 0.0001},
+            {name: "diseaseSteady", initial: 0.0001}
         ],
         upgrades: [
             {name: "skinning", type: 'stone age', costs: {skins: 10}},
@@ -142,7 +147,6 @@
             {name: "domination"},
             {name: "hated"},
             {name: "loved"},
-            {name: "cat", title: "Cat!"},
             {name: "glaring"},
             {name: "clowder"},
             {name: "fields"},

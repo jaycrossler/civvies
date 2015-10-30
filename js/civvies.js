@@ -124,7 +124,7 @@ var Civvies = (function ($, _, Helpers, maths) {
 
         this.timing_log.push(msg);
         if (showToConsole) {
-            console.log(msg);
+            console.log(JSON.stringify(msg));
         }
         if (this._private_functions.log_display) {
             this._private_functions.log_display(this);

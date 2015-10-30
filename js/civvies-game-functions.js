@@ -1,10 +1,7 @@
 //TODO: Mood
 //TODO: Trading - plugin
-//TODO: Fighting
 //TODO: Raiding
-//TODO: Burying dead
 //TODO: Raising dead
-
 
 (function (Civvies) {
     var _c = new Civvies('get_private_functions');
@@ -56,8 +53,12 @@
 
         return val;
     };
-    _c.variable = function (game, var_name) {
-        return game.data.variables[var_name];
+    _c.variable = function (game, var_name, set_to) {
+        if (set_to === undefined) {
+            return game.data.variables[var_name];
+        } else {
+            game.data.variables[var_name] = set_to;
+        }
     };
     _c.getResourceMax = function (game, resource) {
         var storage = _c.variable(game, 'storageInitial');
