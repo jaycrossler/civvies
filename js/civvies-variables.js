@@ -149,7 +149,6 @@
             {name: "fields"},
             {name: "underworld"},
             {name: "fullHouse", title: "Full House"},
-            {name: "plague", title: "Plagued"},
             {name: "ghostTown", title: "Ghost Town"},
             {name: "wonder"},
             {name: "seven"},
@@ -160,6 +159,7 @@
         land: [
             {name:'homeland', size:300}
         ],
+        //TODO: Move to attacks plugin
         enemies: [
             {name: 'wolves', humans:false, technology:'none', warfare:'medium', strength:'low', size_min:4, size_max:40, siege_weapons:false, scouts:false},
             {name: 'lions', humans:false, technology:'none', warfare:'medium', strength:'medium', size_min:4, size_max:40, siege_weapons:false, scouts:false},

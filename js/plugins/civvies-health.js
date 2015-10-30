@@ -56,6 +56,11 @@ function populations_possibly_get_sick(game) {
     //Healing loses efficiency by 1% every turn
     game.data.resources.healing = game.data.resources.healing || 0;
     game.data.resources.healing = Math.max((game.data.resources.healing - .1) * 0.99, 0);
+
+    if (current_disease_rate > .3) {
+        game.data.achievements.diseased = true;
+    }
+
 }
 function bury_the_dead(game) {
     var corpses = game.data.resources.corpses || 0;
@@ -94,6 +99,9 @@ var sick_people = [
 ];
 
 new Civvies('add_game_option', 'populations', sick_people);
+
+new Civvies('add_game_option', 'achievements', {name: "diseased"});
+new Civvies('add_game_option', 'achievements', {name: "plague"});
 
 new Civvies('add_game_option', 'functions_each_tick', populations_possibly_get_sick);
 new Civvies('add_game_option', 'functions_each_tick', bury_the_dead);

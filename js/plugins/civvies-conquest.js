@@ -622,6 +622,7 @@ function redraw_ui_controls(game) {
     });
 
 
+    var can_invade = true;
     _.each(game.data.armies, function(army, army_id) {
         $pointers_conquest.armies[army_id].army_name.text(army.name || "Your Army");
 
@@ -639,10 +640,10 @@ function redraw_ui_controls(game) {
                 var round = last_round.time - active_battle.started;
                 note_text = " (Attacking, casualties: " + current_count + " of " + army_count + ", round: " + round + ")";
             }
+            can_invade = false;
         } else {
             note_text = " (size: "+army_count+")";
         }
-
 
         $pointers_conquest.armies[army_id].army_note.text(note_text);
     });
@@ -650,7 +651,7 @@ function redraw_ui_controls(game) {
     var army = game.data.armies[army_id_to_assign_to];
     var army_count = army_size(game, army);
     _.each(game.game_options.land_names, function (land_name) {
-        $pointers_conquest.lands[land_name.name].button.prop('disabled', (army_count < 1));
+        $pointers_conquest.lands[land_name.name].button.prop('disabled', (army_count < 1) || !can_invade);
     });
 }
 
