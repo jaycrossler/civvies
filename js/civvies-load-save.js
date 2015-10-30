@@ -95,9 +95,9 @@
             game.logMessage('Saved game and exported to base64', true);
         }
         if (read_cookie(cookie_name) || localStorage.getItem(cookie_name)) {
-            console.log('Savegame exists');
+//            console.log('Savegame exists');
             if (saveType == 'auto') {
-                game.logMessage('Autosaved', true);
+                game.logMessage('Autosaved', false);
             } else if (saveType == 'manual') {
                 game.logMessage('Saved game manually', true);
             }

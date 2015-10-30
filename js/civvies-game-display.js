@@ -369,27 +369,29 @@
             .hide()
             .appendTo($pointers.jobs_list);
 
-        var $table = $('<table>')
+        var $table = $('<div>')
             .appendTo($pointers.jobs_list);
 
         var last_displayed_type = game.game_options.populations[0].type;
-        _.each(game.game_options.populations, function (job) {
+        var people_list = game.game_options.populations.sort(function(a, b) {return (b.cull_order || 5) - (a.cull_order || 5)});
+        _.each(people_list, function (job) {
             var name = _.str.titleize(job.title || job.name);
             var amount = game.data.populations[job.name];
 
-            if (job.type != last_displayed_type) {
-                $('<tr>')
-                    .css({height: '6px'})
-                    .appendTo($table);
-            }
+            //TODO: Maybe colorize or use icons for job types?
+//            if (job.type != last_displayed_type) {
+//                $('<div>')
+//                    .css({height: '6px'})
+//                    .appendTo($table);
+//            }
             last_displayed_type = job.type;
 
-            var $tr = $('<tr>')
+            var $tr = $('<div>')
+                .css({width:'inherit', textAlign:'center'})
                 .appendTo($table);
             if (!amount) $tr.hide();
 
-            var $td1 = $('<td>')
-                .appendTo($tr);
+
             _.each(assign_multiples, function (times) {
                 var times_text;
                 var use_button = false;
@@ -430,7 +432,7 @@
                                 _c.assign_workers(game, job, times);
                                 _c.redraw_data(game);
                             })
-                            .appendTo($td1);
+                            .appendTo($tr);
 
                         if (times == 1 || times == -1) {
                             $btn.show();
@@ -443,7 +445,7 @@
                         var $inner = $('<div>')
                             .addClass('multiplier_holder')
                             .popover({title: title, content: description, trigger: 'hover', placement: 'bottom', html: true})
-                            .appendTo($td1);
+                            .appendTo($tr);
                         $('<span>')
                             .text(times_text)
                             .appendTo($inner);

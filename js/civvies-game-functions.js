@@ -383,8 +383,8 @@
             });
         }
 
-        pop.current = people;
-        pop.current_that_eats = eaters;
+        pop.current = Math.round(people);
+        pop.current_that_eats = Math.round(eaters);
 
         var storage = 0;
         var building_count = 0;
@@ -399,8 +399,8 @@
             }
             building_count += (num_buildings * building_size);
         });
-        pop.land_current = building_count;
-        pop.max = storage;
+        pop.land_current = Math.round(building_count);
+        pop.max = Math.round(storage);
 
         var land_size = 0;
         _.each(game.data.land, function (land) {
@@ -408,11 +408,14 @@
                 land_size += land.size;
             }
         });
-        pop.land_max = land_size;
+        pop.land_max = Math.round(land_size);
 
         var highest_pop = game.data.variables.highest_population || 0;
         if (pop.current > highest_pop) {
             _c.update_highest_population(game, pop.current);
+        }
+        if (highest_pop > 1000 && pop.current < 1) {
+            game.data.achievements.ghostTown = true;
         }
 
         return pop;

@@ -53,9 +53,6 @@
         ],
         populations: [
             {name: 'unemployed', title: 'Unemployed Worker', type: 'basic', notes: "Unassigned Workers that eat up food", unassignable: true, cull_order: 3, doesnt_consume_food:true},
-            {name: 'sick', title: 'sick people', type: 'basic', consumes: {food: 1}, notes: "Sick workers that need medical help and eat a large amount", unassignable: true, cull_order: 2},
-            {name: 'ill', title:'ill people', type: 'basic', consumes: {food: 1}, notes: "Ill workers that are very sick", unassignable: true, cull_order: 1},
-            {name: 'dying', title: 'dying people', type: 'basic', consumes: {food: 1}, notes: "Workers that are almost dying", unassignable: true, cull_order: 1},
 
             {name: 'farmers', type: 'basic', produces: {food: "farmers"}, doesnt_require_building: true, cull_order: 10},
             {name: 'woodcutters', type: 'basic', produces: {wood: "woodcutters"}, doesnt_require_building: true, cull_order: 9},
