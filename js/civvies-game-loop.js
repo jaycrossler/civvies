@@ -200,7 +200,6 @@
 
         //TODO: Have a buffer so that food can be over the limit for the loop
         //TODO: Food seems to be eaten twice
-        //TODO: Herbs went over upper limit, check limits are always in effect on random rolls
 
 //        //Resource-related
         eat_food_or_die(game);

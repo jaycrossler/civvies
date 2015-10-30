@@ -42,8 +42,8 @@ _c.attack_with_army = function (game, army_id, land_name, options, func_finish) 
 };
 
 function enemy_from_land_name(game, land_name, is_defensive) {
-    var name = _.str.titleize(land_name.title || land_name.name);
-    name += (is_defensive) ? ' defensive forces' : ' invading army';
+    var nick_name = _.str.titleize(land_name.title || land_name.name);
+    var name = nick_name + (is_defensive) ? ' defensive forces' : ' invading army';
 
     //TODO: Have a random name or area name for enemy
 
@@ -68,12 +68,13 @@ function enemy_from_land_name(game, land_name, is_defensive) {
 
     var economy = (fortification * 10) + (siege_pct * 6) + (cavalry * 3) + soldiers;
 
-    return {land_name: land_name.name, name: name, soldiers: Math.round(soldiers), cavalry: Math.round(cavalry), siege: Math.round(siege), fortification: Math.round(fortification),
+    return {land_name: land_name.name, name: name, nick_name: nick_name,
+        soldiers: Math.round(soldiers), cavalry: Math.round(cavalry), siege: Math.round(siege), fortification: Math.round(fortification),
         economy: economy, land_size: Math.round(Math.sqrt(land_name.population_min))};
 }
 function calculate_reward(game, battle) {
-    var economoy = battle.defender.economy / 4;
-    var chest = {resources: {food: Math.round(economoy * 10)}, buildings: {}, populations: {}, upgrades: {}};
+    var economy = battle.defender.economy / 4;
+    var chest = {resources: {food: Math.round(economy * 10)}, buildings: {}, populations: {}, upgrades: {}};
 
     var treasure_options = [];
     var last_resource = game.game_options.resources.length;
@@ -82,28 +83,22 @@ function calculate_reward(game, battle) {
     var resources = _.filter(game.game_options.resources, function(res){return !res.dont_capture});
     var populations = _.filter(game.game_options.populations, function(res){return !res.dont_capture});
     var buildings = _.filter(game.game_options.buildings, function(res){return !res.dont_capture});
-    var upgrades = _.filter(game.game_options.upgrades, function(res){return !res.dont_capture});
 
     for (i = 0; i < 8; i++) {
         _.each(resources, function (resource, i) {
-            treasure_options.push({type: 'resources', name: resource, amount: economoy * (last_resource - i)});
+            treasure_options.push({type: 'resources', name: resource, amount: economy * (last_resource - i)});
         });
     }
     for (i = 0; i < 2; i++) {
         _.each(populations, function (resource) {
-            treasure_options.push({type: 'populations', name: resource, amount: economoy / 5});
+            treasure_options.push({type: 'populations', name: resource, amount: economy / 5});
         });
     }
     _.each(buildings, function (resource) {
-        treasure_options.push({type: 'buildings', name: resource, amount: economoy / 10});
+        treasure_options.push({type: 'buildings', name: resource, amount: economy / 10});
     });
-    if (economoy > 3000) {
-        _.each(upgrades, function (resource) {
-            treasure_options.push({type: 'upgrades', name: resource, amount: 1});
-        });
-    }
 
-    for (i = 0; i < economoy; i++) {
+    for (i = 0; i < economy; i++) {
         var rand_item = _c.randOption(treasure_options, game.game_options);
         if (rand_item) {
             chest[rand_item.type][rand_item.name.name] = chest[rand_item.type][rand_item.name.name] || 0;
@@ -112,10 +107,12 @@ function calculate_reward(game, battle) {
     }
 
     if (battle.defender.land_size) {
-        chest.land = {name: 'Conquered area from ' + battle.defender.name, size: battle.defender.land_size}
+        chest.land = {name: 'Conquered area from ' + battle.defender.name, size: battle.defender.land_size};
     }
+    chest.from = battle.defender.nick_name;
+
     if (chest.resources.gold) {
-        chest.resources.gold = chest.resources.gold / 3;
+        chest.resources.gold = Math.min(chest.resources.gold / 3, Math.pow(economy, 1/5));
     }
 
     return chest;
@@ -181,11 +178,11 @@ function run_battle(game, battle) {
         }
 
         //Increase disease
-        game.data.variables.diseaseCurrent *= 2;
+        game.data.variables.diseaseCurrent *= 1.3;
         if (battle_state.victor == 'tie') {
-            game.data.variables.diseaseCurrent *= 2;
+            game.data.variables.diseaseCurrent *= 1.3;
         } else if (battle_state.victor == 'defender') {
-            game.data.variables.diseaseCurrent *= 3;
+            game.data.variables.diseaseCurrent *= 1.6;
         }
 
         //Move dead to be corpses
@@ -351,10 +348,20 @@ function battle_result_details(game, battle_result) {
 }
 function open_battle_chest(game, rewards, $holder) {
 
-    var loot = [];
-    _.each(['buildings', 'populations', 'resources', 'upgrades'], function(key_c) {
+    var msg = "";
+    _.each(['resources', 'buildings', 'populations'], function(key_c) {
         var category = rewards[key_c];
 
+        var cat_text = "";
+        if (key_c == 'resources') {
+            cat_text = "<b>Resources Looted:</b>";
+        } else if (key_c == 'buildings') {
+            cat_text = "<b>Buildings Conquered:</b>";
+        } else {
+            cat_text = "<b>People Converted:</b>";
+        }
+
+        var loot = [];
         for (var key_i in category) {
             var count = category[key_i];
             count = Math.round(count);
@@ -366,16 +373,18 @@ function open_battle_chest(game, rewards, $holder) {
                 game.data[key_c][key_i] += count;
             }
         }
+        if (loot.length) {
+            msg += cat_text + "<br/>" + loot.join(",<br/>")+ ".<br/>";
+        }
     });
 
     if (rewards.land) {
-        loot.push("Gained " + rewards.land.size + " land!")
+        msg += "<br/>Gained " + rewards.land.size + " land!";
         game.data.land.push(rewards.land);
     }
 
-    var msg = loot.join(",<br/>");
     if (msg) {
-        msg = "Added to city:<br/>" + msg;
+//        msg = "Added to city:<br/>" + msg;
     } else {
         msg = "No treasure found";
     }
@@ -387,9 +396,13 @@ function open_battle_chest(game, rewards, $holder) {
 
     $holder
         .html(msg);
+
     setTimeout(function () {
         $holder
-            .hide("slow");
+            .text("[]")
+            .css({display:'inline-block'})
+            .popover({title: "Battle Chest from "+(rewards.from || 'conquering'), content: msg, trigger: 'hover', placement: 'left', html:true})
+
     }, 8000);
 
 }
@@ -493,7 +506,7 @@ function build_ui_controls(game) {
         .appendTo($battle_holder);
 
     $pointers_conquest.battle_result_holder = $('<div>')
-        .css({display: 'inline-block', verticalAlign: 'top', margin: '0px 20px'})
+        .css({display: 'inline-block', verticalAlign: 'top', margin: '0px 20px', height: '300px', overflowY: 'hidden', overflowX: 'scroll'})
         .appendTo($battle_holder);
 
     _.each(game.game_options.land_names, function (land_name, i) {
@@ -501,7 +514,7 @@ function build_ui_controls(game) {
 
         var func_finish = function (game, battle_result) {
             var $battle_result = $('<div>')
-                .css({padding: '10px', margin: '10px'})
+                .css({padding: '10px', margin: '0px 5px 5px 5px'})
                 .prependTo($pointers_conquest.battle_result_holder);
 
             if (battle_result.victor == 'attacker') {
@@ -521,18 +534,25 @@ function build_ui_controls(game) {
                 $battle_result
                     .css({backgroundColor: 'orange'});
             }
-            var result_message = battle_result.victor == 'tie' ? 'Tie, no winner' : _.str.titleize(battle_result.victor) + ' wins!';
+            var result_message = "";
+            if (battle_result.victor == 'tie') {
+                result_message = "Tie with " + battle_result.defender.nick_name;
+            } else if (battle_result.victor == 'attacker') {
+                result_message = "Win vs. a " + battle_result.defender.nick_name;
+            } else {
+                result_message = "Loss vs. a " + battle_result.defender.nick_name;
+            }
             var result_details = battle_result_details(game, battle_result);
             $('<span>')
                 .text(result_message)
                 .popover({title: 'Battle Results', content: result_details, trigger: 'hover', placement: 'top', html: true})
-                .css({padding: '10px', margin: '10px'})
+                .css({padding: '8px', margin: '0px 5px', color:'white', borderRadius:'8px'})
                 .appendTo($battle_result);
 
             if (battle_result.reward) {
                 var $chest = $('<div>')
                     .text('Open Victory Chest!')
-                    .css({padding: '4px', backgroundColor: 'brown', borderRadius: '4px', color: 'gold', cursor: 'pointer'})
+                    .css({padding: '4px', backgroundColor: 'brown', borderRadius: '8px', color: 'gold', cursor: 'pointer', html:true})
                     .on('click', function () {
                         open_battle_chest(game, battle_result.reward, $chest);
                     })
@@ -543,7 +563,8 @@ function build_ui_controls(game) {
         var $land = $('<div>')
             .appendTo($land_holder);
         $pointers_conquest.lands[land_name.name].button = $('<button>')
-            .text('Attack with your army')
+            .text('Invade!')
+            .css({width:'100px'})
             .prop({disabled: true})
             .on('click', function () {
                 _c.attack_with_army(game, army_id_to_assign_to, land_name, {}, func_finish);

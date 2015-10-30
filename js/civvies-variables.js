@@ -53,9 +53,9 @@
         ],
         populations: [
             {name: 'unemployed', title: 'Unemployed Worker', type: 'basic', notes: "Unassigned Workers that eat up food", unassignable: true, cull_order: 3, doesnt_consume_food:true},
-            {name: 'sick', type: 'basic', consumes: {food: 1}, notes: "Sick workers that need medical help and eat a large amount", unassignable: true, cull_order: 2},
-            {name: 'ill', type: 'basic', consumes: {food: 1}, notes: "Ill workers that are very sick", unassignable: true, cull_order: 1},
-            {name: 'dying', type: 'basic', consumes: {food: 1}, notes: "Workers that are almost dying", unassignable: true, cull_order: 1},
+            {name: 'sick', title: 'sick people', type: 'basic', consumes: {food: 1}, notes: "Sick workers that need medical help and eat a large amount", unassignable: true, cull_order: 2},
+            {name: 'ill', title:'ill people', type: 'basic', consumes: {food: 1}, notes: "Ill workers that are very sick", unassignable: true, cull_order: 1},
+            {name: 'dying', title: 'dying people', type: 'basic', consumes: {food: 1}, notes: "Workers that are almost dying", unassignable: true, cull_order: 1},
 
             {name: 'farmers', type: 'basic', produces: {food: "farmers"}, doesnt_require_building: true, cull_order: 10},
             {name: 'woodcutters', type: 'basic', produces: {wood: "woodcutters"}, doesnt_require_building: true, cull_order: 9},
@@ -64,7 +64,7 @@
             {name: 'tanners', type: 'medieval', consumes: {skins: 1}, produces: {leather: "tanners"}},
             {name: 'blacksmiths', type: 'medieval', consumes: {ore: 1}, produces: {metal: "blacksmiths"}},
             {name: 'apothecaries', type: 'medieval', consumes: {herbs: 1}, produces: {healing: "apothecaries"}},
-            {name: 'clerics', type: 'medieval', consumes: {food: 2, herbs: 1}, supports: {healing: .1, burying: .2}, produces: {piety: "clerics"}, cull_order: 6},
+            {name: 'clerics', type: 'medieval', consumes: {food: 2, herbs: 1}, supports: {healing: "clerics", burying: .2}, produces: {piety: "clerics"}, cull_order: 6},
             {name: 'labourers', type: 'medieval', consumes: {herbs: 10, leather: 10, metal: 10, piety: 10}, produces: {wonder: 1}, cull_order: 2}
         ],
         variables: [
@@ -76,7 +76,7 @@
             {name: "miners", initial: 0.2},
             {name: "tanners", initial: 0.5},
             {name: "blacksmiths", initial: 0.5},
-            {name: "apothecaries", initial: 0.1},
+            {name: "apothecaries", initial: 0.2},
             {name: "clerics", initial: 0.05},
             {name: "foodSpecialChance", initial: 0.02},
             {name: "woodSpecialChance", initial: 0.02},
