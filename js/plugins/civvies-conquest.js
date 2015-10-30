@@ -296,7 +296,7 @@ function fight_using_battle_state(game, battle_state) {
     state.defender_count = army_size(game, state.defender);
 
     //Every round of battle increases disease a little
-    game.data.variables.diseaseCurrent += .00001;
+    game.data.variables.diseaseCurrent *= 1.01;
 
     //Check for a victory
     state.victor = check_for_victor(game, state);

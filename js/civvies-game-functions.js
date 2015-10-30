@@ -336,7 +336,6 @@
 
     _c.increment_resource = function (game, resource, amount) {
 
-        //TODO: This now only does one roll, then gives resources if roll passes. Needs to simulate doing 'amount' roles
         var max = _c.getResourceMax(game, resource);
         game.data.resources[resource.name] = maths.clamp(game.data.resources[resource.name] + amount, 0, max);
 
@@ -346,12 +345,9 @@
                 if (_.isString(percent)) {
                     percent = game.data.variables[percent];
                 }
-                if (_.isNumber(percent)) {
-                    if (_c.random(game.game_options) < percent) {
-                        if (chance.resource) {
-                            game.data.resources[chance.resource] += amount;
-                        }
-                    }
+                if (_.isNumber(percent) && amount > 0) {
+                    var num_special_resources = _c.randManyRolls(amount, percent, game.game_options);
+                    _c.increment_resource(game, _c.info(game, 'resources', chance.resource), num_special_resources);
                 }
             });
         }

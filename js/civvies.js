@@ -82,7 +82,7 @@ var Civvies = (function ($, _, Helpers, maths) {
         }
 
         //Run all functions added by plugins
-        _.each(game.game_options.functions_on_setup, function(func){
+        _.each(game.game_options.functions_on_setup, function (func) {
             func(game);
         });
 
@@ -188,10 +188,41 @@ var Civvies = (function ($, _, Helpers, maths) {
         return result;
     }
 
+    function randHistogram(center, tries, game_options, min, max) {
+        var closest = 1;
+        min = min || 0;
+        max = max || 1;
+        var multiplier = max - min;
+        var modified_center = (center - min) / multiplier;
+
+        for (var i = 0; i < tries; i++) {
+            var roll = random(game_options);
+            if (Math.abs(roll - modified_center) < Math.abs(closest - modified_center)) {
+                closest = roll;
+            }
+        }
+        return (closest * multiplier) + min;
+    }
+
+    function randManyRolls(rolls, chance, game_options) {
+        var successes = 0;
+        if (rolls < 100) {
+            for (var i = 0; i < rolls; i++) {
+                if (random(game_options) < chance) successes++;
+            }
+        } else {
+            successes = randHistogram(rolls * chance, Math.pow(rolls, 1 / 3), game_options, 0, rolls);
+        }
+
+        return Math.round(successes);
+    }
+
     CivviesClass.prototype._private_functions = {
         random: random,
         randInt: randInt,
-        randOption: randOption
+        randOption: randOption,
+        randManyRolls: randManyRolls,
+        randHistogram: randHistogram
     };
 
     return CivviesClass;
