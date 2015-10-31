@@ -3,7 +3,6 @@ var army_id_to_assign_to = 0;
 
 var $pointers_conquest = {forces: [], lands: []};
 //TODO: Save game after each battle round
-//TODO: Move much of this to main so that it's extensible
 //TODO: Allow multiple armies
 
 
@@ -26,7 +25,7 @@ _c.assign_to_army = function (game, job, amount, army_id) {
 
 };
 _c.attack_with_army = function (game, army_id, land_name, options, func_finish) {
-    var enemy = enemy_from_land_name(game, land_name, true);
+    var enemy = _c.build_enemy_force_from_land_name(game, land_name, true);
 
     var battle = {player_state: 'attacker', in_progress: true, started: game.data.tick_count, defender: enemy, attacker: game.data.armies[army_id], options: {}, func_finish: func_finish, tie_after_ticks: 20};
 
@@ -41,7 +40,7 @@ _c.attack_with_army = function (game, army_id, land_name, options, func_finish) 
     game.data.battles.push(battle);
 };
 
-function enemy_from_land_name(game, land_name, is_defensive) {
+_c.build_enemy_force_from_land_name = function(game, land_name, is_defensive) {
     var nick_name = _.str.titleize(land_name.title || land_name.name);
     var name = nick_name + (is_defensive) ? ' defensive forces' : ' invading army';
 
@@ -71,8 +70,8 @@ function enemy_from_land_name(game, land_name, is_defensive) {
     return {land_name: land_name.name, name: name, nick_name: nick_name,
         soldiers: Math.round(soldiers), cavalry: Math.round(cavalry), siege: Math.round(siege), fortification: Math.round(fortification),
         economy: economy, land_size: Math.round(Math.sqrt(land_name.population_min))};
-}
-function calculate_reward(game, battle) {
+};
+_c.calculate_reward_after_battle = function(game, battle) {
     var economy = battle.defender.economy / 4;
     var chest = {resources: {food: Math.round(economy * 10)}, buildings: {}, populations: {}, upgrades: {}};
 
@@ -116,95 +115,8 @@ function calculate_reward(game, battle) {
     }
 
     return chest;
-}
-
-function run_battle(game, battle) {
-    battle.history = battle.history || [];
-
-    var battle_state = _.last(battle.history) || create_battle_state_from_battle(game, battle);
-    battle_state = fight_using_battle_state(game, battle_state);
-
-    if (game.data.tick_count > (battle.started + battle.tie_after_ticks)) {
-        //Battle timed out
-        battle_state.victor = 'tie';
-        battle_state.note = 'Time out as battle took too long.';
-    }
-
-    //Save the history of this phase of the battle
-    battle.history.push(battle_state);
-
-
-    //Update the army's forces with casualties
-    battle.attacker.soldiers = battle_state.attacker.soldiers;
-    battle.attacker.cavalry = battle_state.attacker.cavalry;
-    battle.attacker.siege = battle_state.attacker.siege;
-
-    battle.defender.soldiers = battle_state.defender.soldiers;
-    battle.defender.cavalry = battle_state.defender.cavalry;
-    battle.defender.siege = battle_state.defender.siege;
-
-
-    //If the battle is over
-    if (battle_state.victor) {
-        var attacker_people_lost = battle.attacker_size_initial - army_size(game, battle.attacker);
-        var defender_people_lost = battle.defender_size_initial - army_size(game, battle.defender);
-
-        if (battle.player_state == 'attacker' && battle_state.victor == 'attacker') {
-            battle.reward = calculate_reward(game, battle);
-
-            if (battle.attacker_size_initial > 500 && attacker_people_lost < (battle.attacker_size_initial * .2)) {
-                game.data.achievements.conquest = true;
-            }
-        }
-
-        //End battle metadata
-        game.data.achievements.battle = true;
-        battle.in_progress = false;
-        battle.victor = battle_state.victor;
-        battle.ended = game.data.tick_count;
-
-        //Build a log message and add achievements
-        var msg = "Battle finished.  ";
-        var you_won = (battle.player_state == battle_state.victor);
-        if (you_won) {
-            game.data.achievements.victor = true;
-            msg += 'You won.  ';
-
-            if (battle.attacker_size_initial > 500 && battle.defender_size_initial > 500) {
-                game.data.achievements.war = true;
-            }
-        } else {
-            msg += 'You did not win.  ';
-        }
-
-        //Increase disease
-        game.data.variables.diseaseCurrent *= 1.3;
-        if (battle_state.victor == 'tie') {
-            game.data.variables.diseaseCurrent *= 1.3;
-        } else if (battle_state.victor == 'defender') {
-            game.data.variables.diseaseCurrent *= 1.6;
-        }
-
-        //Move dead to be corpses
-        if (battle.player_state == 'attacker' && attacker_people_lost) {
-            game.data.resources.corpses += attacker_people_lost;
-            msg += attacker_people_lost +" corpses."
-        } else if (battle.player_state == 'defender' && defender_people_lost) {
-            game.data.resources.corpses += defender_people_lost;
-            msg += defender_people_lost +" corpses."
-        }
-        game.logMessage(msg);
-
-        if (battle.func_finish) {
-             battle.func_finish(game, battle)
-         }
-    }
-}
-
-function create_battle_state_from_battle(game, battle) {
-    return {time: game.data.tick_count, defender: _.clone(battle.defender), attacker: _.clone(battle.attacker)}
-}
-function fight_using_battle_state(game, battle_state) {
+};
+_c.fight_using_battle_state = function(game, battle_state) {
     var state = _.clone(battle_state);
     state.time = game.data.tick_count;
 
@@ -213,9 +125,11 @@ function fight_using_battle_state(game, battle_state) {
     var forces = {};
 
     //Build a matrix of forces and their attack efficacy
+    var army_units = _.filter(game.game_options.populations, function(f){return f.can_join_army});
     _.each(['defender', 'attacker'], function (force) {
         forces[force] = {};
-        _.each(['cavalry', 'soldiers', 'siege'], function (unit) {
+        _.each(army_units, function (unit_type) {
+            var unit = unit_type.name;
             forces[force][unit] = {
                 count: (battle_state[force][unit] || 0),
                 accuracy: _c.random(game.game_options) * 2 * (_c.variable(game, unit + '_accuracy') || .03),
@@ -283,8 +197,8 @@ function fight_using_battle_state(game, battle_state) {
 
     //Update battle_state numbers, remove any casualties or wounded
     _.each(['defender', 'attacker'], function (force) {
-        _.each(['cavalry', 'soldiers', 'siege'], function (unit) {
-            state[force][unit] = Math.floor(forces[force][unit].count);
+        _.each(army_units, function (unit) {
+            state[force][unit.name] = Math.floor(forces[force][unit.name].count);
         });
     });
     state.defender.fortification = Math.ceil(forces.defender.fortification.count);
@@ -298,6 +212,94 @@ function fight_using_battle_state(game, battle_state) {
     //Check for a victory
     state.victor = check_for_victor(game, state);
     return state;
+};
+
+//-- Local Functions -----------
+function run_battle(game, battle) {
+    battle.history = battle.history || [];
+
+    var battle_state = _.last(battle.history) || create_battle_state_from_battle(game, battle);
+    battle_state = _c.fight_using_battle_state(game, battle_state);
+
+    if (game.data.tick_count > (battle.started + battle.tie_after_ticks)) {
+        //Battle timed out
+        battle_state.victor = 'tie';
+        battle_state.note = 'Time out as battle took too long.';
+    }
+
+    //Save the history of this phase of the battle
+    battle.history.push(battle_state);
+
+
+    //Update the army's forces with casualties
+    battle.attacker.soldiers = battle_state.attacker.soldiers;
+    battle.attacker.cavalry = battle_state.attacker.cavalry;
+    battle.attacker.siege = battle_state.attacker.siege;
+
+    battle.defender.soldiers = battle_state.defender.soldiers;
+    battle.defender.cavalry = battle_state.defender.cavalry;
+    battle.defender.siege = battle_state.defender.siege;
+
+
+    //If the battle is over
+    if (battle_state.victor) {
+        var attacker_people_lost = battle.attacker_size_initial - army_size(game, battle.attacker);
+        var defender_people_lost = battle.defender_size_initial - army_size(game, battle.defender);
+
+        if (battle.player_state == 'attacker' && battle_state.victor == 'attacker') {
+            battle.reward = _c.calculate_reward_after_battle(game, battle);
+
+            if (battle.attacker_size_initial > 500 && attacker_people_lost < (battle.attacker_size_initial * .2)) {
+                game.data.achievements.conquest = true;
+            }
+        }
+
+        //End battle metadata
+        game.data.achievements.battle = true;
+        battle.in_progress = false;
+        battle.victor = battle_state.victor;
+        battle.ended = game.data.tick_count;
+
+        //Build a log message and add achievements
+        var msg = "Battle finished.  ";
+        var you_won = (battle.player_state == battle_state.victor);
+        if (you_won) {
+            game.data.achievements.victor = true;
+            msg += 'You won.  ';
+
+            if (battle.attacker_size_initial > 500 && battle.defender_size_initial > 500) {
+                game.data.achievements.war = true;
+            }
+        } else {
+            msg += 'You did not win.  ';
+        }
+
+        //Increase disease
+        game.data.variables.diseaseCurrent *= 1.3;
+        if (battle_state.victor == 'tie') {
+            game.data.variables.diseaseCurrent *= 1.3;
+        } else if (battle_state.victor == 'defender') {
+            game.data.variables.diseaseCurrent *= 1.6;
+        }
+
+        //Move dead to be corpses
+        if (battle.player_state == 'attacker' && attacker_people_lost) {
+            game.data.resources.corpses += attacker_people_lost;
+            msg += attacker_people_lost +" corpses."
+        } else if (battle.player_state == 'defender' && defender_people_lost) {
+            game.data.resources.corpses += defender_people_lost;
+            msg += defender_people_lost +" corpses."
+        }
+        game.logMessage(msg);
+
+        if (battle.func_finish) {
+             battle.func_finish(game, battle)
+         }
+    }
+}
+
+function create_battle_state_from_battle(game, battle) {
+    return {time: game.data.tick_count, defender: _.clone(battle.defender), attacker: _.clone(battle.attacker)}
 }
 
 function check_for_victor(game, battle_state) {
@@ -327,8 +329,9 @@ function run_battles_each_tick(game) {
 }
 function army_size(game, army) {
     var count = 0;
-    _.each(['soldiers', 'cavalry', 'siege'], function (key) {
-        var num = army[key];
+    var army_units = _.filter(game.game_options.populations, function(f){return f.can_join_army});
+    _.each(army_units, function (unit) {
+        var num = army[unit.name];
         if (num && _.isNumber(num)) {
             count += num;
         }

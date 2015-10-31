@@ -362,8 +362,8 @@
                 eaters += game.data.populations[key];
             }
         }
-        //TODO: Move this into the conquest plugin?
-        //Count population and eaters in army
+
+        //Count population and eaters in armies
         if (game.data.armies) {
             _.each(game.data.armies, function(army){
                 for (var key in army) {
@@ -594,9 +594,8 @@
                 _.each(game.game_options.populations, function (job) {
                     rate += _c.rate_of_job_from_resource(game, job, resource, game.data.populations[job.name]);
                 });
-                //TODO: Move to conquest plugin?
 
-                //Also count consumbales from armies
+                //Also count consumables from armies
                 if (game.data.armies) {
                     _.each(game.data.armies, function(army){
                         for (var key in army) {
