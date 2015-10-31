@@ -14,19 +14,19 @@
 
         resources: [
             //Note: Grouping 1 is clickable by user to gather resources manually
-            {name: 'food', grouping: 1, image: '../images/civclicker/food.png', chances: [{chance: "foodSpecialChance", resource: 'herbs'}], amount_from_click: 1},
-            {name: 'wood', grouping: 1, image: '../images/civclicker/wood.png', chances: [{chance: "woodSpecialChance", resource: 'skins'}], amount_from_click: 1},
-            {name: 'stone', grouping: 1, image: '../images/civclicker/stone.png', chances: [{chance: "stoneSpecialChance", resource: 'ore'}], amount_from_click: 1},
+            {name: 'food', grouping: 1, image: '../images/civclicker/food.png', chances: [{chance: "foodSpecialChance", resource: 'herbs'}], amount_from_click: 1, purchase_with_gold:5000},
+            {name: 'wood', grouping: 1, image: '../images/civclicker/wood.png', chances: [{chance: "woodSpecialChance", resource: 'skins'}], amount_from_click: 1, purchase_with_gold:5000},
+            {name: 'stone', grouping: 1, image: '../images/civclicker/stone.png', chances: [{chance: "stoneSpecialChance", resource: 'ore'}], amount_from_click: 1, purchase_with_gold:5000},
 
-            {name: 'herbs', grouping: 2, image: '../images/civclicker/herbs.png', notes: "Found sometimes when gathering food or by farmers"},
-            {name: 'skins', grouping: 2, image: '../images/civclicker/skins.png', notes: "Found sometimes when collecting wood or by woodcutters"},
-            {name: 'ore', grouping: 2, image: '../images/civclicker/ore.png', notes: "Found sometimes when mining ore or by miners"},
+            {name: 'herbs', grouping: 2, image: '../images/civclicker/herbs.png', notes: "Found sometimes when gathering food or by farmers", purchase_with_gold:500},
+            {name: 'skins', grouping: 2, image: '../images/civclicker/skins.png', notes: "Found sometimes when collecting wood or by woodcutters", purchase_with_gold:500},
+            {name: 'ore', grouping: 2, image: '../images/civclicker/ore.png', notes: "Found sometimes when mining ore or by miners", purchase_with_gold:500},
 
-            {name: 'leather', grouping: 2, image: '../images/civclicker/leather.png', notes: "Created from Skins by Tanners working in a Tannery"},
-            {name: 'metal', grouping: 2, image: '../images/civclicker/metal.png', notes: "Created from Ore by Blacksmiths working in a Smithy"},
+            {name: 'leather', grouping: 2, image: '../images/civclicker/leather.png', notes: "Created from Skins by Tanners working in a Tannery", purchase_with_gold:250},
+            {name: 'metal', grouping: 2, image: '../images/civclicker/metal.png', notes: "Created from Ore by Blacksmiths working in a Smithy", purchase_with_gold:250},
 
             {name: 'piety', grouping: 2, image: '../images/civclicker/piety.png', notes: "Created by Clerics working in a Temple", dont_capture:true},
-            {name: 'corpses', grouping: 2, image: '../images/civclicker/piety.png', notes: "Created when towns people die from starvation or fighting", dont_capture:true},
+            {name: 'corpses', grouping: 2, image: '../images/civclicker/piety.png', notes: "Created when people die from starvation or fighting", dont_capture:true},
 
             {name: 'healing', grouping: 3, image: '../images/civclicker/piety.png', notes: "Created by Clerics and Apothecaries", dont_capture:true}
         ],
@@ -56,7 +56,7 @@
 
             {name: 'farmers', type: 'basic', produces: {food: "farmers"}, doesnt_require_building: true, cull_order: 10},
             {name: 'woodcutters', type: 'basic', produces: {wood: "woodcutters"}, doesnt_require_building: true, cull_order: 9},
-            {name: 'miners', type: 'basic', produces: {stone: "miners"}, doesnt_require_building: true},
+            {name: 'miners', type: 'basic', produces: {stone: "miners"}, doesnt_require_building: true, cull_order: 8},
 
             {name: 'tanners', type: 'medieval', consumes: {skins: 1}, produces: {leather: "tanners"}},
             {name: 'blacksmiths', type: 'medieval', consumes: {ore: 1}, produces: {metal: "blacksmiths"}},

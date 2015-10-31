@@ -94,8 +94,8 @@ function bury_the_dead(game) {
 var sick_people = [
     {name: 'sick', title: 'sick people', type: 'basic', consumes: {food: 1}, notes: "Sick workers that need medical help and eat a large amount", unassignable: true, cull_order: 2},
     {name: 'ill', title: 'ill people', type: 'basic', consumes: {food: 1}, notes: "Ill workers that are very sick", unassignable: true, cull_order: 1},
-    {name: 'diseased', title: 'diseased people', type: 'basic', consumes: {food: 1}, notes: "Diseased workers that are spread disease", unassignable: true, cull_order: 0},
-    {name: 'dying', title: 'dying people', type: 'basic', consumes: {food: 1}, notes: "Workers that are almost dying", unassignable: true, cull_order: 0}
+    {name: 'diseased', title: 'diseased people', type: 'basic', consumes: {food: 1}, notes: "Diseased workers that are spread disease", unassignable: true, cull_order: 1},
+    {name: 'dying', title: 'dying people', type: 'basic', consumes: {food: 1}, notes: "Workers that are almost dying", unassignable: true, cull_order: 1}
 ];
 
 new Civvies('add_game_option', 'populations', sick_people);

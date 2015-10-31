@@ -1,5 +1,4 @@
 //TODO: Mood
-//TODO: Trading - plugin
 //TODO: Raiding
 //TODO: Raising dead
 

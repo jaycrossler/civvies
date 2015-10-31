@@ -383,7 +383,7 @@ Helpers.randomLetters = function (n) {
 };
 Helpers.pluralize = function (str) {
     var uncountable_words = [
-        'equipment', 'information', 'rice', 'money', 'species', 'series',
+        'equipment', 'information', 'rice', 'money', 'species', 'series', 'gold',
         'fish', 'sheep', 'moose', 'deer', 'news', 'food', 'wood', 'ore', 'piety', 'land'
     ];
     var plural_rules = [

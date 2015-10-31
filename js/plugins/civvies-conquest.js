@@ -514,7 +514,7 @@ function build_ui_controls(game) {
 
         var func_finish = function (game, battle_result) {
             var $battle_result = $('<div>')
-                .css({padding: '10px', margin: '0px 5px 5px 5px'})
+                .css({padding: '10px', margin: '0px 5px 5px 5px', borderRadius:'8px'})
                 .prependTo($pointers_conquest.battle_result_holder);
 
             if (battle_result.victor == 'attacker') {
@@ -546,7 +546,7 @@ function build_ui_controls(game) {
             $('<span>')
                 .text(result_message)
                 .popover({title: 'Battle Results', content: result_details, trigger: 'hover', placement: 'top', html: true})
-                .css({padding: '8px', margin: '0px 5px', color:'white', borderRadius:'8px'})
+                .css({padding: '8px', margin: '0px 5px', color:'white'})
                 .appendTo($battle_result);
 
             if (battle_result.reward) {
