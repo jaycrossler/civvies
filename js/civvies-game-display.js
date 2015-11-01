@@ -490,7 +490,7 @@
                 jobs_shown = true;
 
                 enabled = assignable;
-                job.$holder.text(Math.round(amount));
+                job.$holder.text(Math.floor(amount));
 
                 _.each(assign_multiples, function (times) {
                     enabled = _c.population_is_assignable(game, job, times);

@@ -1,12 +1,19 @@
-//--Add special resource
-var resource = {name: 'wonder', grouping: 3, image: '../images/civclicker/piety.png', notes: "Created by Labourers working on a Wonder", dont_capture:true};
-new Civvies('add_game_option', 'resources', resource);
+(function (Civvies) {
 
-new Civvies('add_game_option', 'achievements', {name: "seven", category:"wonder"});
-new Civvies('add_game_option', 'achievements', {name: "wonder", category:"wonder"});
-new Civvies('add_game_option', 'achievements', {name: "rushed", category:"wonder"});
-new Civvies('add_game_option', 'achievements', {name: "neverclick", title: "Never Click", category:"wonder"});
+    var _c = new Civvies('get_private_functions');
+
+
+//--Add special resource
+    var resource = {name: 'wonder', grouping: 3, image: '../images/civclicker/piety.png', notes: "Created by Labourers working on a Wonder", dont_capture: true};
+    new Civvies('add_game_option', 'resources', resource);
+
+    new Civvies('add_game_option', 'achievements', {name: "seven", category: "wonder"});
+    new Civvies('add_game_option', 'achievements', {name: "wonder", category: "wonder"});
+    new Civvies('add_game_option', 'achievements', {name: "rushed", category: "wonder"});
+    new Civvies('add_game_option', 'achievements', {name: "neverclick", title: "Never Click", category: "wonder"});
 
 //--Build a workflow that will show on a custom pane-------------
-var workflow_conquest = {name: 'wonder', selection_pane: false};
-new Civvies('add_game_option', 'workflows', workflow_conquest);
+    var workflow_conquest = {name: 'wonder', selection_pane: false};
+    new Civvies('add_game_option', 'workflows', workflow_conquest);
+
+})(Civvies);
