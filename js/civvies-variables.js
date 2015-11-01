@@ -10,7 +10,7 @@
         functions_each_tick:[],
 
         arrays_to_map_to_objects: 'resources,buildings,populations,variables,upgrades,achievements'.split(','),
-        arrays_to_map_to_arrays: 'land,workflows'.split(','),
+        arrays_to_map_to_arrays: 'land,workflows,events'.split(','),
 
         resources: [
             //Note: Grouping 1 is clickable by user to gather resources manually
@@ -140,8 +140,8 @@
             {name: "empire", category:"basic", order:11},
 
             {name: "engineer", category:"city"},
-            {name: "hated", category:"city"},
-            {name: "loved", category:"city"},
+            {name: "hated", category:"city"}, //TODO
+            {name: "loved", category:"city"}, //TODO
             {name: "ghostTown", title: "Ghost Town", category:"city"}
         ],
         land: [
@@ -162,7 +162,8 @@
             {name: 'empire', population_min: 500000}
             //TODO: How to have necropolis in plugin: {name: 'necropolis', population_min: '1000', zombie_multiplier:2}. Pass in a logic test function
         ],
-        workflows: []
+        workflows: [],
+        events: []
     };
 
     CivviesClass.initializeOptions('game_options', _game_options);

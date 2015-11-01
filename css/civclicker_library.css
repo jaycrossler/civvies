@@ -59,6 +59,12 @@ body{
 .notes_text {
     color: orangered;
 }
+.trader {
+    font-size: 14px;
+    cursor: hand;
+    border: 2px solid black;
+    background-color: gold;
+}
 .population_holder {
     display: inline-block;
     padding: .1em .4em;

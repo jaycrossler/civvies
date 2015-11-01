@@ -63,7 +63,7 @@ _c.calculate_reward_after_battle = function(game, battle) {
     chest.from = battle.defender.nick_name;
 
     if (chest.resources.gold) {
-        chest.resources.gold = Math.min(chest.resources.gold / 3, Math.pow(economy, 1/5));
+        chest.resources.gold = Math.min(3, Math.pow(economy, 1/5));
     }
 
     return chest;

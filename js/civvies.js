@@ -1,9 +1,10 @@
 var Civvies = (function ($, _, Helpers, maths) {
     //Uses jquery and Underscore
 
+    //TODO: Pass all plugins in with a namespace, then allow them to be turned on and off dynamically
     //-----------------------------
     //Private Global variables
-    var version = '0.0.2',
+    var version = '0.0.3',
         summary = 'HTML game engine to simulate civilization or city building.',
         author = 'Jay Crossler - http://github.com/jaycrossler',
         file_name = 'civvies.js';

@@ -24,6 +24,7 @@ function populations_possibly_get_sick(game) {
     //TODO: More unburied corpses means more disease
     //TODO: Have health variable remove disease
     //TODO: Sick people move to being ill, then swap back to their positions if healed, or to more ill, until dead (have a counter?)
+    //TODO: Track where sick people came from, and return them to those jobs if possible when healed
 
     var current_disease_rate = _c.variable(game, "diseaseCurrent");
     var disease_steady = _c.variable(game, "diseaseSteady");
@@ -95,7 +96,7 @@ var sick_people = [
     {name: 'sick', title: 'sick people', type: 'basic', consumes: {food: 1}, notes: "Sick workers that need medical help and eat a large amount", unassignable: true, cull_order: 2},
     {name: 'ill', title: 'ill people', type: 'basic', consumes: {food: 1}, notes: "Ill workers that are very sick", unassignable: true, cull_order: 1},
     {name: 'diseased', title: 'diseased people', type: 'basic', consumes: {food: 1}, notes: "Diseased workers that are spread disease", unassignable: true, cull_order: 1},
-    {name: 'dying', title: 'dying people', type: 'basic', consumes: {food: 1}, notes: "Workers that are almost dying", unassignable: true, cull_order: 1}
+    {name: 'dying', title: 'dying people', type: 'basic', consumes: {food: 1}, notes: "Workers that are almost dying", unassignable: true, cull_order: 1, dont_capture:true}
 ];
 
 new Civvies('add_game_option', 'populations', sick_people);
