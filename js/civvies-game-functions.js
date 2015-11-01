@@ -386,6 +386,7 @@
         pop.current_that_eats = Math.round(eaters);
 
         var storage = 0;
+        var building_sizes = 0;
         var building_count = 0;
         _.each(game.game_options.buildings, function (building) {
             var num_buildings = game.data.buildings[building.name];
@@ -396,9 +397,11 @@
             if (building.land_size !== undefined) {
                 building_size = building.land_size;
             }
-            building_count += (num_buildings * building_size);
+            building_sizes += (num_buildings * building_size);
+            building_count += num_buildings;
         });
-        pop.land_current = Math.round(building_count);
+        pop.land_current = Math.round(building_sizes);
+        pop.buildings = Math.round(building_count);
         pop.max = Math.round(storage);
 
         var land_size = 0;
@@ -415,6 +418,9 @@
         }
         if (highest_pop > 1000 && pop.current < 1) {
             game.data.achievements.ghostTown = true;
+        }
+        if (building_count > 1000) {
+            game.data.achievements.engineer = true;
         }
 
         return pop;
@@ -472,16 +478,16 @@
 
         var assignable = false;
         if (!job.unassignable) {
-            var current = game.data.populations[job.name];
+            var current = Math.round(game.data.populations[job.name]);
             if (_.isNumber(times)) {
                 if (times > 0) {
                     var unassigned_workers = game.data.populations.unemployed;
                     if (times <= unassigned_workers) assignable = true;
-                } else {
-                    if ((current + times) >= 0) assignable = true;
+                } else if ((current + times) >= 0) {
+                    assignable = true;
                 }
             }
-            if (assignable && !job.doesnt_require_building) {
+            if (assignable && !job.doesnt_require_building && times > 0) {
                 //Check through buildings
                 var offices_total = 0;
                 _.each(game.game_options.buildings, function (building) {
@@ -494,7 +500,7 @@
                 });
                 assignable = ((current + times) <= offices_total);
             }
-            if (assignable && job.upgrades) {
+            if (assignable && job.upgrades && times > 0) {
                 for (var ucost in job.upgrades) {
                     var has_upgrade = game.data.upgrades[ucost];
                     if (!has_upgrade) {

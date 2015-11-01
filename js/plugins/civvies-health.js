@@ -100,8 +100,8 @@ var sick_people = [
 
 new Civvies('add_game_option', 'populations', sick_people);
 
-new Civvies('add_game_option', 'achievements', {name: "diseased"});
-new Civvies('add_game_option', 'achievements', {name: "plague"});
+new Civvies('add_game_option', 'achievements', {name: "diseased", category:"health"});
+new Civvies('add_game_option', 'achievements', {name: "plague", category:"health"});
 
 new Civvies('add_game_option', 'functions_each_tick', populations_possibly_get_sick);
 new Civvies('add_game_option', 'functions_each_tick', bury_the_dead);

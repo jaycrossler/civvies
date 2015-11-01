@@ -4,6 +4,8 @@ function buy_resource_with_gold(game, resource, amount) {
     if (game.data.resources.gold > 0) {
         game.data.resources[resource.name] += resource.purchase_with_gold;
         game.data.resources.gold--;
+
+        game.data.achievements.merchant = true;
     }
     _c.redraw_data(game);
 }
@@ -48,6 +50,9 @@ new Civvies('add_game_option', 'upgrades', upgrades);
 //--Add special resource
 var resource = {name: 'gold', grouping: 2, image: '../images/civclicker/gold.png', notes: "Created from trading goods with Traders"};
 new Civvies('add_game_option', 'resources', resource);
+
+
+new Civvies('add_game_option', 'achievements', {name: "merchant", category:"trade"});
 
 
 //--Build a workflow that will show on a custom pane-------------

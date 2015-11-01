@@ -272,6 +272,18 @@
         $('<br/>')
             .appendTo($pointers.population_info);
 
+        var $d3b = $('<div>')
+            .addClass('population_holder')
+            .popover({title: "Buildings", content: "Buildings in your empire", placement: 'top', trigger: 'hover'})
+            .appendTo($pointers.population_info);
+        $("<span>")
+            .text("Buildings: ")
+            .appendTo($d3b);
+        $pointers.building_count = $("<span>")
+            .addClass('number')
+            .text(population.buildings)
+            .appendTo($d3b);
+
         var $d4 = $('<div>')
             .addClass('population_holder')
             .popover({title: "Population", content: "If there are more buildings that this land can hold, then population happiness will decrease.", placement: 'top', trigger: 'hover'})
@@ -341,7 +353,7 @@
         $pointers.population_max.text(population.max);
         $pointers.land_current.text(population.land_current);
         $pointers.land_max.text(population.land_max);
-
+        $pointers.building_count.text(population.buildings);
 
         _.each(purchase_multiples, function (times) {
             var food_cost = _c.worker_food_cost(game, times);
@@ -491,7 +503,7 @@
                         }
                         $btn.prop({disabled: !enabled});
 
-                        if (game.data.variables.highest_population >= (4 * Math.abs(times))) {
+                        if (game.data.variables.highest_population >= (3 * Math.abs(times))) {
                             $btn.show();
                         }
                     }
@@ -702,6 +714,16 @@
         $("<div>")
             .appendTo($pointers.achievements_list);
 
+//        var achievement_list = game.game_options.achievements.sort(function(a, b){
+//            var cat_a = a.category.toLowerCase();
+//            var cat_b = b.category.toLowerCase();
+//
+//            if(cat_a == cat_b) {
+//                return (a.order < b.order);
+//            } else {
+//                return (cat_a < cat_b) ? -1 : 1;
+//            }
+//        });
         _.each(game.game_options.achievements, function (achievement) {
             var has_achievement = (game.data.achievements[achievement.name]);
             var color = has_achievement ? "#aaf" : "#faa";
