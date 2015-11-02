@@ -105,8 +105,8 @@
             .text("Sell " + res_amount_text + " " + res_names + " for 1 gold")
             .css({width: '220px', margin: '2px 10px'})
             .prop('disabled', !can_buy)
-            .on('click', function () {
-                buy_gold_with_resource(game, trader.resource, trader.economy);
+            .click(function () {
+                buy_gold_with_resource(game, trader.resource, trader.desired_amount);
             })
             .appendTo($div);
 

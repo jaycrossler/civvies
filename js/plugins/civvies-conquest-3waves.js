@@ -86,6 +86,16 @@
                 };
             })
         });
+// TODO: Better take fortifications into account
+//        var fortifications = 0;
+//        var fortification_buildings = _.filter(game.game_options.buildings, function (f) {
+//            return f.defense && f.defense.troops;
+//        });
+//        _.each(fortification_buildings, function(fort){
+//           fortifications += game.data.buildings[fort.name] * (_c.variable(game, 'fortification_strength') || 1);
+//        });
+
+
         forces.defender.fortification = {
             count: (battle_state.defender.fortification || 0),
             strength: _c.random(game.game_options) * 2 * (_c.variable(game, 'fortification_strength') || 1),

@@ -93,6 +93,8 @@
         var attackers_down = _c.randManyRolls(defenders, .35, game.game_options); //Higher chance to loose force, but might be less if forces don't exist in army
         var defenders_down = _c.randManyRolls(attackers, .25, game.game_options);
 
+        defenders_down -= _c.randManyRolls(state.defender.fortification || 0, 0.5, game.game_options); //Each Fortification has 50% to protect a defender
+
         var army_units = _.filter(game.game_options.populations, function (f) {
             return f.can_join_army
         });
@@ -137,20 +139,16 @@
 
 
         //Update the army's forces with casualties
-        battle.attacker.soldiers = battle_state.attacker.soldiers;
-        battle.attacker.cavalry = battle_state.attacker.cavalry;
-        battle.attacker.siege = battle_state.attacker.siege;
+        _.each(game.game_options.populations, function (job) {
+            if (job.can_join_army) {
+                battle.attacker[job] = battle_state.attacker[job] || 0;
+                battle.defender[job] = battle_state.defender[job] || 0;
+                if (battle.player_state == 'defender') {
+                    game.data.populations[job] = battle.defender[job] || 0;
+                }
+            }
+        });
 
-        battle.defender.soldiers = battle_state.defender.soldiers;
-        battle.defender.cavalry = battle_state.defender.cavalry;
-        battle.defender.siege = battle_state.defender.siege;
-        battle.defender.fortification = battle_state.defender.fortification;
-        if (battle.player_state == 'defender') {
-            game.data.populations.soldiers = battle.defender.soldiers;
-            game.data.populations.cavalry = battle.defender.cavalry;
-            game.data.populations.siege = battle.defender.siege;
-            game.data.buildings.fortification = battle.defender.fortification;
-        }
 
         //If the battle is over
         if (battle_state.victor) {
@@ -363,7 +361,7 @@
             $pointers_conquest.armies[army_id] = $pointers_conquest.armies[army_id] || {};
             $pointers_conquest.armies[army_id].army_holder = $('<div>')
                 .css({fontWeight: 'bold'})
-                .popover({title: "Build up an invading armed force", content: "Transfer soldiers and cavalry between your city and your army.", trigger: 'hover', placement: 'bottom'})
+                .popover({title: "Build up an invading armed force", content: "Transfer troops between your city and your army.", trigger: 'hover', placement: 'bottom'})
                 .appendTo($holder);
 
             $pointers_conquest.armies[army_id].army_name = $('<span>')
@@ -635,7 +633,7 @@
     var buildings = [
         {name: 'barracks', type: 'business', costs: {food: 20, wood: 60, stone: 120}, supports: {soldiers: 5, gold: 1}, upgrades: {fighting: true, masonry: true}},
         {name: 'stable', type: 'business', costs: {food: 60, wood: 60, stone: 120, leather: 10}, supports: {cavalry: 5}, upgrades: {fighting: true, horseback: true}},
-        {name: 'fortification', type: 'upgrade', costs: {stone: 100}, supports: {gold: 2}, notes: "Improves Defenses", upgrades: {codeoflaws: true, palisade: true}}
+        {name: 'fortification', type: 'upgrade', costs: {stone: 100, metal:10}, supports: {gold: 2}, defense:{troops:"fortification_strength"}, notes: "Improves Defenses", upgrades: {palisade: true}}
     ];
     new Civvies('add_game_option', 'buildings', buildings);
 
