@@ -12,7 +12,7 @@
     new Civvies('add_game_option', 'achievements', {name: "glaring", category: "zombies"});
     new Civvies('add_game_option', 'achievements', {name: "clowder", category: "zombies"});
 
-//--Build a workflow that will show on a custom pane-------------
+//--Build a workflow that doesn't show anywhere-------------
     var workflow_conquest = {name: 'zombies', selection_pane: false, upgrade_categories: []};
     new Civvies('add_game_option', 'workflows', workflow_conquest);
 

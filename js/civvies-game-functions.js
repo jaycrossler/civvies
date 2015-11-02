@@ -1,5 +1,4 @@
 //TODO: Mood
-//TODO: Raiding
 //TODO: Raising dead
 
 (function (Civvies) {

@@ -1,5 +1,7 @@
 (function (Civvies) {
 
+    //TODO: Battles are too easy against asymetric forces
+
     var _c = new Civvies('get_private_functions');
 
     function check_for_victor(game, battle_state) {
@@ -20,7 +22,7 @@
 
     _c.build_enemy_force_from_land_name = function (game, land_name, is_defensive) {
         var nick_name = _.str.titleize(land_name.title || land_name.name);
-        var name = nick_name + (is_defensive) ? ' defensive forces' : ' invading army';
+        var name = nick_name + ((is_defensive) ? ' defensive forces' : ' invading army');
 
         //TODO: Have a random name or area name for enemy
 

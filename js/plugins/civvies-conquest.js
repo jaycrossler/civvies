@@ -6,11 +6,18 @@
     var $pointers_conquest = {forces: [], lands: []};
 //TODO: Save game after each battle round
 //TODO: Allow multiple armies
-
+//TODO: Too much treasure and buildings
+//TODO: Take func_finish out and put string in so battles can be resumed mid-save
+//TODO: Have a delay up front for army moving out
 
     _c.build_enemy_force_from_land_name = function (game, land_name, is_defensive) {
         var nick_name = _.str.titleize(land_name.title || land_name.name);
-        var name = nick_name + (is_defensive) ? ' defensive forces' : ' invading army';
+        var name;
+        if (is_defensive) {
+            name = nick_name +"'s defensive militia";
+        } else {
+            name = "Invaders from a nearby "+ nick_name;
+        }
 
         var min = (land_name.population_min / 20) * .9;
         var max = min * 10;
@@ -137,7 +144,13 @@
         battle.defender.soldiers = battle_state.defender.soldiers;
         battle.defender.cavalry = battle_state.defender.cavalry;
         battle.defender.siege = battle_state.defender.siege;
-
+        battle.defender.fortification = battle_state.defender.fortification;
+        if (battle.player_state == 'defender') {
+            game.data.populations.soldiers = battle.defender.soldiers;
+            game.data.populations.cavalry = battle.defender.cavalry;
+            game.data.populations.siege = battle.defender.siege;
+            game.data.buildings.fortification = battle.defender.fortification;
+        }
 
         //If the battle is over
         if (battle_state.victor) {
@@ -372,6 +385,16 @@
                     var $unit = $('<div>')
                         .appendTo($holder);
 
+                    $pointers_conquest.forces[job.name].remove100 = $('<button>')
+                        .text('-100')
+                        .popover({title: "Remove 100 from army", content: "Remove 100 " + job.name, trigger: 'hover', placement: 'bottom'})
+                        .prop({disabled: true})
+                        .addClass('multiplier')
+                        .on('click', function () {
+                            assign_to_army(game, job, -100, army_id_to_assign_to);
+                            _c.redraw_data(game);
+                        })
+                        .appendTo($unit);
                     $pointers_conquest.forces[job.name].remove10 = $('<button>')
                         .text('-10')
                         .popover({title: "Remove 10 from army", content: "Remove 10 " + job.name, trigger: 'hover', placement: 'bottom'})
@@ -422,6 +445,16 @@
                         .addClass('multiplier')
                         .on('click', function () {
                             assign_to_army(game, job, 10, army_id_to_assign_to);
+                            _c.redraw_data(game);
+                        })
+                        .appendTo($unit);
+                    $pointers_conquest.forces[job.name].add100 = $('<button>')
+                        .text('+100')
+                        .popover({title: "Add 100 to army", content: "Add 100 " + job.name, trigger: 'hover', placement: 'bottom'})
+                        .prop({disabled: true})
+                        .addClass('multiplier')
+                        .on('click', function () {
+                            assign_to_army(game, job, 100, army_id_to_assign_to);
                             _c.redraw_data(game);
                         })
                         .appendTo($unit);
@@ -539,7 +572,7 @@
                 var current_at_city = game.data.populations[job.name] || 0;
                 var current_in_army = army[job.name] || 0;
 
-                _.each([-10, -1, 1, 10], function (amount) {
+                _.each([-100, -10, -1, 1, 10, 100], function (amount) {
                     if (amount > 0) {
                         $pointers_conquest.forces[job.name]['add' + Math.abs(amount)]
                             .prop({disabled: (current_at_city < amount)})
