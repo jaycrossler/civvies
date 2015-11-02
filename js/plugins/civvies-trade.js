@@ -5,7 +5,7 @@
 
     function buy_resource_with_gold(game, resource, amount) {
         if (game.data.resources.gold > 0) {
-            game.data.resources[resource.name] += resource.purchase_with_gold;
+            game.data.resources[resource.name] += amount;  //TODO: Resources that go over limit get reduced on tick clock
             game.data.resources.gold--;
 
             game.data.achievements.merchant = true;
@@ -116,7 +116,6 @@
     }
 
     function trader_comes_to_town(game) {
-        //TODO: How to restore from a load game in middle of trade?
         var desired_amount = _c.randInt(90, game.game_options) + 5;
         var resource = _c.randOption(game.game_options.resources, game.game_options, game.game_options.resources.gold);
         var length = _c.randInt(25, game.game_options) + 5;
@@ -131,7 +130,6 @@
     }
 
     function check_for_trader(game) {
-        //TODO: Check no other trades are in town?
         if (_c.random(game.game_options) < _c.variable(game, 'traderArrive')) {
             trader_comes_to_town(game);
         }
@@ -153,9 +151,9 @@
 
 //--Build some specialized upgrades-------------
     var upgrades = [
-        {name: "trade", type: 'commerce', costs: {gold: 1}, upgrades: {writing: true}, variable_increase: {traderArrive: 0.003}},
-        {name: "currency", type: 'commerce', costs: {gold: 10, ore: 1000}, upgrades: {writing: true, trade: true}, variable_increase: {traderArrive: 0.003}},
-        {name: "commerce", type: 'commerce', costs: {gold: 100, piety: 10000}, upgrades: {currency: true, civilservice: true}, variable_increase: {traderArrive: 0.003}}
+        {name: "trade", type: 'commerce', costs: {gold: 1}, upgrades: {writing: true}, variable_increase: {traderArrive: 0.03}},
+        {name: "currency", type: 'commerce', costs: {gold: 10, ore: 1000}, upgrades: {writing: true, trade: true}, variable_increase: {traderArrive: 0.03}},
+        {name: "commerce", type: 'commerce', costs: {gold: 100, piety: 10000}, upgrades: {currency: true, civilservice: true}, variable_increase: {traderArrive: 0.03}}
     ];
     new Civvies('add_game_option', 'upgrades', upgrades);
 
@@ -168,7 +166,7 @@
 
     new Civvies('add_game_option', 'achievements', {name: "merchant", category: "trade"});
 
-    new Civvies('add_game_option', 'variables', {name: "traderArrive", initial: 0.004, category: "trade"});
+    new Civvies('add_game_option', 'variables', {name: "traderArrive", initial: 0.04, category: "trade"});
 
 //--Build a workflow that will show on a custom pane-------------
     var workflow_upgrades = {name: 'trade', selection_pane: true, upgrade_categories: ['commerce'], setup_function: build_trade_buttons_ui_controls, redraw_function: redraw_ui_controls};

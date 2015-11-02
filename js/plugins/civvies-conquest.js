@@ -80,8 +80,8 @@
         var state = _.clone(battle_state);
         state.time = game.data.tick_count;
 
-        var attackers = army_size(game, state.attacker);
-        var defenders = army_size(game, state.defender);
+        var attackers = _c.army_size(game, state.attacker);
+        var defenders = _c.army_size(game, state.defender);
 
         var attackers_down = _c.randManyRolls(defenders, .35, game.game_options); //Higher chance to loose force, but might be less if forces don't exist in army
         var defenders_down = _c.randManyRolls(attackers, .25, game.game_options);
@@ -94,7 +94,7 @@
             battle_state.attacker[unit_dead.name] = Math.max(0, battle_state.attacker[unit_dead.name] - 1);
         }
 
-        state.attacker_count = army_size(game, state.attacker);
+        state.attacker_count = _c.army_size(game, state.attacker);
         state.defender_count = Math.max(defenders - defenders_down, 0);
         state.defender.army_size = state.defender_count;
 
@@ -141,8 +141,8 @@
 
         //If the battle is over
         if (battle_state.victor) {
-            var attacker_people_lost = battle.attacker_size_initial - army_size(game, battle.attacker);
-            var defender_people_lost = battle.defender_size_initial - army_size(game, battle.defender);
+            var attacker_people_lost = battle.attacker_size_initial - _c.army_size(game, battle.attacker);
+            var defender_people_lost = battle.defender_size_initial - _c.army_size(game, battle.defender);
 
             if (battle.player_state == 'attacker' && battle_state.victor == 'attacker') {
                 battle.reward = _c.calculate_reward_after_battle(game, battle);
@@ -221,8 +221,8 @@
 
         battle.attacker.id = army_id;
 
-        battle.attacker_size_initial = army_size(game, battle.attacker);
-        battle.defender_size_initial = army_size(game, battle.defender);
+        battle.attacker_size_initial = _c.army_size(game, battle.attacker);
+        battle.defender_size_initial = _c.army_size(game, battle.defender);
         if (battle.attacker_size_initial > 100) {
             game.data.achievements.army = true;
         }
@@ -244,7 +244,7 @@
         });
     }
 
-    function army_size(game, army) {
+    _c.army_size = function(game, army) {
         if (army.army_size) return army.army_size;
         var count = 0;
         var army_units = _.filter(game.game_options.populations, function (f) {
@@ -257,7 +257,7 @@
             }
         });
         return count;
-    }
+    };
 
     function battle_result_details(game, battle_result) {
         //TODO: Increase battle details
@@ -563,11 +563,11 @@
                 return battle.in_progress && battle.attacker.id == army_id;
             });
 
-            var army_count = army_size(game, army);
+            var army_count = _c.army_size(game, army);
             if (active_battle && active_battle.attacker) {
                 var last_round = _.last(active_battle.history);
                 if (last_round && last_round.time) {
-                    var current_count = army_size(game, active_battle.attacker);
+                    var current_count = _c.army_size(game, active_battle.attacker);
                     army_count = active_battle.attacker_size_initial;
                     var round = last_round.time - active_battle.started;
                     note_text = " (Attacking, casualties: " + current_count + " of " + army_count + ", round: " + round + ")";
@@ -581,7 +581,7 @@
         });
 
         var army = game.data.armies[army_id_to_assign_to];
-        var army_count = army_size(game, army);
+        var army_count = _c.army_size(game, army);
         _.each(game.game_options.land_names, function (land_name) {
             $pointers_conquest.lands[land_name.name].button.prop('disabled', (army_count < 1) || !can_invade);
         });

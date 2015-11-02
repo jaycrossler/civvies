@@ -4,8 +4,8 @@
 
     function heal_the_wounded(game) {
         var sick_population = Math.ceil(game.data.populations.sick) || 0;
-//        var ill_population = Math.ceil(game.data.populations.ill) || 0;  //TODO: Move from sick to ill
-//        var dying_population = Math.ceil(game.data.populations.dying) || 0;
+        var ill_population = Math.ceil(game.data.populations.ill) || 0;  //TODO: Move from sick to ill
+        var dying_population = Math.ceil(game.data.populations.dying) || 0;
 
         var healing_amount = (Math.ceil(game.data.resources.healing) || 0) / 5;
 
@@ -23,6 +23,16 @@
                 game.logMessage(healing_amount + ' sick people healed');
             }
         }
+        if (game.data.populations.sick < 0) {
+            game.data.populations.sick = 0;
+        }
+        if (game.data.populations.ill < 0) {
+            game.data.populations.ill = 0;
+        }
+        if (game.data.populations.dying < 0) {
+            game.data.populations.dying = 0;
+        }
+
     }
 
     function populations_possibly_get_sick(game) {
@@ -30,6 +40,7 @@
         //TODO: Have health variable remove disease
         //TODO: Sick people move to being ill, then swap back to their positions if healed, or to more ill, until dead (have a counter?)
         //TODO: Track where sick people came from, and return them to those jobs if possible when healed
+        //TODO: Sometimes less than 0 sick people
 
         var current_disease_rate = _c.variable(game, "diseaseCurrent");
         var disease_steady = _c.variable(game, "diseaseSteady");
@@ -113,6 +124,5 @@
     new Civvies('add_game_option', 'functions_each_tick', populations_possibly_get_sick);
     new Civvies('add_game_option', 'functions_each_tick', bury_the_dead);
     new Civvies('add_game_option', 'functions_each_tick', heal_the_wounded);
-
 
 })(Civvies);

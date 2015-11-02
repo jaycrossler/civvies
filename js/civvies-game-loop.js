@@ -2,6 +2,8 @@
     var _c = new Civvies('get_private_functions');
 
     function populations_produce_products(game) {
+        var resource_changes = {};
+
         for (var val in game.data.populations) {
             var number = game.data.populations[val];
             if (number) {
@@ -20,7 +22,8 @@
                         if (_.isString(amount_c)) {
                             amount_c = game.data.variables[amount_c];
                         }
-                        _c.increment_resource(game, res_c, can_consume * -amount_c);
+                        resource_changes[res_c.name] = resource_changes[res_c.name] || 0;
+                        resource_changes[res_c.name] += can_consume * -amount_c;
                     }
                     can_produce = can_consume;
                 }
@@ -32,35 +35,48 @@
                         if (_.isString(amount_p)) {
                             amount_p = game.data.variables[amount_p];
                         }
-                        _c.increment_resource(game, res_p, can_produce * amount_p);
+                        resource_changes[res_p.name] = resource_changes[res_p.name] || 0;
+                        resource_changes[res_p.name] += can_produce * amount_p;
                     }
                 }
             }
         }
+
+        //Make the actual changes after all taken into account
+        for (var key in resource_changes) {
+            _c.increment_resource(game, _c.info(game, 'resources', key), resource_changes[key]);
+        }
+
     }
 
     function eat_food_or_die(game) {
         var population = _c.population(game);
 
-        if (population.current <= game.data.resources.food) {
+        if (population.current_that_eats <= game.data.resources.food) {
             //Enough food, everyone is happy
             game.data.resources.food -= population.current_that_eats;
         } else {
-
             //First, try assigning any unemployed workers to farms
+            var food_that_needs_to_be_found = population.current - game.data.resources.food;
 
             if (game.data.populations.unemployed) {
-                game.logMessage("Not enough food, assigned " + game.data.populations.unemployed+ " vagrants to farms", true);
-                _c.assign_workers(game, _c.info(game,'populations','farmers'),game.data.populations.unemployed);
+                var unemployed_moved = Math.min(food_that_needs_to_be_found, game.data.populations.unemployed);
+
+                game.logMessage("Not enough food, assigned " + unemployed_moved + " vagrants to farms", true);
+                _c.assign_workers(game, _c.info(game, 'populations', 'farmers'), unemployed_moved);
                 return;
             }
 
             //The culling, eat most of the food, then start removing non-essential people
-            game.data.resources.food *= .2;
+            game.data.resources.food *= .4;
 
-            var to_remove = population.current_that_eats - game.data.resources.food - game.data.populations.farmers + .5;
+            //Remove many of the remaining people
+            var to_remove = population.current_that_eats - game.data.resources.food - (game.data.populations.farmers/2) + .5;
             to_remove = Math.round(to_remove);
-            if (to_remove < 0) return;
+            if (to_remove >= 1) {
+                to_remove = _c.randManyRolls(to_remove, .7, game.game_options); //70% of the remaining starve
+            }
+            if (to_remove < 1) return;
 
             //TODO: population eats corpses instead, and gets sick
 
@@ -86,7 +102,6 @@
                     }
                 }
             }
-
         }
     }
 
@@ -113,18 +128,17 @@
         _c.autosave_if_time(game);
 
         //TODO: Have a buffer so that food can be over the limit for the loop
-        //TODO: Food seems to be eaten twice
+        //TODO: Have all changes to resources first run and build a change matrix, then apply them at the end (so food surplus isn't removed beforehand)
 
         eat_food_or_die(game);
         populations_produce_products(game);
 //        check_for_attacks(game);
 //        check_for_accidents(game);
-//        check_for_traders(game);
 //        build_a_wonder(game);
 
 
         //Run each registered plugin function
-        _.each(game.game_options.functions_each_tick, function(func){
+        _.each(game.game_options.functions_each_tick, function (func) {
             func(game);
         });
 

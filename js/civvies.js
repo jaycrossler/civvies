@@ -1,7 +1,7 @@
 var Civvies = (function ($, _, Helpers, maths) {
     //Uses jquery and Underscore
 
-    //TODO: Pass all plugins in with a namespace, then allow them to be turned on and off dynamically
+    //TODO: Allow all plugins to be turned on and off dynamically
     //-----------------------------
     //Private Global variables
     var version = '0.0.3',

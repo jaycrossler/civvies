@@ -138,8 +138,8 @@
         });
         state.defender.fortification = Math.ceil(forces.defender.fortification.count);
 
-        state.attacker_count = army_size(game, state.attacker);
-        state.defender_count = army_size(game, state.defender);
+        state.attacker_count = _c.army_size(game, state.attacker);
+        state.defender_count = _c.army_size(game, state.defender);
 
         //Every round of battle increases disease a little
         game.data.variables.diseaseCurrent *= 1.01;
