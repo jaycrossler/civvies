@@ -205,6 +205,11 @@ var Civvies = (function ($, _, Helpers, maths) {
         }
         return (closest * multiplier) + min;
     }
+    function randRange (minVal, maxVal, game_options, floatVal) {
+        //optional Floatval specifies number of decimal points
+        var randVal = minVal + (random(game_options) * (maxVal - minVal + 1));
+        return (floatVal !== undefined) ? Math.round(randVal - .5) : randVal.toFixed(floatVal);
+    }
 
     function randManyRolls(rolls, chance, game_options) {
         var successes = 0;
@@ -223,6 +228,7 @@ var Civvies = (function ($, _, Helpers, maths) {
         random: random,
         randInt: randInt,
         randOption: randOption,
+        randRange: randRange,
         randManyRolls: randManyRolls,
         randHistogram: randHistogram
     };
