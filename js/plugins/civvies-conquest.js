@@ -6,7 +6,7 @@
     var $pointers_conquest = {forces: [], lands: []};
 //TODO: Save game after each battle round
 //TODO: Allow multiple armies
-//TODO: Too much treasure and buildings
+//TODO: Too much treasure and buildings... how about now that it is using sqrt?
 //TODO: Take func_finish out and put string in so battles can be resumed mid-save
 //TODO: Have a delay up front for army moving out
 
@@ -30,10 +30,11 @@
         max = max * 1.1;
         var resistance = min + (_c.random(game.game_options) * (max - min));
 
-        return {land_name: land_name.name, name: name, army_size: Math.round(resistance), nick_name: nick_name, economy: resistance / 2, land_size: Math.round(Math.sqrt(land_name.population_min))};
+        var land_size = Math.round(Math.sqrt(land_name.population_min)) * 2;
+        return {land_name: land_name.name, name: name, army_size: Math.round(resistance), nick_name: nick_name, economy: resistance / 2, land_size: land_size};
     };
     _c.calculate_reward_after_battle = function (game, battle) {
-        var economy = battle.defender.economy / 4;
+        var economy = Math.pow(battle.defender.economy, 1/2);
         var chest = {resources: {food: Math.round(economy * 10)}, buildings: {}, populations: {}, upgrades: {}};
 
         var treasure_options = [];
@@ -141,10 +142,10 @@
         //Update the army's forces with casualties
         _.each(game.game_options.populations, function (job) {
             if (job.can_join_army) {
-                battle.attacker[job] = battle_state.attacker[job] || 0;
-                battle.defender[job] = battle_state.defender[job] || 0;
+                battle.attacker[job.name] = battle_state.attacker[job.name] || 0;
+                battle.defender[job.name] = battle_state.defender[job.name] || 0;
                 if (battle.player_state == 'defender') {
-                    game.data.populations[job] = battle.defender[job] || 0;
+                    game.data.populations[job.name] = battle.defender[job.name] || 0;
                 }
             }
         });
@@ -184,11 +185,11 @@
             }
 
             //Increase disease
-            game.data.variables.diseaseCurrent *= 1.3;
+            game.data.variables.diseaseCurrent *= 1.02;
             if (battle_state.victor == 'tie') {
-                game.data.variables.diseaseCurrent *= 1.3;
+                game.data.variables.diseaseCurrent *= 1.03;
             } else if (battle_state.victor == 'defender') {
-                game.data.variables.diseaseCurrent *= 1.6;
+                game.data.variables.diseaseCurrent *= 1.06;
             }
 
             //Move dead to be corpses
@@ -631,9 +632,9 @@
 
 //--Buildings---------------------------------
     var buildings = [
-        {name: 'barracks', type: 'business', costs: {food: 20, wood: 60, stone: 120}, supports: {soldiers: 5, gold: 1}, upgrades: {fighting: true, masonry: true}},
+        {name: 'barracks', type: 'business', costs: {food: 20, wood: 60, stone: 120}, supports: {soldiers: 5}, upgrades: {fighting: true, masonry: true}},
         {name: 'stable', type: 'business', costs: {food: 60, wood: 60, stone: 120, leather: 10}, supports: {cavalry: 5}, upgrades: {fighting: true, horseback: true}},
-        {name: 'fortification', type: 'upgrade', costs: {stone: 100, metal:10}, supports: {gold: 2}, defense:{troops:"fortification_strength"}, notes: "Improves Defenses", upgrades: {palisade: true}}
+        {name: 'fortification', type: 'upgrade', costs: {stone: 100, metal:10}, supports: {gold: 1}, defense:{troops:"fortification_strength"}, notes: "Improves Defenses", upgrades: {palisade: true}}
     ];
     new Civvies('add_game_option', 'buildings', buildings);
 

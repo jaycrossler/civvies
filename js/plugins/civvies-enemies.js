@@ -114,9 +114,12 @@
                 msg += 'It was a tie. ';
                 color = 'yellow';
             }
-            var they_lost = battle.attacker_size_initial - (battle.attacker.army_size || _c.army_size(game, battle.attacker));
-            var you_lost = battle.defender_size_initial - (battle.defender.army_size || _c.army_size(game, battle.defender));
-            msg += 'You lost: ' + you_lost + ', they lost: ' + they_lost;
+            var last_state = _.last(battle.history);
+
+            var they_lost = battle.attacker_size_initial - (last_state.attacker_count || _c.army_size(game, last_state.attacker)); //Use last_state.attacker_count ?
+            var you_lost = battle.defender_size_initial - (last_state.defender_count || _c.army_size(game, last_state.defender));
+            var turns = battle.ended - battle.started;
+            msg += turns + ' turns. You lost: ' + you_lost + ', they lost: ' + they_lost;
 
 
             $attacker

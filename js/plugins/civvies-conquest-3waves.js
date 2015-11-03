@@ -101,7 +101,7 @@
             strength: _c.random(game.game_options) * 2 * (_c.variable(game, 'fortification_strength') || 1),
             block: function (attackers_total) {
                 //The amount of force that gets through the fortification
-                return attackers_total - (this.count * this.strength);
+                return Math.max(0,attackers_total - (this.count * this.strength));
             },
             is_hit: function (casualties) {
                 if (this.count - casualties < 0) {
@@ -114,8 +114,9 @@
 
 
         //First, Defender Siege weapons hit attacking cavalry and soldiers
-        forces.attacker.cavalry.is_hit(forces.defender.siege.attack() * .8);
-        forces.attacker.soldiers.is_hit(forces.defender.siege.attack() * .2);
+        var siege_weapon_predamage = forces.defender.siege.attack();
+        forces.attacker.cavalry.is_hit(siege_weapon_predamage * .8);
+        forces.attacker.soldiers.is_hit(siege_weapon_predamage * .2);
 
         //Next, Defender soldiers and Cavalry are hit, though protected by fortifications
         var attackers_total = forces.attacker.cavalry.attack() + forces.attacker.soldiers.attack() + forces.attacker.siege.attack();
@@ -162,4 +163,4 @@
     };
 
 
-})(Civvies)
+})(Civvies);

@@ -191,6 +191,7 @@ var Civvies = (function ($, _, Helpers, maths) {
     }
 
     function randHistogram(center, tries, game_options, min, max) {
+        //NOTE: This breaks down when 'center' is below 5% or above 95% (depending on how many tries are used), for that use randAverage
         var closest = 1;
         min = min || 0;
         max = max || 1;
@@ -205,6 +206,13 @@ var Civvies = (function ($, _, Helpers, maths) {
         }
         return (closest * multiplier) + min;
     }
+    function randAverage(rolls, chance, stddev, game_options) {
+        stddev = stddev || 5;
+        var expected = chance * rolls;
+        var expected_modifier = randHistogram(.5, stddev, game_options);
+
+        return expected * expected_modifier * 2;
+    }
     function randRange (minVal, maxVal, game_options, floatVal) {
         //optional Floatval specifies number of decimal points
         var randVal = minVal + (random(game_options) * (maxVal - minVal + 1));
@@ -218,7 +226,12 @@ var Civvies = (function ($, _, Helpers, maths) {
                 if (random(game_options) < chance) successes++;
             }
         } else {
-            successes = randHistogram(rolls * chance, Math.pow(rolls, 1 / 3), game_options, 0, rolls);
+            //Note, using two different randomization options for large numbers, both have different accuracies/stddevs
+            if (chance < .07 || chance > .93) {
+                successes = randAverage(rolls, chance, 3, game_options);
+            } else {
+                successes = randHistogram(rolls * chance, Math.pow(rolls, 1 / 2), game_options, 0, rolls);
+            }
         }
 
         return Math.round(successes);
@@ -240,3 +253,44 @@ Civvies.initializeOptions = function (option_type, options) {
     var civ_pointer = new Civvies('');
     civ_pointer.initializeOptions(option_type, options);
 };
+
+
+//TODO: Move to a jasmine test
+function test_hist() {
+    var totals = [];
+    var times = 10000, rolls = 1000;
+    _.each([.999,.995,.99,.9,.8,.7,.6,.5,.4,.3,.2,.1,.075,.05,.025,.01,.005,.001,.0005,.0001],function(chance){
+        var expected = rolls*chance;
+        var roll_results = [];
+        for (var i=0; i< times; i++) {
+            roll_results.push(game._private_functions.randManyRolls(rolls,chance, game.game_options));
+        }
+
+        var avg = 0;
+        for (var i=0; i< times; i++) {
+            avg += roll_results[i];
+        }
+        avg /= times;
+        var diff_h = avg - expected;
+        var first_h = roll_results[0];
+
+//        //------------
+//        roll_results = [];
+//        for (var i=0; i< times; i++) {
+//            roll_results.push(game._private_functions.randManyRolls(rolls,chance, game.game_options, true));
+//        }
+//        avg = 0;
+//        for (var i=0; i< times; i++) {
+//            avg += roll_results[i];
+//        }
+//        avg /= times;
+//        var diff_a = avg - expected;
+//        var first_a = roll_results[0];
+//
+
+        //------------
+//        totals.push({chance:chance, expected: expected, first_hist: first_h, difference_using_hist:diff_h, first_avg: first_a, difference_using_avg:diff_a});
+        totals.push({chance:chance, expected: expected, first_hist: first_h, difference_using_hist:diff_h});
+    });
+    console.table(totals);
+}

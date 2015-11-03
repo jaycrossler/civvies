@@ -28,7 +28,7 @@
             {name: 'piety', grouping: 2, image: '../images/civclicker/piety.png', notes: "Created by Clerics working in a Temple", dont_capture:true},
             {name: 'corpses', grouping: 2, image: '../images/civclicker/piety.png', notes: "Created when people die from starvation or fighting", dont_capture:true},
 
-            {name: 'healing', grouping: 3, image: '../images/civclicker/piety.png', notes: "Created by Clerics and Apothecaries", dont_capture:true}
+            {name: 'healing', grouping: 1, image: '../images/civclicker/piety.png', notes: "Created by Clerics and Apothecaries", dont_capture:true}
         ],
         buildings: [
             {name: 'cave', type: 'home', costs: {wood: 2, food:1, stone:1}, population_supports: 1, initial: 1, land_size:0},
@@ -46,7 +46,7 @@
             {name: 'tannery', type: 'business', costs: {wood: 30, stone: 70, skins: 2}, supports: {tanners: 2}, upgrades: {skinning: true}, land_size:2},
             {name: 'smithy', type: 'business', costs: {wood: 30, stone: 70, ore: 2}, supports: {blacksmiths: 2}, upgrades: {prospecting: true}, land_size:2},
             {name: 'apothecary', type: 'business', costs: {wood: 30, stone: 70, herbs: 2}, supports: {apothecaries: 2}, upgrades: {harvesting: true}, land_size:2},
-            {name: 'temple', type: 'business', costs: {wood: 30, stone: 120, herbs: 10}, supports: {clerics: 1, piety:2000, gold:5}, upgrades:{masonry:true}, land_size:2},
+            {name: 'temple', type: 'business', costs: {wood: 30, stone: 120, herbs: 10}, supports: {clerics: 1, piety:2000, gold:1}, upgrades:{masonry:true}, land_size:2},
 
             {name: 'mill', type: 'upgrade', costs: {wood: 100, stone: 100}, options: {food_efficiency: .1}, upgrades: {wheel: true}, notes: "Improves Farming Efficiency"},
             {name: 'graveyard', type: 'upgrade', costs: {wood: 50, stone: 200, herbs: 50}, supports: {grave_spot: 100}, notes: "Increases Grave Plots", upgrades:{writing:true}}
@@ -80,8 +80,8 @@
             {name: "stoneSpecialChance", initial: 0.01},
             {name: "foodCostInitial", initial: 20},
             {name: "gravesFilled", initial: 0},
-            {name: "diseaseCurrent", initial: 0.0001},
-            {name: "diseaseSteady", initial: 0.0001}
+            {name: "diseaseCurrent", initial: 0.0003},
+            {name: "diseaseSteady", initial: 0.0003}
         ],
         upgrades: [
             {name: "skinning", type: 'stone age', costs: {skins: 10}},
