@@ -15,6 +15,7 @@
                 var can_produce = number;
 
                 if (consumes) {
+                    //Find out how much each job can consume
                     var resource_local_changes = {};
                     var can_consume = number;
                     for (resource in consumes) {
@@ -28,11 +29,12 @@
                         resource_local_changes[res_c.name] = resource_changes[res_c.name] || 0;
                         resource_local_changes[res_c.name] -= amount_c;
                     }
+                    //Can only produce the number that matches it's consumption rate
                     can_produce = can_consume;
 
                     if (can_consume) {
                         for (resource in resource_local_changes) {
-                            resource_changes[resource] = resource_changes[resource] || 0
+                            resource_changes[resource] = resource_changes[resource] || 0;
                             resource_changes[resource] += resource_local_changes[resource] * can_consume;
                         }
                     }

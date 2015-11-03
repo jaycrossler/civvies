@@ -637,12 +637,6 @@
 //    _c.upgrade = function () {
 //
 //    };
-//    _c.digGraves = function () {
-//
-//    };
-//    _c.randomWorker = function () {
-//
-//    };
 //    _c.wickerman = function () {
 //
 //    };
@@ -652,25 +646,7 @@
 //    _c.pestControl = function () {
 //
 //    };
-//    _c.plague = function () {
-//
-//    };
-//    _c.spawnMob = function () {
-//
-//    };
 //    _c.smite = function () {
-//
-//    };
-//    _c.party = function () {
-//
-//    };
-//    _c.partyCustom = function () {
-//
-//    };
-//    _c.invade = function () {
-//
-//    };
-//    _c.plunder = function () {
 //
 //    };
 //    _c.glory = function () {
@@ -692,15 +668,6 @@
 //
 //    };
 //    _c.updateWonderLimited = function () {
-//
-//    };
-//    _c.tradeTimer = function () {
-//
-//    };
-//    _c.trade = function () {
-//
-//    };
-//    _c.buy = function () {
 //
 //    };
 //    _c.speedWonder = function () {

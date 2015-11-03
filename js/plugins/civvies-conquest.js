@@ -6,7 +6,6 @@
     var $pointers_conquest = {forces: [], lands: []};
 //TODO: Save game after each battle round
 //TODO: Allow multiple armies
-//TODO: Too much treasure and buildings... how about now that it is using sqrt?
 //TODO: Take func_finish out and put string in so battles can be resumed mid-save
 //TODO: Have a delay up front for army moving out
 
@@ -30,11 +29,11 @@
         max = max * 1.1;
         var resistance = min + (_c.random(game.game_options) * (max - min));
 
-        var land_size = Math.round(Math.sqrt(land_name.population_min)) * 2;
+        var land_size = Math.round(Math.sqrt(land_name.population_min)) * 4;
         return {land_name: land_name.name, name: name, army_size: Math.round(resistance), nick_name: nick_name, economy: resistance / 2, land_size: land_size};
     };
     _c.calculate_reward_after_battle = function (game, battle) {
-        var economy = Math.pow(battle.defender.economy, 1/2);
+        var economy = Math.pow(battle.defender.economy, 1/2) / 2;
         var chest = {resources: {food: Math.round(economy * 10)}, buildings: {}, populations: {}, upgrades: {}};
 
         var treasure_options = [];
@@ -85,7 +84,7 @@
         return chest;
     };
     _c.fight_using_battle_state = function (game, battle_state) {
-        var state = _.clone(battle_state);
+        var state = JSON.parse(JSON.stringify(battle_state));
         state.time = game.data.tick_count;
 
         var attackers = _c.army_size(game, state.attacker);
@@ -271,11 +270,39 @@
         return count;
     };
 
-    function battle_result_details(game, battle_result) {
-        //TODO: Increase battle details
+    _c.battle_result_details = function(game, battle_result) {
         var texts = [];
-        _.each(battle_result.history, function (state) {
-            var text = "Time [" + state.time + "]: Attackers: " + state.attacker_count + ", Defenders: " + state.defender_count + ". " + (state.note || '');
+        var colors = 'red,blue,green,black,orange,pink,grey,gold'.split(',');
+
+        _.each(battle_result.history, function (state, i) {
+            var troops_a = [];
+            var troops_d = [];
+            var army_units = _.filter(game.game_options.populations, function (f) {
+                return f.can_join_army
+            });
+            _.each(army_units, function (unit_type, j) {
+                var unit = unit_type.name;
+                var text_pre = "<span style='color:"+(colors[j] || 'black')+"'>";
+                var text_post = "</span>";
+                if (state.attacker[unit]) {
+//                    troops_a.push(unit[0].toUpperCase()+": "+state.attacker[unit]);
+                    troops_a.push(text_pre + state.attacker[unit] + text_post);
+                }
+                if (state.defender[unit]) {
+                    troops_d.push(text_pre + state.defender[unit] + text_post);
+//                    troops_d.push(unit[0].toUpperCase()+": "+state.defender[unit]);
+                }
+            });
+            var attacker_txt = _c.army_size(game,state.attacker);
+            if (troops_a.length) {
+                attacker_txt += " (" + troops_a.join("/") + ")"
+            }
+            var defender_txt = _c.army_size(game,state.defender);
+            if (troops_d.length) {
+                defender_txt += " (" + troops_d.join("/") + ")"
+            }
+
+            var text = i + "] Att: " + attacker_txt + ", Def: " + defender_txt + ". " + (state.note || '');
 
             texts.push(text);
         });
@@ -505,7 +532,7 @@
                 } else {
                     result_message = "Loss vs. a " + battle_result.defender.nick_name;
                 }
-                var result_details = battle_result_details(game, battle_result);
+                var result_details = _c.battle_result_details(game, battle_result);
                 $('<span>')
                     .text(result_message)
                     .popover({title: 'Battle Results', content: result_details, trigger: 'hover', placement: 'top', html: true})

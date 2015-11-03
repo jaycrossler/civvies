@@ -121,9 +121,10 @@
             var turns = battle.ended - battle.started;
             msg += turns + ' turns. You lost: ' + you_lost + ', they lost: ' + they_lost;
 
-
+            var result_details = _c.battle_result_details(game, battle);
             $attacker
                 .css({backgroundColor: color})
+                .popover({title: 'Battle Results', content: result_details, trigger: 'hover', placement: 'top', html: true})
                 .text(msg);
 
             setTimeout(function () {

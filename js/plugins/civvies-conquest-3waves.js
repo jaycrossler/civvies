@@ -52,7 +52,7 @@
             economy: economy, land_size: Math.round(Math.sqrt(land_name.population_min))};
     };
     _c.fight_using_battle_state = function (game, battle_state) {
-        var state = _.clone(battle_state);
+        var state = JSON.parse(JSON.stringify(battle_state));
         state.time = game.data.tick_count;
 
         //Calculate the amount of each force that hit an enemy
@@ -86,15 +86,6 @@
                 };
             })
         });
-// TODO: Better take fortifications into account
-//        var fortifications = 0;
-//        var fortification_buildings = _.filter(game.game_options.buildings, function (f) {
-//            return f.defense && f.defense.troops;
-//        });
-//        _.each(fortification_buildings, function(fort){
-//           fortifications += game.data.buildings[fort.name] * (_c.variable(game, 'fortification_strength') || 1);
-//        });
-
 
         forces.defender.fortification = {
             count: (battle_state.defender.fortification || 0),
