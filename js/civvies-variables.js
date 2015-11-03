@@ -18,17 +18,17 @@
             {name: 'wood', grouping: 1, image: '../images/civclicker/wood.png', chances: [{chance: "woodSpecialChance", resource: 'skins'}], amount_from_click: 1, purchase_with_gold:5000},
             {name: 'stone', grouping: 1, image: '../images/civclicker/stone.png', chances: [{chance: "stoneSpecialChance", resource: 'ore'}], amount_from_click: 1, purchase_with_gold:5000},
 
-            {name: 'herbs', grouping: 2, image: '../images/civclicker/herbs.png', notes: "Found sometimes when gathering food or by farmers", purchase_with_gold:500},
-            {name: 'skins', grouping: 2, image: '../images/civclicker/skins.png', notes: "Found sometimes when collecting wood or by woodcutters", purchase_with_gold:500},
-            {name: 'ore', grouping: 2, image: '../images/civclicker/ore.png', notes: "Found sometimes when mining ore or by miners", purchase_with_gold:500},
+            {name: 'herbs', grouping: 2, image: '../images/civclicker/herbs.png', value:1.2, notes: "Found sometimes when gathering food or by farmers", purchase_with_gold:500},
+            {name: 'skins', grouping: 2, image: '../images/civclicker/skins.png', value:1.3, notes: "Found sometimes when collecting wood or by woodcutters", purchase_with_gold:500},
+            {name: 'ore', grouping: 2, image: '../images/civclicker/ore.png', value:1.3, notes: "Found sometimes when mining ore or by miners", purchase_with_gold:500},
 
-            {name: 'leather', grouping: 2, image: '../images/civclicker/leather.png', notes: "Created from Skins by Tanners working in a Tannery", purchase_with_gold:250},
-            {name: 'metal', grouping: 2, image: '../images/civclicker/metal.png', notes: "Created from Ore by Blacksmiths working in a Smithy", purchase_with_gold:250},
+            {name: 'leather', grouping: 2, image: '../images/civclicker/leather.png', value:1.5, notes: "Created from Skins by Tanners working in a Tannery", purchase_with_gold:250},
+            {name: 'metal', grouping: 2, image: '../images/civclicker/metal.png', value:1.6, notes: "Created from Ore by Blacksmiths working in a Smithy", purchase_with_gold:250},
 
-            {name: 'piety', grouping: 2, image: '../images/civclicker/piety.png', notes: "Created by Clerics working in a Temple", dont_capture:true},
-            {name: 'corpses', grouping: 2, image: '../images/civclicker/piety.png', notes: "Created when people die from starvation or fighting", dont_capture:true},
+            {name: 'piety', grouping: 2, image: '../images/civclicker/piety.png', value:3, notes: "Created by Clerics working in a Temple", dont_capture:true},
+            {name: 'corpses', grouping: 2, image: '../images/civclicker/piety.png', value:5, notes: "Created when people die from starvation or fighting", dont_capture:true, storageInitial:500},
 
-            {name: 'healing', grouping: 1, image: '../images/civclicker/piety.png', notes: "Created by Clerics and Apothecaries", dont_capture:true}
+            {name: 'healing', grouping: 1, image: '../images/civclicker/piety.png', value:100, notes: "Created by Clerics and Apothecaries", dont_capture:true}
         ],
         buildings: [
             {name: 'cave', type: 'home', costs: {wood: 2, food:1, stone:1}, population_supports: 1, initial: 1, land_size:0},
@@ -49,7 +49,7 @@
             {name: 'temple', type: 'business', costs: {wood: 30, stone: 120, herbs: 10}, supports: {clerics: 1, piety:2000, gold:1}, upgrades:{masonry:true}, land_size:2},
 
             {name: 'mill', type: 'upgrade', costs: {wood: 100, stone: 100}, options: {food_efficiency: .1}, upgrades: {wheel: true}, notes: "Improves Farming Efficiency"},
-            {name: 'graveyard', type: 'upgrade', costs: {wood: 50, stone: 200, herbs: 50}, supports: {grave_spot: 100}, notes: "Increases Grave Plots", upgrades:{writing:true}}
+            {name: 'graveyard', type: 'upgrade', costs: {wood: 50, stone: 200, herbs: 50}, supports: {grave_spot: 100, corpses:10}, notes: "Increases Grave Plots", upgrades:{writing:true}}
         ],
         populations: [
             {name: 'unemployed', title: 'Unemployed Worker', type: 'basic', notes: "Unassigned Workers that eat up food", unassignable: true, cull_order: 3, doesnt_consume_food:true},

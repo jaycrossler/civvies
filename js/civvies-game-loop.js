@@ -15,17 +15,27 @@
                 var can_produce = number;
 
                 if (consumes) {
-                    var can_consume = number; //TODO: find the amount that can be consumed if it's only partial
+                    var resource_local_changes = {};
+                    var can_consume = number;
                     for (resource in consumes) {
                         var res_c = _c.info(game, 'resources', resource);
                         var amount_c = consumes[resource];
                         if (_.isString(amount_c)) {
                             amount_c = game.data.variables[amount_c];
                         }
-                        resource_changes[res_c.name] = resource_changes[res_c.name] || 0;
-                        resource_changes[res_c.name] += can_consume * -amount_c;
+                        can_consume = Math.min(can_consume, Math.floor((game.data.resources[resource] || 0) / amount_c));
+
+                        resource_local_changes[res_c.name] = resource_changes[res_c.name] || 0;
+                        resource_local_changes[res_c.name] -= amount_c;
                     }
                     can_produce = can_consume;
+
+                    if (can_consume) {
+                        for (resource in resource_local_changes) {
+                            resource_changes[resource] = resource_changes[resource] || 0
+                            resource_changes[resource] += resource_local_changes[resource] * can_consume;
+                        }
+                    }
                 }
 
                 if (produces && can_produce) {

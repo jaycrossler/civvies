@@ -37,8 +37,7 @@
     }
 
     function populations_possibly_get_sick(game) {
-        //TODO: More unburied corpses means more disease. Allow unlimited corpses
-        //TODO: Track where sick people came from, and return them to those jobs if possible when healed
+        //TODO: Track where sick people came from, and return them to those jobs if possible when healed - some queue?
 
         var current_disease_rate = _c.variable(game, "diseaseCurrent");
         var num_healers_buffer = Math.sqrt(game.data.populations.apothecaries + (game.data.populations.clerics / 2 ));
@@ -70,7 +69,6 @@
                     game.logMessage(people_became_sick + ' ' + Helpers.pluralize(job_data.title || job_data.name) + ' became sick', true);
                     game.data.populations.diseased += num_diseased;
                 }
-                //TODO: Add to a queue so they will go back to their jobs once healed
             }
         });
 

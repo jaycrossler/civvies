@@ -60,7 +60,7 @@
         }
     };
     _c.getResourceMax = function (game, resource) {
-        var storage = _c.variable(game, 'storageInitial');
+        var storage = resource.storageInitial || _c.variable(game, 'storageInitial');
         _.each(game.game_options.buildings, function (building) {
             if (building.supports && building.supports[resource.name]) {
                 var num_buildings = game.data.buildings[building.name];

@@ -17,7 +17,7 @@ module.exports = function (grunt) {
         '-----------------------------------------------------------------------------------\n' +
         '-- <%= pkg.name %>.js - v<%= pkg.version %> - Built on <%= grunt.template.today("yyyy-mm-dd") %> by <%= pkg.author %> using Grunt.js\n' +
         '-----------------------------------------------------------------------------------\n' +
-        '-- Inspired by civclicker.js - Copyright (C) 2014 David Stark \n' +
+        '-- Inspired by civclicker.js which was Copyright (C) 2014 David Stark \n' +
         '-----------------------------------------------------------------------------------\n' +
         '*/\n';
 

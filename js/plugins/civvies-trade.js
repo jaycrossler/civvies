@@ -3,8 +3,6 @@
     var _c = new Civvies('get_private_functions');
     var $pointers_trade = {trade_buttons: [], traders: {}};
 
-    //TODO: Have trader desired amount be based on resource
-
     function buy_resource_with_gold(game, resource, amount) {
         if (game.data.resources.gold > 0) {
             game.data.resources[resource.name] += amount;  //TODO: Resources that go over limit get reduced on tick clock
@@ -118,8 +116,10 @@
     }
 
     function trader_comes_to_town(game) {
-        var desired_amount = _c.randInt(60, game.game_options) + 5;
         var resource = _c.randOption(game.game_options.resources, game.game_options, game.game_options.resources.gold);
+        var resource_val = resource.value || 1;
+
+        var desired_amount = _c.randInt(60 / resource_val, game.game_options) + 5;
         var length = _c.randInt(25, game.game_options) + 5;
 
         var name = 'Trader from remote village';
@@ -162,7 +162,7 @@
     new Civvies('add_game_option', 'functions_each_tick', check_for_trader);
 
 //--Add special resource
-    var resource = {name: 'gold', grouping: 2, image: '../images/civclicker/gold.png', notes: "Created from trading goods with Traders"};
+    var resource = {name: 'gold', grouping: 2, image: '../images/civclicker/gold.png', notes: "Created from trading goods with Traders", storageInitial:10};
     new Civvies('add_game_option', 'resources', resource);
 
 

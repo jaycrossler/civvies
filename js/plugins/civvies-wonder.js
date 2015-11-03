@@ -4,7 +4,7 @@
 
 
 //--Add special resource
-    var resource = {name: 'wonder', grouping: 3, image: '../images/civclicker/piety.png', notes: "Created by Labourers working on a Wonder", dont_capture: true};
+    var resource = {name: 'wonder', grouping: 3, image: '../images/civclicker/piety.png', notes: "Created by Labourers working on a Wonder", value:10, dont_capture: true};
     new Civvies('add_game_option', 'resources', resource);
 
     new Civvies('add_game_option', 'achievements', {name: "seven", category: "wonder"});
