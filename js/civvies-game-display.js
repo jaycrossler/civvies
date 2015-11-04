@@ -301,7 +301,7 @@
             .popover({title: "Population", content: "If there are more buildings that this land can hold, then population happiness will decrease.", placement: 'top', trigger: 'hover'})
             .appendTo($pointers.population_info);
         $("<span>")
-            .text("Maximum Land Use: ")
+            .text("Comfortably Available Land: ")
             .appendTo($d5);
         $pointers.land_max = $("<span>")
             .addClass('number')

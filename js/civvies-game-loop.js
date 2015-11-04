@@ -12,21 +12,22 @@
                 var produces = job_details.produces;
                 var resource;
 
-                var can_produce = number;
+                var can_produce = Math.floor(number);
 
                 if (consumes) {
                     //Find out how much each job can consume
                     var resource_local_changes = {};
-                    var can_consume = number;
+                    var can_consume = Math.floor(number);
                     for (resource in consumes) {
                         var res_c = _c.info(game, 'resources', resource);
                         var amount_c = consumes[resource];
                         if (_.isString(amount_c)) {
                             amount_c = game.data.variables[amount_c];
                         }
-                        can_consume = Math.min(can_consume, Math.floor((game.data.resources[resource] || 0) / amount_c));
+                        var available_resources = (game.data.resources[resource] || 0) + (resource_changes[resource] || 0);
+                        can_consume = Math.min(can_consume, Math.floor(available_resources / amount_c));
 
-                        resource_local_changes[res_c.name] = resource_changes[res_c.name] || 0;
+                        resource_local_changes[res_c.name] = resource_local_changes[res_c.name] || 0;
                         resource_local_changes[res_c.name] -= amount_c;
                     }
                     //Can only produce the number that matches it's consumption rate

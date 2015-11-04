@@ -162,11 +162,9 @@
         var mood_current = calculate_mood(game);
         $mood
             .text(mood_current.text);
-        //TODO: update moodholder popover text
         $moodHolder
-            .popover({content:mood_current.reasons, trigger:'hover', placement:'bottom', html:true})
-            .css({backgroundColor: mood_current.color, color: mood_current.textColor});
-
+            .css({backgroundColor: mood_current.color, color: mood_current.textColor})
+            .data('bs.popover').options.content = mood_current.reasons;
     }
 
 
