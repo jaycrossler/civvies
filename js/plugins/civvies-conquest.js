@@ -3,19 +3,22 @@
     var _c = new Civvies('get_private_functions');
     var army_id_to_assign_to = 0;
 
-    var $pointers_conquest = {forces: [], lands: []};
+    var army_assignment_buttons = [-100, -10, -1, 'info', 1, 10, 100];
+
+    var $pointers_conquest = {armies: [], lands: []};
 //TODO: Save game after each battle round
-//TODO: Allow multiple armies
+//TODO: Have buttons to create or remove armies
+//TODO: Change messaging if troops are transferred in during battle to only show actual corpses, not -10 corpses
 //TODO: Take func_finish out and put string in so battles can be resumed mid-save
-//TODO: Have a delay up front for army moving out
+//TODO: Have a delay up front for army scouting, moving out and staging, to allow positioning troops
 
     _c.build_enemy_force_from_land_name = function (game, land_name, is_defensive) {
         var nick_name = _.str.titleize(land_name.title || land_name.name);
         var name;
         if (is_defensive) {
-            name = nick_name +"'s defensive militia";
+            name = nick_name + "'s defensive militia";
         } else {
-            name = "Invaders from a nearby "+ nick_name;
+            name = "Invaders from a nearby " + nick_name;
         }
 
         var min = (land_name.population_min / 20) * .9;
@@ -33,7 +36,7 @@
         return {land_name: land_name.name, name: name, army_size: Math.round(resistance), nick_name: nick_name, economy: resistance / 2, land_size: land_size};
     };
     _c.calculate_reward_after_battle = function (game, battle) {
-        var economy = Math.pow(battle.defender.economy, 1/2) / 2;
+        var economy = Math.pow(battle.defender.economy, 1 / 2) / 2;
         var chest = {resources: {food: Math.round(economy * 10)}, buildings: {}, populations: {}, upgrades: {}};
 
         var treasure_options = [];
@@ -126,6 +129,17 @@
         battle.history = battle.history || [];
 
         var battle_state = _.last(battle.history) || create_battle_state_from_battle(game, battle);
+
+        //If defender, check latest troop stats to see if any have died from infection or been bought/moved in
+        if (battle.player_state == 'defender') {
+            _.each(game.game_options.populations, function (job) {
+                if (job.can_join_army) {
+                    battle.defender[job.name] = game.data.populations[job.name] || 0;
+                    battle_state.defender[job.name] = game.data.populations[job.name] || 0;
+                }
+            });
+        }
+        //Fight a round of battle
         battle_state = _c.fight_using_battle_state(game, battle_state);
 
         if (game.data.tick_count > (battle.started + battle.tie_after_ticks)) {
@@ -174,13 +188,13 @@
             var you_won = (battle.player_state == battle_state.victor);
             if (you_won) {
                 game.data.achievements.victor = true;
-                msg += 'You won.  ';
+                msg += '<span style="color:green">You won.  </span>';
 
                 if (battle.attacker_size_initial > 500 && battle.defender_size_initial > 500) {
                     game.data.achievements.war = true;
                 }
             } else {
-                msg += 'You did not win.  ';
+                msg += '<span style="color:red">You did not win.  </span>';
             }
 
             //Increase disease
@@ -255,7 +269,7 @@
         });
     }
 
-    _c.army_size = function(game, army) {
+    _c.army_size = function (game, army) {
         if (army.army_size) return army.army_size;
         var count = 0;
         var army_units = _.filter(game.game_options.populations, function (f) {
@@ -270,7 +284,7 @@
         return count;
     };
 
-    _c.battle_result_details = function(game, battle_result) {
+    _c.battle_result_details = function (game, battle_result) {
         var texts = [];
         var colors = 'red,blue,green,black,orange,pink,grey,gold'.split(',');
 
@@ -282,7 +296,7 @@
             });
             _.each(army_units, function (unit_type, j) {
                 var unit = unit_type.name;
-                var text_pre = "<span style='color:"+(colors[j] || 'black')+"'>";
+                var text_pre = "<span style='color:" + (colors[j] || 'black') + "'>";
                 var text_post = "</span>";
                 if (state.attacker[unit]) {
 //                    troops_a.push(unit[0].toUpperCase()+": "+state.attacker[unit]);
@@ -293,11 +307,11 @@
 //                    troops_d.push(unit[0].toUpperCase()+": "+state.defender[unit]);
                 }
             });
-            var attacker_txt = _c.army_size(game,state.attacker);
+            var attacker_txt = _c.army_size(game, state.attacker);
             if (troops_a.length) {
                 attacker_txt += " (" + troops_a.join("/") + ")"
             }
-            var defender_txt = _c.army_size(game,state.defender);
+            var defender_txt = _c.army_size(game, state.defender);
             if (troops_d.length) {
                 defender_txt += " (" + troops_d.join("/") + ")"
             }
@@ -308,7 +322,7 @@
         });
 
         return "<span style='font-size: .8em'>" + texts.join("<br/>") + "</span>";
-    }
+    };
 
     function open_battle_chest(game, rewards, $holder) {
 
@@ -376,6 +390,98 @@
 
     }
 
+    function draw_an_army_controls(game, army, army_id, $holder) {
+        $pointers_conquest.armies[army_id] = $pointers_conquest.armies[army_id] || {};
+
+        var $army = $pointers_conquest.armies[army_id];
+        $army.army_holder = $('<div>')
+            .css({fontWeight: 'bold', border:'2px solid gold', borderRadius:'4px', padding:'8px', margin:'4px'})
+            .on('click', function(){
+                army_id_to_assign_to = army_id;
+                $army.army_holder
+                    .css({backgroundColor:'gold'});
+
+                _.each($pointers_conquest.armies, function ($army_other){
+                    if ($army_other != $army) {
+                        $army_other.army_holder
+                            .css({backgroundColor:''});
+                    }
+                })
+            })
+            .appendTo($holder);
+
+        $army.army_name = $('<span>')
+            .text(army.name || 'Your Army')
+            .popover({title: "Build up an invading armed force", content: "Transfer troops between your city and your army.", trigger: 'hover', placement: 'bottom'})
+            .appendTo($army.army_holder);
+
+        $army.army_note = $('<span>')
+            .text('')
+            .css({fontWeight: 'normal'})
+            .appendTo($army.army_holder);
+
+        $army.forces = $army.forces || {};
+        _.each(game.game_options.populations, function (job) {
+            if (job.can_join_army) {
+
+                army[job.name] = army[job.name] || 0;
+                $army.forces[job.name] = $army.forces[job.name] || {};
+
+                var amount = army[job.name];//game.data.populations[job.name];
+                var $unit = $('<div>')
+                    .appendTo($army.army_holder);
+
+                //Draw assignment buttons
+                _.each(army_assignment_buttons, function (amount) {
+                    var disabled = true;
+                    var text = '';
+                    var title = '';
+                    var button_text = '';
+                    var button_name = '';
+                    var unit_plural = Math.abs(amount) > 0 ? Helpers.pluralize(job.name) : job.name;
+
+                    if (amount != 'info' && amount > 0) {
+                        button_text = '+' + amount;
+                        text = 'Add ' + amount + ' to army';
+                        title = 'Add ' + amount + ' ' + unit_plural;
+                        button_name = 'add' + amount;
+                    } else if (amount != 'info') {
+                        button_text = amount;
+                        text = 'Remove ' + -amount + ' from army';
+                        title = 'Remove ' + -amount + ' ' + unit_plural;
+                        button_name = 'remove' + -amount;
+                    }
+
+                    if (amount == 'info') {
+                        var $div = $('<div>')
+                            .css({width: '120px', display: 'inline-block', textAlign: 'center'})
+                            .appendTo($unit);
+                        $('<span>')
+                            .text(_.str.titleize(job.title || job.name) + ": ")
+                            .appendTo($div);
+                        $army.forces[job.name].number = $('<span>')
+                            .text(amount)
+                            .addClass('number')
+                            .appendTo($div);
+
+                    } else {
+                        $army.forces[job.name][button_name] = $('<button>')
+                            .text(button_text)
+                            .popover({title: text, content: title, trigger: 'hover', placement: 'bottom'})
+                            .prop({disabled: disabled})
+                            .addClass('multiplier')
+                            .on('click', function () {
+                                assign_to_army(game, job, amount, army_id);
+                                _c.redraw_data(game);
+                            })
+                            .appendTo($unit);
+                    }
+                });
+            }
+        });
+        return $army;
+    }
+
     function build_ui_controls(game) {
         //Return a $ object that will be added to a div on the corresponding pane
         game.data.armies = game.data.armies || [];
@@ -383,110 +489,25 @@
         var $holder = $('<div>');
         $('<hr>').appendTo($holder);
 
+        $pointers_conquest.holder = $('<div>')
+            .appendTo($holder);
+
         _.each(game.data.armies, function (army, army_id) {
-
-            $pointers_conquest.armies = $pointers_conquest.armies || [];
-            $pointers_conquest.armies[army_id] = $pointers_conquest.armies[army_id] || {};
-            $pointers_conquest.armies[army_id].army_holder = $('<div>')
-                .css({fontWeight: 'bold'})
-                .popover({title: "Build up an invading armed force", content: "Transfer troops between your city and your army.", trigger: 'hover', placement: 'bottom'})
-                .appendTo($holder);
-
-            $pointers_conquest.armies[army_id].army_name = $('<span>')
-                .text(army.name || 'Your Army')
-                .appendTo($pointers_conquest.armies[army_id].army_holder);
-
-            $pointers_conquest.armies[army_id].army_note = $('<span>')
-                .text('')
-                .css({fontWeight: 'normal'})
-                .appendTo($pointers_conquest.armies[army_id].army_holder);
-
-            _.each(game.game_options.populations, function (job) {
-                if (job.can_join_army) {
-
-                    army[job.name] = army[job.name] || 0;
-                    $pointers_conquest.forces[job.name] = $pointers_conquest.forces[job.name] || {};
-
-                    var amount = army[job.name];//game.data.populations[job.name];
-                    var $unit = $('<div>')
-                        .appendTo($holder);
-
-                    $pointers_conquest.forces[job.name].remove100 = $('<button>')
-                        .text('-100')
-                        .popover({title: "Remove 100 from army", content: "Remove 100 " + job.name, trigger: 'hover', placement: 'bottom'})
-                        .prop({disabled: true})
-                        .addClass('multiplier')
-                        .on('click', function () {
-                            assign_to_army(game, job, -100, army_id_to_assign_to);
-                            _c.redraw_data(game);
-                        })
-                        .appendTo($unit);
-                    $pointers_conquest.forces[job.name].remove10 = $('<button>')
-                        .text('-10')
-                        .popover({title: "Remove 10 from army", content: "Remove 10 " + job.name, trigger: 'hover', placement: 'bottom'})
-                        .prop({disabled: true})
-                        .addClass('multiplier')
-                        .on('click', function () {
-                            assign_to_army(game, job, -10, army_id_to_assign_to);
-                            _c.redraw_data(game);
-                        })
-                        .appendTo($unit);
-                    $pointers_conquest.forces[job.name].remove1 = $('<button>')
-                        .text('-1')
-                        .popover({title: "Remove 1 from army", content: "Remove 1 " + job.name, trigger: 'hover', placement: 'bottom'})
-                        .prop({disabled: true})
-                        .addClass('multiplier')
-                        .on('click', function () {
-                            assign_to_army(game, job, -1, army_id_to_assign_to);
-                            _c.redraw_data(game);
-                        })
-                        .appendTo($unit);
-
-                    var $div = $('<div>')
-                        .css({width: '120px', display: 'inline-block', textAlign: 'center'})
-                        .appendTo($unit);
-
-                    $('<span>')
-                        .text(_.str.titleize(job.title || job.name) + ": ")
-                        .appendTo($div);
-                    $pointers_conquest.forces[job.name].number = $('<span>')
-                        .text(amount)
-                        .addClass('number')
-                        .appendTo($div);
-
-                    $pointers_conquest.forces[job.name].add1 = $('<button>')
-                        .text('+1')
-                        .popover({title: "Add 1 to army", content: "Add 1 " + job.name, trigger: 'hover', placement: 'bottom'})
-                        .prop({disabled: true})
-                        .addClass('multiplier')
-                        .on('click', function () {
-                            assign_to_army(game, job, 1, army_id_to_assign_to);
-                            _c.redraw_data(game);
-                        })
-                        .appendTo($unit);
-                    $pointers_conquest.forces[job.name].add10 = $('<button>')
-                        .text('+10')
-                        .popover({title: "Add 10 to army", content: "Add 10 " + job.name, trigger: 'hover', placement: 'bottom'})
-                        .prop({disabled: true})
-                        .addClass('multiplier')
-                        .on('click', function () {
-                            assign_to_army(game, job, 10, army_id_to_assign_to);
-                            _c.redraw_data(game);
-                        })
-                        .appendTo($unit);
-                    $pointers_conquest.forces[job.name].add100 = $('<button>')
-                        .text('+100')
-                        .popover({title: "Add 100 to army", content: "Add 100 " + job.name, trigger: 'hover', placement: 'bottom'})
-                        .prop({disabled: true})
-                        .addClass('multiplier')
-                        .on('click', function () {
-                            assign_to_army(game, job, 100, army_id_to_assign_to);
-                            _c.redraw_data(game);
-                        })
-                        .appendTo($unit);
-                }
-            });
+            draw_an_army_controls(game, army, army_id, $pointers_conquest.holder);
         });
+
+        var $taunt = $('<button>')
+            .text('Taunt your neighbors!')
+            .on('click', function(){
+                $taunt.css({color:'red'});
+                game.data.variables.enemiesAttacking = .3;
+                setTimeout(function(){
+                    game.data.variables.enemiesAttacking = .002;
+                }, 2000);
+                $taunt.css({color:''});
+
+            })
+            .appendTo($holder);
 
         $('<hr>').appendTo($holder);
         var $battle_holder = $('<div>').appendTo($holder);
@@ -580,7 +601,6 @@
             $pointers_conquest.lands[land_name.name].attack_details = $('<span>')
                 .html('')
                 .appendTo($land);
-
         });
 
         $('<hr>').appendTo($holder);
@@ -590,32 +610,40 @@
 
     function redraw_ui_controls(game) {
 
-        _.each(game.game_options.populations, function (job) {
-            if (job.can_join_army) {
-                var army = game.data.armies[army_id_to_assign_to] || {};
-                $pointers_conquest.forces[job.name].number.text(army[job.name]);
-
-                var current_at_city = game.data.populations[job.name] || 0;
-                var current_in_army = army[job.name] || 0;
-
-                _.each([-100, -10, -1, 1, 10, 100], function (amount) {
-                    if (amount > 0) {
-                        $pointers_conquest.forces[job.name]['add' + Math.abs(amount)]
-                            .prop({disabled: (current_at_city < amount)})
-                            .popover('hide');
-                    } else {
-                        $pointers_conquest.forces[job.name]['remove' + Math.abs(amount)]
-                            .prop({disabled: (current_in_army + amount < 0)})
-                            .popover('hide');
-                    }
-                });
-            }
-        });
-
-
-        var can_invade = true;
         _.each(game.data.armies, function (army, army_id) {
-            $pointers_conquest.armies[army_id].army_name.text(army.name || "Your Army");
+
+            var $army = $pointers_conquest.armies[army_id];
+
+            if (!$army || !$army.forces) {
+                //TODO: Draw the army control
+                $army = draw_an_army_controls(game, army, army_id, $pointers_conquest.holder);
+                debugger;
+            }
+
+            _.each(game.game_options.populations, function (job) {
+                if (job.can_join_army) {
+                    $army.forces[job.name].number.text(army[job.name]);
+
+                    var current_at_city = game.data.populations[job.name] || 0;
+                    var current_in_army = army[job.name] || 0;
+
+                    _.each(army_assignment_buttons, function (amount) {
+                        if (amount != 'info' && amount > 0) {
+                            $army.forces[job.name]['add' + Math.abs(amount)]
+                                .prop({disabled: (current_at_city < amount)})
+                                .popover('hide');
+                        } else if (amount != 'info') {
+                            $army.forces[job.name]['remove' + Math.abs(amount)]
+                                .prop({disabled: (current_in_army + amount < 0)})
+                                .popover('hide');
+                        }
+                    });
+                }
+            });
+
+
+            var can_invade = true;
+            $army.army_name.text(army.name || "Your Army");
 
             var note_text = '';
             var active_battle = _.find(game.data.battles, function (battle) {
@@ -636,14 +664,16 @@
                 note_text = " (size: " + army_count + ")";
             }
 
-            $pointers_conquest.armies[army_id].army_note.text(note_text);
+            $army.army_note.text(note_text);
+
+            //TODO: How to pick which Army is invading?
+            //TODO: Hide unrealistic losses
+            _.each(game.game_options.land_names, function (land_name) {
+                $pointers_conquest.lands[land_name.name].button.prop('disabled', (army_count < 1) || !can_invade);
+            });
+
         });
 
-        var army = game.data.armies[army_id_to_assign_to];
-        var army_count = _c.army_size(game, army);
-        _.each(game.game_options.land_names, function (land_name) {
-            $pointers_conquest.lands[land_name.name].button.prop('disabled', (army_count < 1) || !can_invade);
-        });
     }
 
 //--Build some specialized upgrades-------------
@@ -661,7 +691,7 @@
     var buildings = [
         {name: 'barracks', type: 'business', costs: {food: 20, wood: 60, stone: 120}, supports: {soldiers: 5}, upgrades: {fighting: true, masonry: true}},
         {name: 'stable', type: 'business', costs: {food: 60, wood: 60, stone: 120, leather: 10}, supports: {cavalry: 5}, upgrades: {fighting: true, horseback: true}},
-        {name: 'fortification', type: 'upgrade', costs: {stone: 100, metal:10}, supports: {gold: 1}, defense:{troops:"fortification_strength"}, notes: "Improves Defenses", upgrades: {palisade: true}}
+        {name: 'fortification', type: 'upgrade', costs: {stone: 100, metal: 10}, supports: {gold: 1}, defense: {troops: "fortification_strength"}, notes: "Improves Defenses", upgrades: {palisade: true}}
     ];
     new Civvies('add_game_option', 'buildings', buildings);
 
