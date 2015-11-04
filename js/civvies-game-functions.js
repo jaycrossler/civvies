@@ -588,7 +588,7 @@
             if (_.isString(rate_less)) rate_less = _c.variable(game,rate_less);
             rate -= (rate_less * amount);
         }
-        return rate;
+        return Helpers.round(rate,1);
     };
     _c.calculate_resource_rates = function (game) {
         var increments = {};

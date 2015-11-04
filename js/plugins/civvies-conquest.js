@@ -6,13 +6,14 @@
     var army_assignment_buttons = [-100, -10, -1, 'info', 1, 10, 100];
 
     var $pointers_conquest = {armies: [], lands: []};
-//TODO: Save game after each battle round
+
+//TODO: Save game after each battle round?
 //TODO: Have buttons to create or remove armies
 //TODO: Change messaging if troops are transferred in during battle to only show actual corpses, not -10 corpses
 //TODO: Take func_finish out and put string in so battles can be resumed mid-save
 //TODO: Have a delay up front for army scouting, moving out and staging, to allow positioning troops
 //TODO: Have cooldown timer on army attacking
-//TODO: Hide invasion buttons if army is attacking
+//TODO: Use barracks/stable counts to determine if can transfer soldiers back into town
 
     _c.build_enemy_force_from_land_name = function (game, land_name, is_defensive) {
         var nick_name = _.str.titleize(land_name.title || land_name.name);
@@ -413,9 +414,11 @@
             })
             .appendTo($holder);
 
+        var army_name = army.name || 'Your Army';
+        var msg = "Transfer troops between your city and " + army_name + ". When in the army, they no longer defend your lands, but also no longer require barracks or stables.";
         $army.army_name = $('<span>')
-            .text(army.name || 'Your Army')
-            .popover({title: "Build up an invading armed force", content: "Transfer troops between your city and your army.", trigger: 'hover', placement: 'bottom'})
+            .text(army_name)
+            .popover({title: "Build up an invading armed force", content: msg, trigger: 'hover', placement: 'bottom'})
             .appendTo($army.army_holder);
 
         $army.army_note = $('<span>')
