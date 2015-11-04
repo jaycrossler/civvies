@@ -1,4 +1,3 @@
-//TODO: Mood
 //TODO: Raising dead
 //TODO: Better show upgrades that you don't have - count and maybe small icons?  Move categories to the bottom?
 

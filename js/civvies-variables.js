@@ -66,9 +66,7 @@
         ],
         variables: [
             {name: "storageInitial", initial: 120},
-            {name: "happiness", initial: 1},
             {name: "farmers", initial: 1.2},
-            {name: "pestBonus", initial: 0},
             {name: "woodcutters", initial: 0.5},
             {name: "miners", initial: 0.2},
             {name: "tanners", initial: 0.5},

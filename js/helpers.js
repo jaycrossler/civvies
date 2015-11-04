@@ -187,6 +187,9 @@ Helpers.invertColor = function (hexTripletColor) {
 };
 Helpers.rgb2hex = function (rgb) {
     if (typeof rgb != "string") return rgb;
+    if (rgb[0] == "#") {
+        rgb = rgb.substr(1);
+    }
     function hex(x) {
         return ("0" + parseInt(x).toString(16)).slice(-2);
     }
