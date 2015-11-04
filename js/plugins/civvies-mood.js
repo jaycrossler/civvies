@@ -53,7 +53,7 @@
             mood -= .05;
             reasons.push("<span style='color:green'>Some illness</span>");
         } else {
-            mood += .05;
+            mood += .03;
             reasons.push("<span style='color:green'>Healthy population</span>");
         }
 
@@ -72,9 +72,8 @@
             mood -= .05;
             reasons.push("<span style='color:green'>Corpses need to be buried</span>");
         } else {
-            mood += .05;
+            mood += .03;
         }
-
 
         //Gain mood for each of last 3 battles won (but lose it for losses or in progress)
         var battles_to_check = 4;
@@ -107,11 +106,13 @@
         } else if (mood < .9) {
             data.text = 'Unhappy';
         } else if (mood < .95) {
-            data.text = 'Content';
+            data.text = 'Sad';
         } else if (mood < 1.05) {
-            data.text = 'Happy';
+            data.text = 'Content';
         } else if (mood < 1.1) {
             data.text = 'Good';
+        } else if (mood < 1.15) {
+            data.text = 'Happy';
         } else if (mood < 1.2) {
             data.text = 'Very Happy';
         } else if (mood < 1.3) {
@@ -128,7 +129,7 @@
         if (mood < 1) {
             reasons.push("<span style='color:red'>Workers produce less and fewer special resources are found.</span>");
         } else {
-            reasons.push("<span style='color:green'>Workers produce more and more special resources are found.</span>");
+            reasons.push("<span style='color:green'>Workers produce more and additional special resources are found.</span>");
         }
 
         data.color = Helpers.blendColors('red','blue', maths.clamp(mood / 1.5,0,1));
@@ -172,19 +173,16 @@
         if (set_to === undefined) {
             var amount = game.data.variables[var_name];
             var mood = game.data.variables.happiness || 1;
+            var mood_modifier = 1;
 
-            if (var_name == "farmers") {
-                amount *= (mood / 3);
-            } else if (var_name == "woodcutters") {
-                amount *= (mood / 3);
-            } else if (var_name == "miners") {
-                amount *= (mood / 3);
-            } else if (var_name == "foodSpecialChance") {
-                amount *= (mood / 4);
-            } else if (var_name == "woodSpecialChance") {
-                amount *= (mood / 4);
-            } else if (var_name == "stoneSpecialChance") {
-                amount *= (mood / 4);
+            if (var_name == "farmers" || var_name == "woodcutters" || var_name == "miners") {
+                mood_modifier = 3;
+            } else if (var_name == "foodSpecialChance" || var_name == "woodSpecialChance" || var_name == "stoneSpecialChance") {
+                mood_modifier = 4;
+            }
+            //Multiple some variables based on the positive or negative mood
+            if (mood_modifier > 1) {
+                amount += amount * ((mood-1) / mood_modifier);
             }
             return amount;
         } else {

@@ -11,6 +11,8 @@
 //TODO: Change messaging if troops are transferred in during battle to only show actual corpses, not -10 corpses
 //TODO: Take func_finish out and put string in so battles can be resumed mid-save
 //TODO: Have a delay up front for army scouting, moving out and staging, to allow positioning troops
+//TODO: Have cooldown timer on army attacking
+//TODO: Hide invasion buttons if army is attacking
 
     _c.build_enemy_force_from_land_name = function (game, land_name, is_defensive) {
         var nick_name = _.str.titleize(land_name.title || land_name.name);
@@ -63,9 +65,9 @@
                 treasure_options.push({type: 'populations', name: resource, amount: economy / 5});
             });
         }
-        _.each(buildings, function (resource) {
-            treasure_options.push({type: 'buildings', name: resource, amount: economy / 10});
-        });
+//        _.each(buildings, function (resource) {
+//            treasure_options.push({type: 'buildings', name: resource, amount: economy / 10});
+//        });
 
         for (i = 0; i < economy; i++) {
             var rand_item = _c.randOption(treasure_options, game.game_options);
@@ -407,6 +409,7 @@
                             .css({backgroundColor:''});
                     }
                 })
+                redraw_ui_controls(game);
             })
             .appendTo($holder);
 
@@ -590,6 +593,8 @@
             if (next && next.population_min) {
                 max = next.population_min / 10;
             }
+            $pointers_conquest.lands[land_name.name].min_defenders = min;
+
             var description = "A " + name + " has at least " + Helpers.abbreviateNumber(land_name.population_min) +
                 " citizens. They likely have between " + Helpers.abbreviateNumber(min) + " and " +
                 Helpers.abbreviateNumber(max) + " protectors";
@@ -610,12 +615,11 @@
 
     function redraw_ui_controls(game) {
 
+        var active_army_available_count = 0;
         _.each(game.data.armies, function (army, army_id) {
 
             var $army = $pointers_conquest.armies[army_id];
-
             if (!$army || !$army.forces) {
-                //TODO: Draw the army control
                 $army = draw_an_army_controls(game, army, army_id, $pointers_conquest.holder);
                 debugger;
             }
@@ -641,8 +645,6 @@
                 }
             });
 
-
-            var can_invade = true;
             $army.army_name.text(army.name || "Your Army");
 
             var note_text = '';
@@ -651,27 +653,33 @@
             });
 
             var army_count = _c.army_size(game, army);
-            if (active_battle && active_battle.attacker) {
+            if (active_battle) {
                 var last_round = _.last(active_battle.history);
                 if (last_round && last_round.time) {
                     var current_count = _c.army_size(game, active_battle.attacker);
                     army_count = active_battle.attacker_size_initial;
                     var round = last_round.time - active_battle.started;
-                    note_text = " (Attacking, casualties: " + current_count + " of " + army_count + ", round: " + round + ")";
+                    note_text = " (Attacking, survivors: " + current_count + " of " + army_count + ", round: " + round + ")";
                 }
-                can_invade = false;
+                if (army_id == army_id_to_assign_to) {
+                    active_army_available_count = 0;
+                }
             } else {
                 note_text = " (size: " + army_count + ")";
+                if (army_id == army_id_to_assign_to) {
+                    active_army_available_count = army_count;
+                }
             }
 
             $army.army_note.text(note_text);
+        });
 
-            //TODO: How to pick which Army is invading?
-            //TODO: Hide unrealistic losses
-            _.each(game.game_options.land_names, function (land_name) {
-                $pointers_conquest.lands[land_name.name].button.prop('disabled', (army_count < 1) || !can_invade);
-            });
+        //Show invade buttons for places that are possible wins for the selected army
+        _.each(game.game_options.land_names, function (land_name) {
+            var min_def = $pointers_conquest.lands[land_name.name].min_defenders;
+            var can_invade = (active_army_available_count <= min_def);
 
+            $pointers_conquest.lands[land_name.name].button.prop('disabled', can_invade);
         });
 
     }

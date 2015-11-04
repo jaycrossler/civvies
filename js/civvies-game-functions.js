@@ -73,7 +73,7 @@
         var costs = [];
         for (key in item.costs || {}) {
             var amount = item.costs[key];
-            if (_.isString(amount)) amount = game.data.variables[amount];
+            if (_.isString(amount)) amount = _c.variable(game, amount);
             amount *= times;
 
             var out = Helpers.abbreviateNumber(amount) + " ";
@@ -101,7 +101,7 @@
 
         for (key in item.costs || {}) {
             amount = item.costs[key];
-            if (_.isString(amount)) amount = game.data.variables[amount];
+            if (_.isString(amount)) amount = _c.variable(game,amount);
             amount *= times;
 
             out = Helpers.abbreviateNumber(amount) + " ";
@@ -117,7 +117,7 @@
         }
         for (key in item.consumes || {}) {
             amount = item.consumes[key];
-            if (_.isString(amount)) amount = game.data.variables[amount];
+            if (_.isString(amount)) amount = _c.variable(game,amount);
             amount *= times;
 
             out = Helpers.abbreviateNumber(amount) + " ";
@@ -133,7 +133,7 @@
         }
         for (key in item.benefits || {}) {
             amount = item.benefits[key];
-            if (_.isString(amount)) amount = game.data.variables[amount];
+            if (_.isString(amount)) amount = _c.variable(game,amount);
             amount *= times;
 
             out = Helpers.abbreviateNumber(amount) + " ";
@@ -149,7 +149,7 @@
         }
         for (key in item.produces || {}) {
             amount = item.produces[key];
-            if (_.isString(amount)) amount = game.data.variables[amount];
+            if (_.isString(amount)) amount = _c.variable(game,amount);
             amount *= times;
 
             out = Helpers.abbreviateNumber(amount) + " ";
@@ -165,7 +165,7 @@
         }
         for (key in item.supports || {}) {
             amount = item.supports[key];
-            if (_.isString(amount)) amount = game.data.variables[amount];
+            if (_.isString(amount)) amount = _c.variable(game,amount);
             amount *= times;
 
             out = Helpers.abbreviateNumber(amount) + " ";
@@ -341,7 +341,7 @@
             _.each(resource.chances || [], function (chance) {
                 var percent = chance.chance || 0.01;
                 if (_.isString(percent)) {
-                    percent = game.data.variables[percent];
+                    percent = _c.variable(game, percent);
                 }
                 if (_.isNumber(percent) && amount > 0) {
                     var num_special_resources = _c.randManyRolls(amount, percent, game.game_options);
@@ -411,7 +411,7 @@
         });
         pop.land_max = Math.round(land_size);
 
-        var highest_pop = game.data.variables.highest_population || 0;
+        var highest_pop = _c.variable(game,'highest_population') || 0;
         if (pop.current > highest_pop) {
             _c.update_highest_population(game, pop.current);
         }
@@ -425,23 +425,23 @@
         return pop;
     };
     _c.update_highest_population = function (game, current) {
-        game.data.variables.highest_population = current;
+        _c.variable(game,'highest_population', current);
         var city_type = _c.redraw_city_honorific(game);
         game.data.achievements[city_type] = true;
     };
 
     _c.redraw_city_honorific = function (game) {
-        var current = game.data.variables.highest_population || 1;
+        var current = _c.variable(game,'highest_population') || 1;
         var city_type = 'Thorp';
         _.each(game.game_options.land_names, function (land_name) {
             if (current >= land_name.population_min) {
                 city_type = land_name.name;
             }
         });
-        game.data.variables.land_name = _.str.titleize(city_type.title || city_type);
+        _c.variable(game,'land_name', _.str.titleize(city_type.title || city_type));
 
         $('#civType')
-            .text(game.data.variables.land_name);
+            .text(_c.variable(game,'land_name'));
 
         return city_type;
     };
@@ -561,16 +561,16 @@
             if (upgrade.variable_increase) {
                 for (var val in upgrade.variable_increase) {
                     var inc_amount = upgrade.variable_increase[val];
-                    if (game.data.variables[val] === undefined) {
-                        game.data.variables[val] = inc_amount;
+                    if (_c.variable(game, val) === undefined) {
+                        _c.variable(game, val, inc_amount);
                     } else {
-                        game.data.variables[val] += inc_amount;
+                        _c.variable(game, val, game.data.variables[val] + inc_amount);
                     }
                 }
             }
             if (upgrade.variable_set) {
                 for (var val in upgrade.variable_increase) {
-                    game.data.variables[val] = upgrade.variable_increase[val];
+                    _c.variable(game, val, upgrade.variable_increase[val]);
                 }
             }
         }
@@ -579,13 +579,13 @@
         var rate = 0;
         if (amount && job.produces && job.produces[resource.name]) {
             var rate_per = job.produces[resource.name];
-            if (_.isString(rate_per)) rate_per = game.data.variables[rate_per];
+            if (_.isString(rate_per)) rate_per = _c.variable(game, rate_per);
             rate += (rate_per * amount);
         }
 
         if (amount && job.consumes && job.consumes[resource.name]) {
             var rate_less = job.consumes[resource.name];
-            if (_.isString(rate_less)) rate_less = game.data.variables[rate_less];
+            if (_.isString(rate_less)) rate_less = _c.variable(game,rate_less);
             rate -= (rate_less * amount);
         }
         return rate;

@@ -61,8 +61,7 @@
             {name: 'tanners', type: 'medieval', consumes: {skins: 1}, produces: {leather: "tanners"}},
             {name: 'blacksmiths', type: 'medieval', consumes: {ore: 1}, produces: {metal: "blacksmiths"}},
             {name: 'apothecaries', type: 'medieval', consumes: {herbs: 1}, produces: {healing: "apothecaries"}},
-            {name: 'clerics', type: 'medieval', consumes: {food: 2, herbs: 1}, supports: {healing: "clerics", burying: .2}, produces: {piety: "clerics"}, cull_order: 6},
-            {name: 'labourers', type: 'medieval', consumes: {herbs: 10, leather: 10, metal: 10, piety: 10}, produces: {wonder: 1}, cull_order: 2}
+            {name: 'clerics', type: 'medieval', consumes: {food: 2, herbs: 1}, supports: {healing: "clerics", burying: .2}, produces: {piety: "clerics"}, cull_order: 6}
         ],
         variables: [
             {name: "storageInitial", initial: 120},
