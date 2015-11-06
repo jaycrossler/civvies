@@ -2,6 +2,7 @@ var Civvies = (function ($, _, Helpers, maths) {
     //Uses jquery and Underscore
 
     //TODO: Allow all plugins to be turned on and off dynamically
+    //TODO: Move all Rand functions to Helpers and pass in a custom random() function
     //-----------------------------
     //Private Global variables
     var version = '0.0.3',

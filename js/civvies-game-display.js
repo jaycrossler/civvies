@@ -1,4 +1,10 @@
 (function (Civvies) {
+//TODO: Buttons hard to push on ios
+//TODO: Mouseovers for main resources get in the way
+//TODO: Rates don't seem to take consumption into account
+//TODO: Don't have enemies attack until town above a certain size
+//TODO: With of job buying buttons weird on iOS
+//TODO: Save and settings buttons not working on iOS
 
     var $pointers = {};
 
@@ -119,7 +125,8 @@
             }
 
             if (resource.$rate) {
-                var res_rate = Helpers.abbreviateNumber(rates[resource.name]) || 0;
+                var res_rate = Helpers.round(rates[resource.name],1) || 0;
+                res_rate = Helpers.abbreviateNumber(res_rate);
                 var rate_text;
                 if (res_rate < 0) {
                     rate_text = '<span style="color:red">' + res_rate + '/s';

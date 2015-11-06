@@ -137,8 +137,6 @@
             {name: "empire", category:"basic", order:11},
 
             {name: "engineer", category:"city"},
-            {name: "hated", category:"city"}, //TODO
-            {name: "loved", category:"city"}, //TODO
             {name: "ghostTown", title: "Ghost Town", category:"city"}
         ],
         land: [

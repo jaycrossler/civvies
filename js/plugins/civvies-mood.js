@@ -97,6 +97,7 @@
 
         if (mood < .5) {
             data.text = 'Terrible';
+            game.data.achievements.hated = true;
         } else if (mood < .6) {
             data.text = 'Horrible';
         } else if (mood < .7) {
@@ -122,7 +123,8 @@
         } else if (mood < 1.5) {
             data.text = 'Excellent';
         } else {
-            data.text = 'Wonderful'
+            data.text = 'Wonderful';
+            game.data.achievements.loved = true;
         }
 
         reasons.push("<hr/><i>Mood amount: " + Helpers.round(mood,2) + "</i>");
@@ -194,5 +196,8 @@
 
     new Civvies('add_game_option', 'functions_on_setup', build_mood_controls);
     new Civvies('add_game_option', 'functions_each_tick', redraw_mood);
+
+    new Civvies('add_game_option', 'achievements', {name: "hated", category:"city"});
+    new Civvies('add_game_option', 'achievements', {name: "loved", category:"city"});
 
 })(Civvies);

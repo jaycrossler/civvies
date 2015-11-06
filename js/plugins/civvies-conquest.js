@@ -7,6 +7,7 @@
 
     var $pointers_conquest = {armies: [], lands: []};
 
+//TODO: If battle chest hasn't opened after 30 seconds, open it?
 //TODO: Save game after each battle round?
 //TODO: Have buttons to create or remove armies
 //TODO: Change messaging if troops are transferred in during battle to only show actual corpses, not -10 corpses
